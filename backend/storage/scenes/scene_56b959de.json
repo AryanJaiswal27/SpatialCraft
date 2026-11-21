@@ -1,0 +1,577 @@
+{
+  "scene_id": "scene_56b959de",
+  "name": "Reconstructed Room",
+  "image_url": "/api/uploads/scene_56b959de_1795284735.jpg",
+  "room": {
+    "dimensions": {
+      "width": 3.6,
+      "height": 2.9,
+      "depth": 3.6
+    },
+    "floor": {
+      "material": "glossy_ceramic_tile",
+      "color": "#d8dad7",
+      "texture_url": null
+    },
+    "walls": {
+      "material": "matte_plaster",
+      "color": "#d9dcd8",
+      "texture_url": null
+    },
+    "ceiling": {
+      "material": "plaster",
+      "color": "#fafafa",
+      "texture_url": null
+    }
+  },
+  "objects": [
+    {
+      "id": "obj_desk_1",
+      "name": "Light Oak Executive Office Desk",
+      "category": "table",
+      "description": "Rectangular light oak laminate office desk with full-height side panels, positioned perpendicular to the left wall",
+      "position": {
+        "x": -0.95,
+        "y": 0.375,
+        "z": 0.05
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 1.65,
+        "height": 0.75,
+        "depth": 0.78
+      },
+      "color": "#c6a682",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_desk_1.jpg",
+      "box_2d": [
+        0.54,
+        0.26,
+        1.0,
+        0.76
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_cabinet_1",
+      "name": "Window-Wall Low Storage Credenza",
+      "category": "bookshelf",
+      "description": "Long light oak laminate low storage cabinet with top drawers and lower hinged doors running along the window wall",
+      "position": {
+        "x": 0.15,
+        "y": 0.375,
+        "z": -1.55
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 2.3,
+        "height": 0.75,
+        "depth": 0.5
+      },
+      "color": "#c2a27e",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_cabinet_1.jpg",
+      "box_2d": [
+        0.5,
+        0.65,
+        0.91,
+        1.0
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_cabinet_2",
+      "name": "Side Return Storage Cabinet",
+      "category": "bookshelf",
+      "description": "Matching light oak laminate side credenza connecting the main desk area to the corner along the left wall",
+      "position": {
+        "x": -1.55,
+        "y": 0.375,
+        "z": -1.15
+      },
+      "rotation": {
+        "yaw": 90.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.5,
+        "height": 0.75,
+        "depth": 1.3
+      },
+      "color": "#c2a27e",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_cabinet_2.jpg",
+      "box_2d": [
+        0.49,
+        0.43,
+        0.65,
+        0.66
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_chair_1",
+      "name": "Foreground Grey Mesh Visitor Chair",
+      "category": "chair",
+      "description": "Ergonomic grey mesh-back office chair with light grey upholstered seat, black curved armrests, and swivel base",
+      "position": {
+        "x": -0.7,
+        "y": 0.48,
+        "z": 0.85
+      },
+      "rotation": {
+        "yaw": 155.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.62,
+        "height": 0.96,
+        "depth": 0.6
+      },
+      "color": "#8c9091",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_chair_1.jpg",
+      "box_2d": [
+        0.64,
+        0.11,
+        1.0,
+        0.39
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_chair_2",
+      "name": "Plastic-Wrapped Grey Mesh Visitor Chair",
+      "category": "chair",
+      "description": "Matching ergonomic grey mesh office chair covered in protective clear plastic wrapping near the left wall",
+      "position": {
+        "x": -1.35,
+        "y": 0.48,
+        "z": 0.75
+      },
+      "rotation": {
+        "yaw": 140.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.62,
+        "height": 0.96,
+        "depth": 0.6
+      },
+      "color": "#9a9e9f",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_chair_2.jpg",
+      "box_2d": [
+        0.58,
+        0.01,
+        0.96,
+        0.27
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_chair_3",
+      "name": "Executive Mesh Swivel Chair",
+      "category": "chair",
+      "description": "Ergonomic grey mesh-back swivel office chair with black armrests positioned behind the main desk",
+      "position": {
+        "x": -0.75,
+        "y": 0.5,
+        "z": -0.62
+      },
+      "rotation": {
+        "yaw": -15.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.64,
+        "height": 1.0,
+        "depth": 0.62
+      },
+      "color": "#7b7e7f",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_chair_3.jpg",
+      "box_2d": [
+        0.51,
+        0.56,
+        0.71,
+        0.75
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_decor_1",
+      "name": "Silver Laptop",
+      "category": "decor",
+      "description": "Open 15-inch silver clamshell laptop resting at the center of the main office desk",
+      "position": {
+        "x": -0.82,
+        "y": 0.87,
+        "z": 0.08
+      },
+      "rotation": {
+        "yaw": 180.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.36,
+        "height": 0.24,
+        "depth": 0.25
+      },
+      "color": "#b8bcc0",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_decor_1.jpg",
+      "box_2d": [
+        0.61,
+        0.42,
+        0.76,
+        0.59
+      ],
+      "attached_to_id": "obj_desk_1",
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_decor_2",
+      "name": "Compact Laser Printer",
+      "category": "decor",
+      "description": "Black and silver desktop monochrome laser printer with open paper output tray on the far left of the desk",
+      "position": {
+        "x": -1.48,
+        "y": 0.875,
+        "z": -0.05
+      },
+      "rotation": {
+        "yaw": 90.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.36,
+        "height": 0.25,
+        "depth": 0.32
+      },
+      "color": "#2f3235",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_decor_2.jpg",
+      "box_2d": [
+        0.49,
+        0.31,
+        0.61,
+        0.43
+      ],
+      "attached_to_id": "obj_desk_1",
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_decor_3",
+      "name": "Black Office Landline Telephone",
+      "category": "decor",
+      "description": "Standard black corded desk telephone with keypad and handset resting on the side return cabinet",
+      "position": {
+        "x": -1.52,
+        "y": 0.83,
+        "z": -0.78
+      },
+      "rotation": {
+        "yaw": 75.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.2,
+        "height": 0.16,
+        "depth": 0.22
+      },
+      "color": "#222426",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_decor_3.jpg",
+      "box_2d": [
+        0.48,
+        0.45,
+        0.56,
+        0.51
+      ],
+      "attached_to_id": "obj_cabinet_2",
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_decor_4",
+      "name": "Black Laptop Backpack",
+      "category": "decor",
+      "description": "Soft black fabric backpack with grey shoulder straps lying flat on top of the window-wall credenza",
+      "position": {
+        "x": -0.05,
+        "y": 0.85,
+        "z": -1.52
+      },
+      "rotation": {
+        "yaw": 10.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.45,
+        "height": 0.2,
+        "depth": 0.34
+      },
+      "color": "#232528",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_decor_4.jpg",
+      "box_2d": [
+        0.48,
+        0.68,
+        0.62,
+        0.85
+      ],
+      "attached_to_id": "obj_cabinet_1",
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_decor_5",
+      "name": "Stainless Steel Water Bottle",
+      "category": "decor",
+      "description": "Tall cylindrical brushed stainless steel insulated water bottle standing on the right side of the credenza",
+      "position": {
+        "x": 0.55,
+        "y": 0.89,
+        "z": -1.52
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.08,
+        "height": 0.28,
+        "depth": 0.08
+      },
+      "color": "#a8abae",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_decor_5.jpg",
+      "box_2d": [
+        0.46,
+        0.87,
+        0.57,
+        0.91
+      ],
+      "attached_to_id": "obj_cabinet_1",
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_decor_6",
+      "name": "Wooden Award Plaque",
+      "category": "decor",
+      "description": "Circular polished brown wooden trophy plaque standing on the side return cabinet near the wall",
+      "position": {
+        "x": -1.58,
+        "y": 0.86,
+        "z": -1.15
+      },
+      "rotation": {
+        "yaw": 60.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.15,
+        "height": 0.22,
+        "depth": 0.08
+      },
+      "color": "#7c522b",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_decor_6.jpg",
+      "box_2d": [
+        0.44,
+        0.52,
+        0.51,
+        0.55
+      ],
+      "attached_to_id": "obj_cabinet_2",
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_decor_7",
+      "name": "Stack of Office Folders and Books",
+      "category": "decor",
+      "description": "Neat stack of yellow, blue, and red binders and reference folders placed in the far corner of the credenza",
+      "position": {
+        "x": -1.15,
+        "y": 0.81,
+        "z": -1.52
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.42,
+        "height": 0.12,
+        "depth": 0.32
+      },
+      "color": "#d8c356",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_decor_7.jpg",
+      "box_2d": [
+        0.45,
+        0.58,
+        0.52,
+        0.7
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_decor_8",
+      "name": "Black Smartphone",
+      "category": "decor",
+      "description": "Matte black smartphone lying face down next to the laptop on the main desk",
+      "position": {
+        "x": -0.52,
+        "y": 0.76,
+        "z": 0.16
+      },
+      "rotation": {
+        "yaw": 25.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.08,
+        "height": 0.015,
+        "depth": 0.16
+      },
+      "color": "#1e2022",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_decor_8.jpg",
+      "box_2d": [
+        0.73,
+        0.58,
+        0.78,
+        0.64
+      ],
+      "attached_to_id": "obj_desk_1",
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_decor_9",
+      "name": "Dark Printed Magazine",
+      "category": "decor",
+      "description": "Flat dark-covered magazine or brochure resting on the far right end of the window-wall credenza",
+      "position": {
+        "x": 0.88,
+        "y": 0.76,
+        "z": -1.52
+      },
+      "rotation": {
+        "yaw": 15.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.24,
+        "height": 0.02,
+        "depth": 0.3
+      },
+      "color": "#383b3e",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_decor_9.jpg",
+      "box_2d": [
+        0.56,
+        0.89,
+        0.61,
+        1.0
+      ],
+      "attached_to_id": "obj_cabinet_1",
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_art_1",
+      "name": "Printed Wall Schedule Sheet",
+      "category": "art",
+      "description": "Single white A4 printed tabular schedule taped to the left wall above the side return cabinet",
+      "position": {
+        "x": -1.79,
+        "y": 1.38,
+        "z": -0.95
+      },
+      "rotation": {
+        "yaw": 90.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.01,
+        "height": 0.3,
+        "depth": 0.21
+      },
+      "color": "#e2e4e6",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_56b959de_obj_art_1.jpg",
+      "box_2d": [
+        0.35,
+        0.48,
+        0.45,
+        0.52
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    }
+  ],
+  "created_at": "2026-11-21T23:44:07.866587",
+  "updated_at": "2026-11-21T23:44:07.866587",
+  "status": "ready",
+  "status_message": "Scene reconstructed successfully"
+}

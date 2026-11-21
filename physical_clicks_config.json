@@ -30,8 +30,8 @@
     },
     "antigravity_header": {
       "name": "05. ANTIGRAVITY WINDOW / TOP HEADER",
-      "x": 0,
-      "y": 0,
+      "x": 340,
+      "y": 1053,
       "description": "Hover over the top title bar or tab header of this Antigravity IDE window.\nAntigravity clicks here to bring the IDE window to the top/foreground."
     },
     "ide_chat_box": {
@@ -47,5 +47,5 @@
     "llm_generation_timeout": 120.0,
     "move_duration": 0.4
   },
-  "last_calibrated_at": "2026-11-21T23:24:20.879978"
+  "last_calibrated_at": "2026-11-21T23:41:16.642789"
 }
