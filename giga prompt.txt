@@ -1,0 +1,10 @@
+we want to build a project related to building 3d models of objects(mostly furniture in a room) from a single image using AI.
+it should recreate the 3d room with the furniture and objects in their original positions. it should also have a feature where user can change the position of objects and the objects should be updated in the 3d model.  
+user should be able to prompt to change the 3d model. user have ability to add or remove or change position of 3d models.
+
+it should be a website on phone, accessed over public internet. user should be able to upload images of room. then the photos should come here in this folder, given to a llm in a website(deepseek, chatgpt, gemini,claude), then take the output from the llms, give it to this antigravity to convert them into files. then display on mobile. the models should be very detailed.
+
+No. i want you physically click buttons, paste images and prompt in the browser window in which llm is opened
+
+make this.
+

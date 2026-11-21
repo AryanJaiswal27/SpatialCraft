@@ -1,0 +1,77 @@
+JSON
+{
+  "room": {
+    "dimensions": { "width": 5.0, "height": 2.8, "depth": 5.0 },
+    "floor": { "material": "light_oak_wood_parquet", "color": "#c4a482" },
+    "walls": { "material": "matte_plaster", "color": "#f2efe9" },
+    "ceiling": { "material": "matte_plaster", "color": "#fafafa" }
+  },
+  "objects": [
+    {
+      "id": "obj_sofa_1",
+      "name": "Modern Grey Three-Seater Sofa",
+      "category": "sofa",
+      "description": "Contemporary low-profile fabric sofa with deep seat cushions and brushed metal legs",
+      "position": { "x": 0.0, "y": 0.425, "z": -1.2 },
+      "dimensions": { "width": 2.2, "height": 0.85, "depth": 0.95 },
+      "rotation": { "yaw": 0.0 },
+      "color": "#6e737b",
+      "box_2d": [0.45, 0.20, 0.78, 0.80]
+    },
+    {
+      "id": "obj_rug_1",
+      "name": "Large Wool Area Rug",
+      "category": "rug",
+      "description": "Off-white textured woven wool area rug centered under the seating arrangement",
+      "position": { "x": 0.0, "y": 0.01, "z": -0.6 },
+      "dimensions": { "width": 2.6, "height": 0.02, "depth": 2.0 },
+      "rotation": { "yaw": 0.0 },
+      "color": "#e5e2dc",
+      "box_2d": [0.65, 0.15, 0.90, 0.85]
+    },
+    {
+      "id": "obj_table_1",
+      "name": "Minimalist Wooden Coffee Table",
+      "category": "table",
+      "description": "Rectangular solid oak coffee table with rounded edges",
+      "position": { "x": 0.0, "y": 0.225, "z": -0.3 },
+      "dimensions": { "width": 1.2, "height": 0.45, "depth": 0.6 },
+      "rotation": { "yaw": 0.0 },
+      "color": "#b58d63",
+      "box_2d": [0.60, 0.30, 0.82, 0.70]
+    },
+    {
+      "id": "obj_tv_unit_1",
+      "name": "Floating Media Console",
+      "category": "tv_unit",
+      "description": "Wall-mounted walnut media console with slatted cabinet doors",
+      "position": { "x": 0.0, "y": 0.3, "z": 2.3 },
+      "dimensions": { "width": 2.0, "height": 0.4, "depth": 0.4 },
+      "rotation": { "yaw": 180.0 },
+      "color": "#5c4033",
+      "box_2d": [0.40, 0.25, 0.65, 0.75]
+    },
+    {
+      "id": "obj_plant_1",
+      "name": "Fiddle Leaf Fig Plant",
+      "category": "plant",
+      "description": "Large potted indoor fiddle leaf fig in a ceramic white planter",
+      "position": { "x": -1.8, "y": 0.75, "z": -1.8 },
+      "dimensions": { "width": 0.6, "height": 1.5, "depth": 0.6 },
+      "rotation": { "yaw": 15.0 },
+      "color": "#3b5323",
+      "box_2d": [0.25, 0.05, 0.75, 0.25]
+    },
+    {
+      "id": "obj_lamp_1",
+      "name": "Arching Floor Lamp",
+      "category": "lamp",
+      "description": "Modern matte black metal arching floor lamp with dome shade",
+      "position": { "x": 1.9, "y": 1.05, "z": -1.5 },
+      "dimensions": { "width": 0.5, "height": 2.1, "depth": 1.2 },
+      "rotation": { "yaw": -45.0 },
+      "color": "#222222",
+      "box_2d": [0.10, 0.75, 0.75, 0.95]
+    }
+  ]
+}

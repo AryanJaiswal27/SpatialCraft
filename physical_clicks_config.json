@@ -1,0 +1,45 @@
+{
+  "screen": {
+    "width": 1920,
+    "height": 1080
+  },
+  "targets": {
+    "browser_tab": {
+      "name": "01. BROWSER TAB / HEADER",
+      "x": 386,
+      "y": 1051,
+      "description": "Hover over your browser tab header (e.g. ChatGPT, Gemini, Claude tab).\nAntigravity clicks here to bring your browser window to the foreground."
+    },
+    "prompt_box": {
+      "name": "02. CHAT COMPOSER / PROMPT BOX",
+      "x": 963,
+      "y": 949,
+      "description": "Hover inside the message composer textarea.\nAntigravity clicks here to paste images (Ctrl+V) and paste CAD prompts."
+    },
+    "send_button": {
+      "name": "03. SEND / SUBMIT BUTTON",
+      "x": 1399,
+      "y": 946,
+      "description": "Hover over the send arrow / submit button.\nAntigravity clicks here to dispatch prompts to the LLM."
+    },
+    "copy_button": {
+      "name": "04. COPY RESPONSE BUTTON",
+      "x": 856,
+      "y": 876,
+      "description": "Hover over the copy response icon at the bottom of the LLM output.\nAntigravity clicks here to extract the generated 3D CAD data."
+    },
+    "ide_chat_box": {
+      "name": "05. ANTIGRAVITY IDE CHAT INPUT",
+      "x": 1270,
+      "y": 915,
+      "description": "Hover inside the chat input box at the bottom of this Antigravity IDE window.\nAntigravity clicks here to paste the browser's LLM response directly into this chat."
+    }
+  },
+  "delays": {
+    "click_settle": 0.3,
+    "image_upload_settle": 3.0,
+    "llm_generation_timeout": 45.0,
+    "move_duration": 0.4
+  },
+  "last_calibrated_at": "2026-11-21T23:24:20.879978"
+}

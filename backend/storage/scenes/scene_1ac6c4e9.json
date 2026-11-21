@@ -1,0 +1,1013 @@
+{
+  "scene_id": "scene_1ac6c4e9",
+  "name": "Reconstructed Room",
+  "image_url": "/api/uploads/scene_1ac6c4e9_1794400879.jpg",
+  "room": {
+    "dimensions": {
+      "width": 4.2,
+      "height": 2.8,
+      "depth": 3.8
+    },
+    "floor": {
+      "material": "light_grey_ceramic_tiles",
+      "color": "#d4d4ce",
+      "texture_url": null
+    },
+    "walls": {
+      "material": "smooth_matte_plaster",
+      "color": "#eeefeb",
+      "texture_url": null
+    },
+    "ceiling": {
+      "material": "plaster",
+      "color": "#fafafa",
+      "texture_url": null
+    }
+  },
+  "objects": [
+    {
+      "id": "obj_main_desk",
+      "name": "Large Light Oak Office Desk",
+      "category": "table",
+      "description": "Large rectangular executive office desk with a thick light oak laminate tabletop and matching wooden front and side panels.",
+      "position": {
+        "x": 2.322668503685866,
+        "y": 0.38,
+        "z": 0.5325833117743501
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 2.35,
+        "height": 0.76,
+        "depth": 1.25
+      },
+      "color": "#c4a276",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_main_desk.jpg",
+      "box_2d": [
+        0.57,
+        0.25,
+        0.94,
+        0.77
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_back_storage_desk",
+      "name": "Back Wall Wooden Storage Counter",
+      "category": "table",
+      "description": "Long light oak wooden office counter positioned against the rear wall beneath the window, featuring multiple built-in drawers, lower storage cabinets, metal handles and an open drawer.",
+      "position": {
+        "x": -0.07733149631413366,
+        "y": 1.17,
+        "z": 0.5325833117743501
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 3.25,
+        "height": 0.82,
+        "depth": 0.6
+      },
+      "color": "#b99a70",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_back_storage_desk.jpg",
+      "box_2d": [
+        0.48,
+        0.42,
+        0.89,
+        1.0
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_executive_chair",
+      "name": "Grey Mesh Executive Office Chair",
+      "category": "chair",
+      "description": "Ergonomic grey mesh-back office chair with black armrests, padded seat, adjustable height and five-wheel base, positioned behind the main desk.",
+      "position": {
+        "x": 0.35,
+        "y": 0.52,
+        "z": -0.15
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.68,
+        "height": 1.04,
+        "depth": 0.68
+      },
+      "color": "#777b7b",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_executive_chair.jpg",
+      "box_2d": [
+        0.5,
+        0.55,
+        0.72,
+        0.69
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_visitor_chair_1",
+      "name": "Grey Mesh Visitor Office Chair",
+      "category": "chair",
+      "description": "Grey ergonomic mesh-back visitor chair with curved black armrests, padded seat and black five-star caster base, positioned in the left foreground.",
+      "position": {
+        "x": -0.631399890430135,
+        "y": 0.52,
+        "z": 1.7080981738865884
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.68,
+        "height": 1.04,
+        "depth": 0.7
+      },
+      "color": "#777b7b",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_visitor_chair_1.jpg",
+      "box_2d": [
+        0.61,
+        0.1,
+        1.0,
+        0.4
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_visitor_chair_2",
+      "name": "Plastic Wrapped Office Chair",
+      "category": "chair",
+      "description": "Grey upholstered office chair with black armrests and wheeled base, partially covered in transparent protective plastic, positioned behind the other visitor chair.",
+      "position": {
+        "x": -1.507732105936895,
+        "y": 0.52,
+        "z": 1.6336886717167154
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.65,
+        "height": 1.02,
+        "depth": 0.68
+      },
+      "color": "#a5a7a3",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_visitor_chair_2.jpg",
+      "box_2d": [
+        0.57,
+        0.0,
+        0.91,
+        0.15
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_window",
+      "name": "Large Black Metal Grilled Window",
+      "category": "decor",
+      "description": "Large rectangular sliding window with dark grey metal frame, multiple horizontal and vertical security bars, translucent daylight-facing glass and a projecting grey stone or metal sill.",
+      "position": {
+        "x": 0.85,
+        "y": 2.05,
+        "z": -1.85
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 2.4,
+        "height": 1.5,
+        "depth": 0.1
+      },
+      "color": "#454b4b",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_window.jpg",
+      "box_2d": [
+        0.0,
+        0.64,
+        0.51,
+        1.0
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_printer",
+      "name": "Multifunction Office Laser Printer",
+      "category": "decor",
+      "description": "Compact black and silver multifunction office laser printer with document feeder, control panel and white paper output tray, placed on the rear-left portion of the main desk.",
+      "position": {
+        "x": -0.95,
+        "y": 0.91,
+        "z": 0.08
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.43,
+        "height": 0.3,
+        "depth": 0.38
+      },
+      "color": "#6c7070",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_printer.jpg",
+      "box_2d": [
+        0.49,
+        0.3,
+        0.61,
+        0.44
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_laptop",
+      "name": "Silver HP Laptop",
+      "category": "decor",
+      "description": "Open silver HP laptop with black keyboard, large display and visible HP logo on the back of the screen, placed near the center of the main desk.",
+      "position": {
+        "x": -0.12,
+        "y": 0.78,
+        "z": 0.62
+      },
+      "rotation": {
+        "yaw": -0.3,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.34,
+        "height": 0.04,
+        "depth": 0.25
+      },
+      "color": "#aeb9c2",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_laptop.jpg",
+      "box_2d": [
+        0.61,
+        0.42,
+        0.77,
+        0.6
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_smartphone",
+      "name": "Black Smartphone",
+      "category": "decor",
+      "description": "Small black rectangular smartphone with dark glass screen lying flat on the right side of the main desk.",
+      "position": {
+        "x": 2.323,
+        "y": 0.766,
+        "z": 0.533
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.08,
+        "height": 0.012,
+        "depth": 0.16
+      },
+      "color": "#17191c",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_smartphone.jpg",
+      "box_2d": [
+        0.73,
+        0.58,
+        0.78,
+        0.64
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_landline_phone",
+      "name": "Black Office Landline Telephone",
+      "category": "decor",
+      "description": "Black corded office desk telephone with numeric keypad, small digital display, handset and coiled telephone cable, positioned on the rear storage counter.",
+      "position": {
+        "x": -0.58,
+        "y": 0.97,
+        "z": -1.43
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.24,
+        "height": 0.28,
+        "depth": 0.23
+      },
+      "color": "#282c30",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_landline_phone.jpg",
+      "box_2d": [
+        0.46,
+        0.44,
+        0.57,
+        0.52
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_award_1",
+      "name": "Transparent Acrylic Award",
+      "category": "decor",
+      "description": "Small transparent acrylic commemorative award or plaque with a circular decorative design, standing upright on the rear storage counter.",
+      "position": {
+        "x": -0.25,
+        "y": 0.94,
+        "z": -1.43
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.17,
+        "height": 0.25,
+        "depth": 0.06
+      },
+      "color": "#c7c5b8",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_award_1.jpg",
+      "box_2d": [
+        0.45,
+        0.49,
+        0.52,
+        0.53
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_award_2",
+      "name": "Golden Wooden Trophy Plaque",
+      "category": "decor",
+      "description": "Small oval golden award plaque mounted on a dark brown wooden base, displayed upright on the rear storage counter.",
+      "position": {
+        "x": 0.0,
+        "y": 0.99,
+        "z": -1.43
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.15,
+        "height": 0.3,
+        "depth": 0.09
+      },
+      "color": "#bd8d32",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_award_2.jpg",
+      "box_2d": [
+        0.44,
+        0.52,
+        0.51,
+        0.55
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_photo_frame",
+      "name": "Small Personal Photograph Frame",
+      "category": "decor",
+      "description": "Small upright rectangular photo frame with a light-colored border and a personal photograph, positioned beside the trophy.",
+      "position": {
+        "x": 0.23,
+        "y": 0.94,
+        "z": -1.43
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.11,
+        "height": 0.22,
+        "depth": 0.05
+      },
+      "color": "#bda58a",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_photo_frame.jpg",
+      "box_2d": [
+        0.45,
+        0.56,
+        0.51,
+        0.58
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_documents_1",
+      "name": "Stack of Office Notebooks and Documents",
+      "category": "decor",
+      "description": "Several stacked colorful notebooks, folders and loose office documents with yellow, blue and multicolored covers arranged on the rear counter.",
+      "position": {
+        "x": 0.65,
+        "y": 0.88,
+        "z": -1.43
+      },
+      "rotation": {
+        "yaw": 0.05,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.48,
+        "height": 0.12,
+        "depth": 0.34
+      },
+      "color": "#d5bb70",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_documents_1.jpg",
+      "box_2d": [
+        0.44,
+        0.58,
+        0.52,
+        0.7
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_black_bag",
+      "name": "Black Soft Office Bag",
+      "category": "decor",
+      "description": "Soft black fabric laptop or travel bag with shoulder straps, lying horizontally on the right portion of the rear storage counter.",
+      "position": {
+        "x": 1.25,
+        "y": 0.93,
+        "z": -1.42
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.55,
+        "height": 0.19,
+        "depth": 0.36
+      },
+      "color": "#17191b",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_black_bag.jpg",
+      "box_2d": [
+        0.48,
+        0.7,
+        0.56,
+        0.86
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_water_bottle",
+      "name": "Stainless Steel Water Bottle",
+      "category": "decor",
+      "description": "Tall cylindrical silver stainless steel reusable water bottle with a narrow screw-top cap, standing on the far-right section of the rear counter.",
+      "position": {
+        "x": 1.83,
+        "y": 1.07,
+        "z": -1.42
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.09,
+        "height": 0.48,
+        "depth": 0.09
+      },
+      "color": "#a5aaa8",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_water_bottle.jpg",
+      "box_2d": [
+        0.45,
+        0.87,
+        0.57,
+        0.91
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_brochure",
+      "name": "Printed Office Brochure",
+      "category": "decor",
+      "description": "Flat dark-colored printed booklet or brochure with visible graphic printing, resting near the right-front edge of the rear counter.",
+      "position": {
+        "x": 1.55,
+        "y": 0.84,
+        "z": -1.15
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.35,
+        "height": 0.015,
+        "depth": 0.23
+      },
+      "color": "#34383a",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_brochure.jpg",
+      "box_2d": [
+        0.56,
+        0.89,
+        0.61,
+        1.0
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_wall_notice",
+      "name": "Wall Mounted Printed Office Notice",
+      "category": "art",
+      "description": "Small vertically oriented white printed information sheet attached to the rear wall above the office counter.",
+      "position": {
+        "x": -0.52,
+        "y": 1.72,
+        "z": -1.87
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.17,
+        "height": 0.29,
+        "depth": 0.005
+      },
+      "color": "#e8e6df",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_wall_notice.jpg",
+      "box_2d": [
+        0.35,
+        0.48,
+        0.45,
+        0.52
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_electrical_socket",
+      "name": "Wall Electrical Outlet",
+      "category": "decor",
+      "description": "White rectangular electrical outlet panel with multiple sockets and connected black power plugs, mounted above the rear counter.",
+      "position": {
+        "x": -0.75,
+        "y": 1.36,
+        "z": -1.86
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.22,
+        "height": 0.15,
+        "depth": 0.03
+      },
+      "color": "#eeeeeb",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_electrical_socket.jpg",
+      "box_2d": [
+        0.43,
+        0.42,
+        0.49,
+        0.47
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_charger_adapter",
+      "name": "Black Laptop Power Adapter and Cable",
+      "category": "decor",
+      "description": "Small black rectangular electrical power adapter with loosely arranged connecting wires, placed on the main desk near the printer.",
+      "position": {
+        "x": -0.48,
+        "y": 0.8,
+        "z": 0.31
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.16,
+        "height": 0.06,
+        "depth": 0.11
+      },
+      "color": "#242629",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_charger_adapter.jpg",
+      "box_2d": [
+        0.59,
+        0.44,
+        0.65,
+        0.5
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_eyeglasses",
+      "name": "Black Eyeglasses",
+      "category": "decor",
+      "description": "A pair of dark-framed eyeglasses lying open on the wooden desktop.",
+      "position": {
+        "x": -0.87,
+        "y": 0.78,
+        "z": 0.76
+      },
+      "rotation": {
+        "yaw": 0.2,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.14,
+        "height": 0.025,
+        "depth": 0.055
+      },
+      "color": "#242424",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_eyeglasses.jpg",
+      "box_2d": [
+        0.64,
+        0.36,
+        0.69,
+        0.42
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_pens",
+      "name": "Office Pens and Stationery",
+      "category": "decor",
+      "description": "A couple of individual writing instruments, including a blue pen and a darker pen, lying on the main desk near the laptop and smartphone.",
+      "position": {
+        "x": 0.81,
+        "y": 0.79,
+        "z": 0.97
+      },
+      "rotation": {
+        "yaw": 0.15,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.025,
+        "height": 0.015,
+        "depth": 0.16
+      },
+      "color": "#343f46",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": "/api/crops/scene_1ac6c4e9_obj_pens.jpg",
+      "box_2d": [
+        0.72,
+        0.48,
+        0.79,
+        0.66
+      ],
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_phone_b0bc40",
+      "name": "Smartphone",
+      "category": "phone",
+      "description": "",
+      "position": {
+        "x": -0.07733149631413366,
+        "y": 0.766,
+        "z": 0.5325833117743501
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.08,
+        "height": 0.012,
+        "depth": 0.16
+      },
+      "color": "#18181b",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": null,
+      "box_2d": null,
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_phone_9f5a57",
+      "name": "Smartphone",
+      "category": "phone",
+      "description": "",
+      "position": {
+        "x": -0.07733149631413366,
+        "y": 0.766,
+        "z": 0.5325833117743501
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.08,
+        "height": 0.012,
+        "depth": 0.16
+      },
+      "color": "#18181b",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": null,
+      "box_2d": null,
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_phone_c22f1d",
+      "name": "Smartphone",
+      "category": "phone",
+      "description": "",
+      "position": {
+        "x": -0.07733149631413366,
+        "y": 0.766,
+        "z": 0.5325833117743501
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.08,
+        "height": 0.012,
+        "depth": 0.16
+      },
+      "color": "#18181b",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": null,
+      "box_2d": null,
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_phone_749581",
+      "name": "Smartphone",
+      "category": "phone",
+      "description": "",
+      "position": {
+        "x": 0.32266850368586636,
+        "y": 0.766,
+        "z": 0.5325833117743501
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.08,
+        "height": 0.012,
+        "depth": 0.16
+      },
+      "color": "#18181b",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": null,
+      "box_2d": null,
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_phone_d2619a",
+      "name": "Smartphone",
+      "category": "phone",
+      "description": "",
+      "position": {
+        "x": 0.7226685036858664,
+        "y": 0.766,
+        "z": 0.5325833117743501
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.08,
+        "height": 0.012,
+        "depth": 0.16
+      },
+      "color": "#18181b",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": null,
+      "box_2d": null,
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_phone_ac06be",
+      "name": "Smartphone",
+      "category": "phone",
+      "description": "",
+      "position": {
+        "x": 1.1226685036858663,
+        "y": 0.766,
+        "z": 0.5325833117743501
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.08,
+        "height": 0.012,
+        "depth": 0.16
+      },
+      "color": "#18181b",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": null,
+      "box_2d": null,
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_phone_2fdd32",
+      "name": "Smartphone",
+      "category": "phone",
+      "description": "",
+      "position": {
+        "x": 1.5226685036858663,
+        "y": 0.766,
+        "z": 0.5325833117743501
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.08,
+        "height": 0.012,
+        "depth": 0.16
+      },
+      "color": "#18181b",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": null,
+      "box_2d": null,
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    },
+    {
+      "id": "obj_phone_8511ad",
+      "name": "Smartphone",
+      "category": "phone",
+      "description": "",
+      "position": {
+        "x": 1.9226685036858662,
+        "y": 0.766,
+        "z": 0.5325833117743501
+      },
+      "rotation": {
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0
+      },
+      "dimensions": {
+        "width": 0.08,
+        "height": 0.012,
+        "depth": 0.16
+      },
+      "color": "#18181b",
+      "model_type": "procedural",
+      "model_url": null,
+      "crop_url": null,
+      "box_2d": null,
+      "attached_to_id": null,
+      "relative_position": null,
+      "relative_yaw": null
+    }
+  ],
+  "created_at": "2026-11-21T21:27:28.001933",
+  "updated_at": "2026-11-21T23:20:24.738842",
+  "status": "ready",
+  "status_message": "Scene reconstructed successfully"
+}

@@ -1,0 +1,32 @@
+{
+  "scene_id": "scene_f9327713",
+  "name": "Capture // c3b7c506-1c00-47c5-8edc-a34bbd4be4c2.jpg",
+  "image_url": "/api/uploads/scene_f9327713_1795276320.jpg",
+  "room": {
+    "dimensions": {
+      "width": 5.0,
+      "height": 2.8,
+      "depth": 5.0
+    },
+    "floor": {
+      "material": "parquet",
+      "color": "#c5a078",
+      "texture_url": null
+    },
+    "walls": {
+      "material": "plaster",
+      "color": "#f0eee9",
+      "texture_url": null
+    },
+    "ceiling": {
+      "material": "plaster",
+      "color": "#fafafa",
+      "texture_url": null
+    }
+  },
+  "objects": [],
+  "created_at": "2026-11-21T21:22:00.525987",
+  "updated_at": "2026-11-21T21:22:00.525987",
+  "status": "waiting_payload",
+  "status_message": "ChatGPT requires login. Tap PAYLOAD in top bar to paste ChatGPT output."
+}

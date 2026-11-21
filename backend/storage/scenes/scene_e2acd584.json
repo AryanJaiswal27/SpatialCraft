@@ -1,0 +1,32 @@
+{
+  "scene_id": "scene_e2acd584",
+  "name": "Capture // c3b7c506-1c00-47c5-8edc-a34bbd4be4c2.jpg",
+  "image_url": "/api/uploads/scene_e2acd584_1795282553.jpg",
+  "room": {
+    "dimensions": {
+      "width": 5.0,
+      "height": 2.8,
+      "depth": 5.0
+    },
+    "floor": {
+      "material": "parquet",
+      "color": "#c5a078",
+      "texture_url": null
+    },
+    "walls": {
+      "material": "plaster",
+      "color": "#f0eee9",
+      "texture_url": null
+    },
+    "ceiling": {
+      "material": "plaster",
+      "color": "#fafafa",
+      "texture_url": null
+    }
+  },
+  "objects": [],
+  "created_at": "2026-11-21T23:05:53.372175",
+  "updated_at": "2026-11-21T23:05:53.405822",
+  "status": "processing",
+  "status_message": "Awaiting physical click execution on desktop daemon..."
+}
