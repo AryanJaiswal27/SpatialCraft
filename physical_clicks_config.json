@@ -28,8 +28,14 @@
       "y": 876,
       "description": "Hover over the copy response icon at the bottom of the LLM output.\nAntigravity clicks here to extract the generated 3D CAD data."
     },
+    "antigravity_header": {
+      "name": "05. ANTIGRAVITY WINDOW / TOP HEADER",
+      "x": 0,
+      "y": 0,
+      "description": "Hover over the top title bar or tab header of this Antigravity IDE window.\nAntigravity clicks here to bring the IDE window to the top/foreground."
+    },
     "ide_chat_box": {
-      "name": "05. ANTIGRAVITY IDE CHAT INPUT",
+      "name": "06. ANTIGRAVITY IDE CHAT INPUT",
       "x": 1270,
       "y": 915,
       "description": "Hover inside the chat input box at the bottom of this Antigravity IDE window.\nAntigravity clicks here to paste the browser's LLM response directly into this chat."
@@ -38,7 +44,7 @@
   "delays": {
     "click_settle": 0.3,
     "image_upload_settle": 3.0,
-    "llm_generation_timeout": 45.0,
+    "llm_generation_timeout": 120.0,
     "move_duration": 0.4
   },
   "last_calibrated_at": "2026-11-21T23:24:20.879978"

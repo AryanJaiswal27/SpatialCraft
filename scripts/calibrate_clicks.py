@@ -43,8 +43,14 @@ TARGETS_ORDER = [
         "Antigravity clicks here to extract the generated 3D CAD data."
     ),
     (
+        "antigravity_header",
+        "05. ANTIGRAVITY WINDOW / TOP HEADER",
+        "Hover over the top title bar or tab header of this Antigravity IDE window.\n"
+        "Antigravity clicks here to bring the IDE window to the top/foreground."
+    ),
+    (
         "ide_chat_box",
-        "05. ANTIGRAVITY IDE CHAT INPUT",
+        "06. ANTIGRAVITY IDE CHAT INPUT",
         "Hover inside the chat input box at the bottom of this Antigravity IDE window.\n"
         "Antigravity clicks here to paste the browser's LLM response directly into this chat."
     )
@@ -199,20 +205,21 @@ def run_calibration():
             print(f"  [{idx}] {title:32s} : {status}")
 
         print("\nCalibration Options:")
-        print("  [A] Calibrate ALL targets (1 through 5)")
-        ide_target = existing_targets.get("ide_chat_box", {})
-        if not ide_target.get("x") and not ide_target.get("y"):
-            print("  [5] Calibrate Target 5 only (Antigravity IDE Chat Input) [RECOMMENDED]")
+        print("  [A] Calibrate ALL targets (1 through 6)")
+        ag_header = existing_targets.get("antigravity_header", {})
+        if not ag_header.get("x") and not ag_header.get("y"):
+            print("  [5] Calibrate Target 5 only (Antigravity Window / Top Header) [RECOMMENDED]")
         else:
-            print("  [5] Re-calibrate Target 5 (Antigravity IDE Chat Input)")
-        print("  [1-4] Calibrate a single specific target number")
+            print("  [5] Re-calibrate Target 5 (Antigravity Window / Top Header)")
+        print("  [6] Re-calibrate Target 6 (Antigravity IDE Chat Input)")
+        print("  [1-6] Calibrate a single specific target number")
         print("  [V] Jump straight to Live Visual Verification of existing coordinates")
         
         choice = input("\nSelect option (default A): ").strip().upper()
         if choice == "V":
             run_antigravity_verification_simulation(existing_targets)
             return
-        elif choice in ("1", "2", "3", "4", "5"):
+        elif choice in ("1", "2", "3", "4", "5", "6"):
             target_idx = int(choice) - 1
             targets_to_calibrate = [TARGETS_ORDER[target_idx]]
             print(f"\nSelected single target: {targets_to_calibrate[0][1]}")

@@ -102,6 +102,17 @@ def focus_browser_tab(targets: dict, move_dur: float = 0.4, settle: float = 0.3)
         pyautogui.click()
         time.sleep(settle + 0.3)
 
+def focus_antigravity_window(targets: dict, delays: dict):
+    """Brings the Antigravity IDE window to the foreground by clicking its top header/tab."""
+    ag_head = targets.get("antigravity_header")
+    if ag_head and (ag_head.get("x", 0) > 0 or ag_head.get("y", 0) > 0) and pyautogui:
+        move_dur = delays.get("move_duration", 0.4)
+        settle = delays.get("click_settle", 0.3)
+        print(f"[PHYSICAL] Clicking Antigravity Top Header: ({ag_head['x']}, {ag_head['y']}) to bring IDE to front...")
+        pyautogui.moveTo(ag_head["x"], ag_head["y"], duration=move_dur)
+        pyautogui.click()
+        time.sleep(settle + 0.3)
+
 def paste_to_antigravity_ide(text: str, targets: dict, delays: dict, label: str = "") -> bool:
     """
     Pastes the extracted LLM web response directly into the Antigravity IDE chat composer,
@@ -109,11 +120,10 @@ def paste_to_antigravity_ide(text: str, targets: dict, delays: dict, label: str 
     """
     ide_chat_pos = targets.get("ide_chat_box")
     if not ide_chat_pos or not ide_chat_pos.get("x") or not pyautogui:
-        print(f"[PHYSICAL] Target 5 (ide_chat_box) not calibrated - skipping paste into Antigravity IDE.")
+        print(f"[PHYSICAL] Target 6 (ide_chat_box) not calibrated - skipping paste into Antigravity IDE.")
         print(f"           (Run calibrate_antigravity.bat to calibrate the IDE chat composer)")
         return False
 
-    x, y = ide_chat_pos["x"], ide_chat_pos["y"]
     move_dur = delays.get("move_duration", 0.4)
     settle = delays.get("click_settle", 0.3)
 
@@ -121,31 +131,34 @@ def paste_to_antigravity_ide(text: str, targets: dict, delays: dict, label: str 
     print(f" [PHYSICAL -> ANTIGRAVITY IDE] Dispatching Web Response to IDE Chat...")
     if label:
         print(f"  Context: {label}")
-    print(f"  Target: Antigravity IDE Chat Box at ({x}, {y})")
     print("=" * 65)
 
-    # 1. Ensure clipboard has the response text
+    # 1. Bring Antigravity IDE to the top first!
+    focus_antigravity_window(targets, delays)
+
+    # 2. Ensure clipboard has the response text
     copy_text_to_clipboard(text)
     time.sleep(0.15)
 
-    # 2. Click to focus Antigravity IDE Chat input box
-    print(f"[PHYSICAL] Clicking Antigravity IDE Chat Box ({x}, {y})...")
+    # 3. Click to focus Antigravity IDE Chat input box at the bottom
+    x, y = ide_chat_pos["x"], ide_chat_pos["y"]
+    print(f"[PHYSICAL] Clicking Antigravity IDE Chat Box: ({x}, {y})...")
     pyautogui.moveTo(x, y, duration=move_dur)
     pyautogui.click()
     time.sleep(settle + 0.2)
 
-    # 3. Select all (Ctrl+A) so any leftover draft text is replaced cleanly
+    # 4. Select all (Ctrl+A) so any leftover draft text is replaced cleanly
     pyautogui.keyDown("ctrl")
     pyautogui.press("a")
     pyautogui.keyUp("ctrl")
     time.sleep(0.1)
 
-    # 4. Paste via Ctrl+V
+    # 5. Paste via Ctrl+V
     print(f"[PHYSICAL] Pasting response ({len(text)} chars) into IDE composer...")
     physical_paste()
     time.sleep(0.3)
 
-    # 5. Submit via Enter
+    # 6. Submit via Enter
     print("[PHYSICAL] Pressing [ENTER] to submit message to Antigravity AI...")
     pyautogui.press("enter")
     time.sleep(1.0)
@@ -210,46 +223,128 @@ def paste_and_send(prompt_text: str, image_path: Optional[Path], targets: dict, 
     return True
 
 def wait_and_extract_response(targets: dict, delays: dict) -> str:
-    """Waits for LLM generation and extracts response via physical Copy click with dynamic completion guard."""
+    """
+    Waits for LLM generation with:
+    - 2-minute (120s) generation timeout.
+    - Continuous downward scrolling (pyautogui.scroll + End key) to keep generating tokens in view.
+    - Periodic 'Ctrl+A' page inspection trick to track live streaming progress and extract CAD JSON.
+    - Dynamic completion guard checking balanced JSON braces and response stability.
+    """
     if not pyautogui:
         return ""
 
+    from backend.services.browser_prompt import parse_llm_json_response
+
     move_dur = delays.get("move_duration", 0.4)
-    gen_timeout = delays.get("llm_generation_timeout", 45.0)
+    gen_timeout = delays.get("llm_generation_timeout", 120.0)
     copy_pos = targets.get("copy_button")
     prompt_pos = targets.get("prompt_box")
 
-    print(f"[PHYSICAL] Monitoring LLM generation (up to {gen_timeout}s timeout)...")
+    # Viewport coordinates for scrolling and page content
+    scroll_x = prompt_pos["x"] if prompt_pos else 960
+    scroll_y = max(120, (prompt_pos["y"] - 280)) if prompt_pos else 500
+
+    print(f"\n[PHYSICAL] Monitoring LLM generation (2-min timeout: {int(gen_timeout)}s)...")
+    print(f"[PHYSICAL] Auto-scrolling active at ({scroll_x}, {scroll_y}) with Ctrl+A streaming inspection...")
     start_time = time.time()
     
     # Initial buffer for generation to start
-    time.sleep(6.0)
+    time.sleep(3.5)
+
+    last_len = 0
+    stable_count = 0
 
     while (time.time() - start_time) < gen_timeout:
+        elapsed = time.time() - start_time
+
+        # 1. Continuous scroll down to track streaming tokens and keep copy button in view
+        try:
+            pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
+            pyautogui.scroll(-450)
+            pyautogui.press("end")
+        except Exception:
+            pass
+
+        time.sleep(0.25)
+
+        # 2. Check Copy button if calibrated
         if copy_pos:
+            try:
+                pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=move_dur)
+                pyautogui.click()
+                time.sleep(0.4)
+                clip_text = get_clipboard_text()
+                
+                # Check if complete JSON is present
+                if clip_text and "{" in clip_text and "}" in clip_text:
+                    if any(k in clip_text for k in ("room", "dimensions", "objects", "name", "category")):
+                        # Verify code fence closed or balanced braces
+                        if clip_text.count("{") <= clip_text.count("}"):
+                            print(f"[PHYSICAL // GENERATION COMPLETE] Captured finished response via Copy button ({len(clip_text)} chars)!")
+                            return clip_text
+            except Exception:
+                pass
+
+        # 3. Ctrl+A page snapshot trick to inspect streaming progress
+        try:
+            pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
+            pyautogui.click()
+            time.sleep(0.08)
+            pyautogui.keyDown("ctrl")
+            pyautogui.press("a")
+            pyautogui.keyUp("ctrl")
+            time.sleep(0.08)
+            pyautogui.keyDown("ctrl")
+            pyautogui.press("c")
+            pyautogui.keyUp("ctrl")
+            time.sleep(0.08)
+            pyautogui.press("escape")  # Instantly dismiss highlight
+            time.sleep(0.1)
+
+            page_text = get_clipboard_text()
+            if page_text:
+                cur_len = len(page_text)
+                if cur_len > last_len:
+                    delta = cur_len - last_len
+                    print(f"[PHYSICAL // STREAMING] +{delta} chars ({cur_len} total) | Scrolling down... [{int(elapsed)}s/{int(gen_timeout)}s]")
+                    last_len = cur_len
+                    stable_count = 0
+                elif cur_len == last_len and cur_len > 150:
+                    stable_count += 1
+                    print(f"[PHYSICAL // STREAMING] Generation steady ({stable_count * 2.5:.0f}s unchanged) [{int(elapsed)}s/{int(gen_timeout)}s]")
+
+                # If text has stopped changing for ~5 seconds (2 cycles) and contains a complete room/object CAD model:
+                if stable_count >= 2:
+                    parsed = parse_llm_json_response(page_text)
+                    if parsed and any(k in parsed for k in ("room", "objects", "dimensions", "name")):
+                        print(f"[PHYSICAL // GENERATION COMPLETE] Detected finished CAD response via Ctrl+A inspection ({cur_len} chars)!")
+                        # Try one final click on copy button since we scrolled to the end
+                        if copy_pos:
+                            pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=move_dur)
+                            pyautogui.click()
+                            time.sleep(0.5)
+                            final_clip = get_clipboard_text()
+                            if final_clip and "{" in final_clip and "}" in final_clip and final_clip.count("{") <= final_clip.count("}"):
+                                return final_clip
+                        # Fallback: format parsed JSON nicely
+                        return json.dumps(parsed, indent=2)
+        except Exception:
+            pass
+
+        time.sleep(1.8)
+
+    # Final attempt fallback after 120s timeout
+    print("[PHYSICAL // TIMEOUT] 2-minute timeout reached. Attempting final extraction...")
+    if copy_pos:
+        try:
             pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=move_dur)
             pyautogui.click()
-            time.sleep(0.5)
-            clip_text = get_clipboard_text()
-            
-            # Check if complete JSON is present
-            if clip_text and "{" in clip_text and "}" in clip_text:
-                if "room" in clip_text or "dimensions" in clip_text or "objects" in clip_text:
-                    # Verify code fence closed or balanced braces
-                    if clip_text.count("{") <= clip_text.count("}"):
-                        print(f"[PHYSICAL // GENERATION COMPLETE] Detected finished response ({len(clip_text)} chars)!")
-                        return clip_text
-
-        time.sleep(2.5)
-
-    # Final attempt fallback
-    if copy_pos:
-        pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=move_dur)
-        pyautogui.click()
-        time.sleep(1.0)
-        final_text = get_clipboard_text()
-        if final_text:
-            return final_text
+            time.sleep(0.8)
+            final_text = get_clipboard_text()
+            if final_text:
+                return final_text
+        except Exception:
+            pass
 
     return ""
 

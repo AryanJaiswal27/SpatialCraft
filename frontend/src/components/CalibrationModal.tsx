@@ -95,7 +95,8 @@ export const CalibrationModal: React.FC = () => {
     { key: 'prompt_box', defaultName: '02. Prompt Input Box', hint: 'Composer textarea (Images & prompts are pasted here via Ctrl+V)' },
     { key: 'send_button', defaultName: '03. Send / Submit Button', hint: 'Send arrow or submit button' },
     { key: 'copy_button', defaultName: '04. Copy Response Button', hint: 'Copy Markdown icon at bottom of response' },
-    { key: 'ide_chat_box', defaultName: '05. Antigravity IDE Chat Input', hint: 'Input box at bottom of Antigravity IDE (pastes LLM response here)' },
+    { key: 'antigravity_header', defaultName: '05. Antigravity Window / Top Header', hint: 'Top title bar to bring Antigravity IDE window to front' },
+    { key: 'ide_chat_box', defaultName: '06. Antigravity IDE Chat Input', hint: 'Input box at bottom of Antigravity IDE (pastes LLM response here)' },
   ];
 
   return (
