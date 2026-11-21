@@ -52,27 +52,58 @@ def generate_spatial_prompt() -> str:
 def parse_llm_json_response(raw_text: str) -> Optional[Dict[str, Any]]:
     """
     Extracts and parses JSON from raw LLM output text, handling markdown code fences,
-    surrounding text, and minor formatting quirks.
+    surrounding text, and prior chat history. Prioritizes CAD blocks with 'room' or 'objects'.
     """
-    # 1. Try to find ```json ... ``` blocks
-    code_block_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", raw_text)
-    if code_block_match:
-        candidate = code_block_match.group(1).strip()
+    # 1. Find all ```json ... ``` blocks in reverse order (latest response first!)
+    matches = list(re.finditer(r"```(?:json)?\s*([\s\S]*?)\s*```", raw_text))
+    for m in reversed(matches):
+        candidate = m.group(1).strip()
         try:
-            return json.loads(candidate)
+            parsed = json.loads(candidate)
+            if isinstance(parsed, dict) and ("room" in parsed or "objects" in parsed):
+                return parsed
         except json.JSONDecodeError:
             pass
 
-    # 2. Try to find raw { ... } block
+    # Fallback to any valid JSON in code blocks (reverse)
+    for m in reversed(matches):
+        try:
+            parsed = json.loads(m.group(1).strip())
+            if isinstance(parsed, dict):
+                return parsed
+        except Exception:
+            pass
+
+    # 2. Try to find raw { ... } blocks prioritizing 'room' or 'objects'
+    # Look for last balanced JSON block containing 'room'
+    if "room" in raw_text or "objects" in raw_text:
+        # Search backwards from the end
+        last_open = raw_text.rfind('{"room"')
+        if last_open == -1:
+            last_open = raw_text.rfind('{"objects"')
+        if last_open == -1:
+            last_open = raw_text.rfind('{')
+        if last_open != -1:
+            for end_idx in range(len(raw_text), last_open, -1):
+                if raw_text[end_idx - 1] == '}':
+                    try:
+                        parsed = json.loads(raw_text[last_open:end_idx].strip())
+                        if isinstance(parsed, dict) and ("room" in parsed or "objects" in parsed):
+                            return parsed
+                    except Exception:
+                        pass
+
+    # 3. Greedy outer brace match
     brace_match = re.search(r"(\{[\s\S]*\})", raw_text)
     if brace_match:
-        candidate = brace_match.group(1).strip()
         try:
-            return json.loads(candidate)
-        except json.JSONDecodeError:
+            parsed = json.loads(brace_match.group(1).strip())
+            if isinstance(parsed, dict):
+                return parsed
+        except Exception:
             pass
 
-    # 3. Direct parse attempt
+    # 4. Direct parse attempt
     try:
         return json.loads(raw_text.strip())
     except Exception:

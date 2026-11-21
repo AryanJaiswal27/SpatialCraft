@@ -397,12 +397,26 @@ def generate_object_refinement_prompt(obj: dict, scene_data: Optional[dict] = No
 
 def parse_refinement_json(raw_text: str) -> Optional[dict]:
     import re
-    match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", raw_text)
-    if match:
+    # 1. Search all code fences in reverse (latest response on page first)
+    matches = list(re.finditer(r"```(?:json)?\s*([\s\S]*?)\s*```", raw_text))
+    for m in reversed(matches):
+        candidate = m.group(1).strip()
         try:
-            return json.loads(match.group(1).strip())
+            parsed = json.loads(candidate)
+            if isinstance(parsed, dict) and any(k in parsed for k in ("dimensions", "color", "materials", "id", "description")):
+                return parsed
         except Exception:
             pass
+
+    for m in reversed(matches):
+        try:
+            parsed = json.loads(m.group(1).strip())
+            if isinstance(parsed, dict):
+                return parsed
+        except Exception:
+            pass
+
+    # 2. Greedy outer brace match
     brace = re.search(r"(\{[\s\S]*\})", raw_text)
     if brace:
         try:
