@@ -220,15 +220,17 @@ def paste_and_send(prompt_text: str, image_path: Optional[Path], targets: dict, 
     # Fallback Enter key
     time.sleep(0.2)
     pyautogui.press("enter")
+    copy_text_to_clipboard("")  # Clear clipboard so copy check never reads stale clipboard data
     return True
 
 def wait_and_extract_response(targets: dict, delays: dict) -> str:
     """
     Waits for LLM generation with:
     - 2-minute (120s) generation timeout.
+    - True delta monitoring: checks if content is ACTUALLY streaming vs already finished.
     - Continuous downward scrolling (pyautogui.scroll + End key) to keep generating tokens in view.
     - Periodic 'Ctrl+A' page inspection trick to track live streaming progress and extract CAD JSON.
-    - Dynamic completion guard checking balanced JSON braces and response stability.
+    - Dynamic completion guard requiring stable response AND closed JSON/code fence.
     """
     if not pyautogui:
         return ""
@@ -248,16 +250,32 @@ def wait_and_extract_response(targets: dict, delays: dict) -> str:
     print(f"[PHYSICAL] Auto-scrolling active at ({scroll_x}, {scroll_y}) with Ctrl+A streaming inspection...")
     start_time = time.time()
     
-    # Initial buffer for generation to start
-    time.sleep(3.5)
+    # 1. Take initial baseline snapshot of page BEFORE or right as generation begins
+    time.sleep(2.0)
+    baseline_text = ""
+    try:
+        pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
+        pyautogui.click()
+        time.sleep(0.08)
+        pyautogui.keyDown("ctrl"); pyautogui.press("a"); pyautogui.keyUp("ctrl")
+        time.sleep(0.08)
+        pyautogui.keyDown("ctrl"); pyautogui.press("c"); pyautogui.keyUp("ctrl")
+        time.sleep(0.08)
+        pyautogui.press("escape")
+        baseline_text = get_clipboard_text()
+    except Exception:
+        pass
 
-    last_len = 0
+    baseline_len = len(baseline_text)
+    last_len = baseline_len
+    has_streamed_new_content = False
     stable_count = 0
+    consecutive_stable_needed = 4  # 4 checks * ~2.5s = ~10 seconds of true stability after new tokens appear
 
     while (time.time() - start_time) < gen_timeout:
         elapsed = time.time() - start_time
 
-        # 1. Continuous scroll down to track streaming tokens and keep copy button in view
+        # A. Continuous scroll down to track streaming tokens and keep copy button in view
         try:
             pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
             pyautogui.scroll(-450)
@@ -267,36 +285,34 @@ def wait_and_extract_response(targets: dict, delays: dict) -> str:
 
         time.sleep(0.25)
 
-        # 2. Check Copy button if calibrated
-        if copy_pos:
+        # B. Check Copy button ONLY after minimum wait (15s), tokens streamed, and output stabilized!
+        if copy_pos and elapsed >= 15.0 and has_streamed_new_content and stable_count >= consecutive_stable_needed:
             try:
                 pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=move_dur)
                 pyautogui.click()
                 time.sleep(0.4)
                 clip_text = get_clipboard_text()
                 
-                # Check if complete JSON is present
-                if clip_text and "{" in clip_text and "}" in clip_text:
+                # Check if complete JSON is present and different from baseline
+                if clip_text and "{" in clip_text and "}" in clip_text and clip_text.strip() != baseline_text.strip():
                     if any(k in clip_text for k in ("room", "dimensions", "objects", "name", "category")):
-                        # Verify code fence closed or balanced braces
+                        # Verify code fence closed and braces balanced
                         if clip_text.count("{") <= clip_text.count("}"):
-                            print(f"[PHYSICAL // GENERATION COMPLETE] Captured finished response via Copy button ({len(clip_text)} chars)!")
-                            return clip_text
+                            fence_count = clip_text.count("```")
+                            if fence_count >= 2 or clip_text.strip().endswith("}"):
+                                print(f"[PHYSICAL // GENERATION COMPLETE] Captured finished response via Copy button ({len(clip_text)} chars)!")
+                                return clip_text
             except Exception:
                 pass
 
-        # 3. Ctrl+A page snapshot trick to inspect streaming progress
+        # C. Ctrl+A page snapshot trick to inspect streaming progress
         try:
             pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
             pyautogui.click()
             time.sleep(0.08)
-            pyautogui.keyDown("ctrl")
-            pyautogui.press("a")
-            pyautogui.keyUp("ctrl")
+            pyautogui.keyDown("ctrl"); pyautogui.press("a"); pyautogui.keyUp("ctrl")
             time.sleep(0.08)
-            pyautogui.keyDown("ctrl")
-            pyautogui.press("c")
-            pyautogui.keyUp("ctrl")
+            pyautogui.keyDown("ctrl"); pyautogui.press("c"); pyautogui.keyUp("ctrl")
             time.sleep(0.08)
             pyautogui.press("escape")  # Instantly dismiss highlight
             time.sleep(0.1)
@@ -304,34 +320,37 @@ def wait_and_extract_response(targets: dict, delays: dict) -> str:
             page_text = get_clipboard_text()
             if page_text:
                 cur_len = len(page_text)
-                if cur_len > last_len:
+                
+                # Compare against last check
+                if cur_len > last_len + 15:
                     delta = cur_len - last_len
+                    has_streamed_new_content = True
                     print(f"[PHYSICAL // STREAMING] +{delta} chars ({cur_len} total) | Scrolling down... [{int(elapsed)}s/{int(gen_timeout)}s]")
                     last_len = cur_len
                     stable_count = 0
-                elif cur_len == last_len and cur_len > 150:
+                elif has_streamed_new_content and abs(cur_len - last_len) <= 15:
                     stable_count += 1
-                    print(f"[PHYSICAL // STREAMING] Generation steady ({stable_count * 2.5:.0f}s unchanged) [{int(elapsed)}s/{int(gen_timeout)}s]")
-
-                # If text has stopped changing for ~5 seconds (2 cycles) and contains a complete room/object CAD model:
-                if stable_count >= 2:
-                    parsed = parse_llm_json_response(page_text)
-                    if parsed and any(k in parsed for k in ("room", "objects", "dimensions", "name")):
-                        print(f"[PHYSICAL // GENERATION COMPLETE] Detected finished CAD response via Ctrl+A inspection ({cur_len} chars)!")
-                        # Try one final click on copy button since we scrolled to the end
-                        if copy_pos:
-                            pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=move_dur)
-                            pyautogui.click()
-                            time.sleep(0.5)
-                            final_clip = get_clipboard_text()
-                            if final_clip and "{" in final_clip and "}" in final_clip and final_clip.count("{") <= final_clip.count("}"):
-                                return final_clip
-                        # Fallback: format parsed JSON nicely
-                        return json.dumps(parsed, indent=2)
+                    print(f"[PHYSICAL // WAITING] Output stabilized ({stable_count}/{consecutive_stable_needed}) [{int(elapsed)}s/{int(gen_timeout)}s]")
+                    
+                    if stable_count >= consecutive_stable_needed:
+                        parsed = parse_llm_json_response(page_text)
+                        if parsed and any(k in parsed for k in ("room", "objects", "dimensions", "name")):
+                            print(f"[PHYSICAL // GENERATION COMPLETE] Detected finished CAD response via Ctrl+A inspection ({cur_len} chars)!")
+                            if copy_pos:
+                                pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=move_dur)
+                                pyautogui.click()
+                                time.sleep(0.5)
+                                final_clip = get_clipboard_text()
+                                if final_clip and "{" in final_clip and "}" in final_clip and final_clip.count("{") <= final_clip.count("}"):
+                                    return final_clip
+                            return json.dumps(parsed, indent=2)
+                else:
+                    # Still waiting for initial tokens to start generating
+                    print(f"[PHYSICAL // THINKING] Waiting for LLM to begin generating response... [{int(elapsed)}s/{int(gen_timeout)}s]")
         except Exception:
             pass
 
-        time.sleep(1.8)
+        time.sleep(2.0)
 
     # Final attempt fallback after 120s timeout
     print("[PHYSICAL // TIMEOUT] 2-minute timeout reached. Attempting final extraction...")
@@ -590,6 +609,37 @@ def run_physical_daemon():
                         elif job_type == "refine_single":
                             obj = job.get("object_data", {})
                             execute_object_refinement(scene_id, obj)
+
+                        elif job_type == "screen_action":
+                            # Antigravity screen-control directive
+                            action = job.get("action", "click")
+                            target_key = job.get("target_key")
+                            text_to_type = job.get("text")
+                            coords = job.get("coords")
+                            if not coords and target_key:
+                                cfg = load_config()
+                                coords = cfg.get("targets", {}).get(target_key)
+                            
+                            if coords and pyautogui:
+                                x, y = coords["x"], coords["y"]
+                                print(f"\n[DAEMON // ANTIGRAVITY CONTROL] Action '{action}' on {target_key or 'target'} ({x}, {y})...")
+                                pyautogui.moveTo(x, y, duration=0.4)
+                                if action == "click":
+                                    pyautogui.click()
+                                elif action == "double_click":
+                                    pyautogui.doubleClick()
+                                elif action == "paste":
+                                    pyautogui.click()
+                                    time.sleep(0.2)
+                                    if text_to_type:
+                                        copy_text_to_clipboard(text_to_type)
+                                    physical_paste()
+                                elif action == "scroll_down":
+                                    pyautogui.scroll(-500)
+                                    pyautogui.press("end")
+                                elif action == "press_key":
+                                    key = job.get("key", "enter")
+                                    pyautogui.press(key)
 
                         elif job_type == "test_hover":
                             target_key = job.get("target_key")
