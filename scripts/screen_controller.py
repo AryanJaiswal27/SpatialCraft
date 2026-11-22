@@ -111,9 +111,15 @@ def scroll_down(amount: int = -450):
         pyautogui.press("end")
         print(f"[SCREEN CONTROL] Scrolled down at ({scroll_x}, {scroll_y}) with [End] key.")
 
-def wait_for_llm(timeout: float = 120.0, min_wait: float = 15.0, expected_id: Optional[str] = None) -> str:
-    from backend.services.browser_prompt import parse_llm_json_response
-
+def wait_for_llm(timeout: float = 120.0, min_wait: float = 14.0, expected_id: Optional[str] = None) -> str:
+    """
+    Waits for LLM generation:
+    - 2-minute (120s) generation timeout.
+    - Continuous downward scrolling (scroll down + End key) to keep streaming tokens in view.
+    - Clean, silent waiting: NO repeating Ctrl+A selection flashing.
+    - Enforced 14-second minimum buffer before checking Copy button.
+    - Periodically checks the calibrated Copy button for balanced CAD JSON output.
+    """
     cfg = load_config()
     targets = cfg.get("targets", {})
     delays = cfg.get("delays", {})
@@ -126,29 +132,8 @@ def wait_for_llm(timeout: float = 120.0, min_wait: float = 15.0, expected_id: Op
     if expected_id:
         print(f"                 Expecting target identifier: '{expected_id}'")
 
+    copy_text_to_clipboard("")
     start_time = time.time()
-    
-    # Baseline text snapshot
-    time.sleep(1.5)
-    baseline_text = ""
-    try:
-        pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
-        pyautogui.click()
-        time.sleep(0.08)
-        pyautogui.keyDown("ctrl"); pyautogui.press("a"); pyautogui.keyUp("ctrl")
-        time.sleep(0.08)
-        pyautogui.keyDown("ctrl"); pyautogui.press("c"); pyautogui.keyUp("ctrl")
-        time.sleep(0.08)
-        pyautogui.press("escape")
-        baseline_text = get_clipboard_text()
-    except Exception:
-        pass
-
-    baseline_len = len(baseline_text)
-    last_len = baseline_len
-    has_streamed_new_content = False
-    stable_count = 0
-    consecutive_needed = 4  # ~10s stable after tokens stream
 
     while (time.time() - start_time) < timeout:
         elapsed = time.time() - start_time
@@ -156,74 +141,47 @@ def wait_for_llm(timeout: float = 120.0, min_wait: float = 15.0, expected_id: Op
         # Continuous downward scroll
         try:
             pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
-            pyautogui.scroll(-450)
+            pyautogui.scroll(-500)
             pyautogui.press("end")
         except Exception:
             pass
 
-        time.sleep(0.25)
+        # Wait during initial generation buffer
+        if elapsed < min_wait:
+            time.sleep(2.5)
+            continue
 
-        # Snapshot inspect
-        try:
-            pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
-            pyautogui.click()
-            time.sleep(0.08)
-            pyautogui.keyDown("ctrl"); pyautogui.press("a"); pyautogui.keyUp("ctrl")
-            time.sleep(0.08)
-            pyautogui.keyDown("ctrl"); pyautogui.press("c"); pyautogui.keyUp("ctrl")
-            time.sleep(0.08)
-            pyautogui.press("escape")
-            time.sleep(0.1)
-
-            page_text = get_clipboard_text()
-            if page_text:
-                cur_len = len(page_text)
-                if cur_len > last_len + 15:
-                    delta = cur_len - last_len
-                    has_streamed_new_content = True
-                    print(f"  [STREAMING] +{delta} chars ({cur_len} total) | [{int(elapsed)}s/{int(timeout)}s]")
-                    last_len = cur_len
-                    stable_count = 0
-                elif has_streamed_new_content and abs(cur_len - last_len) <= 15:
-                    stable_count += 1
-                    print(f"  [WAITING] Content steady ({stable_count}/{consecutive_needed}) | [{int(elapsed)}s/{int(timeout)}s]")
-        except Exception:
-            pass
-
-        # Check if min wait has elapsed AND new tokens streamed AND stabilized
-        if elapsed >= min_wait and has_streamed_new_content and stable_count >= consecutive_needed:
-            # Check Copy button
-            if copy_pos:
-                try:
-                    pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=0.3)
-                    pyautogui.click()
-                    time.sleep(0.4)
-                    clip_text = get_clipboard_text()
-                    if clip_text and "{" in clip_text and "}" in clip_text:
-                        if not expected_id or (expected_id in clip_text):
+        # Periodically check Copy button cleanly without selecting page
+        if copy_pos:
+            try:
+                pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=0.3)
+                pyautogui.click()
+                time.sleep(0.4)
+                clip_text = get_clipboard_text()
+                if clip_text and "{" in clip_text and "}" in clip_text:
+                    if clip_text.count("{") <= clip_text.count("}"):
+                        has_schema = any(k in clip_text for k in ("room", "dimensions", "objects", "name", "category", "materials"))
+                        matches_id = True if not expected_id else (expected_id in clip_text)
+                        if has_schema and matches_id:
                             print(f"[SUCCESS] Captured response via Copy button ({len(clip_text)} chars)!")
                             return clip_text
-                except Exception:
-                    pass
+            except Exception:
+                pass
 
-            # Fallback parse from page_text
-            parsed = parse_llm_json_response(page_text)
-            if parsed:
-                if not expected_id or (expected_id in str(parsed)):
-                    print(f"[SUCCESS] Extracted response from page text ({len(page_text)} chars)!")
-                    return json.dumps(parsed, indent=2)
-
-        time.sleep(2.0)
+        time.sleep(3.5)
 
     # Final attempt on timeout
     print(f"[TIMEOUT] {int(timeout)}s reached. Taking final copy...")
     if copy_pos:
         try:
+            pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
+            pyautogui.press("end")
+            time.sleep(0.3)
             pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=0.3)
             pyautogui.click()
-            time.sleep(0.5)
+            time.sleep(0.8)
             final_clip = get_clipboard_text()
-            if final_clip:
+            if final_clip and "{" in final_clip and "}" in final_clip:
                 return final_clip
         except Exception:
             pass
@@ -359,6 +317,10 @@ def run_single_refinement_step(scene_id: str, step_index: int) -> bool:
             update_body["color"] = parsed["color"]
         if "description" in parsed:
             update_body["description"] = parsed["description"]
+        if "materials" in parsed:
+            update_body["materials"] = parsed["materials"]
+        if "features" in parsed:
+            update_body["features"] = parsed["features"]
 
         put_data = json.dumps(update_body).encode("utf-8")
         put_req = urllib.request.Request(

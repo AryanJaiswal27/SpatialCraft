@@ -119,6 +119,15 @@ def update_object(scene_id: str, object_id: str, update: UpdateObjectRequest) ->
     if update.color is not None:
         target.color = update.color
 
+    if getattr(update, "name", None) is not None:
+        target.name = update.name
+    if getattr(update, "description", None) is not None:
+        target.description = update.description
+    if getattr(update, "materials", None) is not None:
+        setattr(target, "materials", update.materials)
+    if getattr(update, "features", None) is not None:
+        setattr(target, "features", update.features)
+
     # Handle attached_to_id explicitly (checking model_fields_set for null/None vs omitted)
     if hasattr(update, "model_fields_set") and "attached_to_id" in update.model_fields_set:
         val = update.attached_to_id

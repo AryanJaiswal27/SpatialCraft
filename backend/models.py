@@ -63,10 +63,16 @@ class PromptEditRequest(BaseModel):
     prompt: str
 
 class UpdateObjectRequest(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    name: Optional[str] = None
+    description: Optional[str] = None
     position: Optional[Vector3D] = None
     rotation: Optional[Rotation3D] = None
     dimensions: Optional[Dimensions3D] = None
     color: Optional[str] = None
+    materials: Optional[Dict[str, Any]] = None
+    features: Optional[List[str]] = None
     attached_to_id: Optional[str] = None
     relative_position: Optional[Vector3D] = None
     relative_yaw: Optional[float] = None

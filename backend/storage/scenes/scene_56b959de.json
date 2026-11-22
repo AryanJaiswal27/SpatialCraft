@@ -29,7 +29,7 @@
       "id": "obj_desk_1",
       "name": "Light Oak Executive Office Desk",
       "category": "table",
-      "description": "Rectangular light oak laminate office desk with full-height side panels, positioned perpendicular to the left wall",
+      "description": "Monolithic rectangular executive office desk constructed from engineered wood core clad in matte light oak woodgrain laminate. Features a 25mm thick flat rectangular tabletop with horizontal grain orientation, square-cut edges finished with matching 2mm PVC edge banding, and a slight ~20mm front overhang. Supported by two full-height 25mm vertical slab gable end panels with vertical grain orientation resting flush on the floor via concealed leveling glides. Includes a full-height front modesty panel recessed approximately 75mm from the front tabletop edge, providing structural rigidity and full under-desk visual concealment. Top work surface is completely flush with no integrated cable pass-through grommets.",
       "position": {
         "x": -0.5499999999999999,
         "y": 0.375,
@@ -41,11 +41,11 @@
         "roll": 0.0
       },
       "dimensions": {
-        "width": 1.65,
+        "width": 1.6,
         "height": 0.75,
-        "depth": 0.78
+        "depth": 0.75
       },
-      "color": "#c6a682",
+      "color": "#c5a785",
       "model_type": "procedural",
       "model_url": null,
       "crop_url": "/api/crops/scene_56b959de_obj_desk_1.jpg",
@@ -57,7 +57,20 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "materials": {
+        "primary": "light_oak_woodgrain_laminate_mdf",
+        "secondary": "matching_pvc_edge_banding"
+      },
+      "features": [
+        "25mm_thick_square_edge_tabletop",
+        "full_height_panel_gable_legs",
+        "recessed_full_height_modesty_panel",
+        "vertical_grain_side_panels",
+        "horizontal_grain_work_surface",
+        "flush_grommetless_desktop",
+        "concealed_floor_leveling_glides"
+      ]
     },
     {
       "id": "obj_cabinet_1",
@@ -600,7 +613,7 @@
     }
   ],
   "created_at": "2026-11-21T23:44:07.866587",
-  "updated_at": "2026-11-21T23:49:33.149535",
+  "updated_at": "2026-11-22T00:06:22.976519",
   "status": "ready",
   "status_message": "Scene reconstructed successfully"
 }
