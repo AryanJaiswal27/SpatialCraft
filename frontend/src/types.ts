@@ -45,6 +45,8 @@ export interface SceneObject {
   attached_to_id?: string | null;
   relative_position?: Vector3D | null;
   relative_yaw?: number | null;
+  materials?: Record<string, string>;
+  features?: string[];
 }
 
 export interface SceneGraph {
