@@ -13,7 +13,7 @@ sys.stdout.reconfigure(line_buffering=True)
 try:
     import pyautogui
     import pyperclip
-    pyautogui.FAILSAFE = True
+    pyautogui.FAILSAFE = False
 except ImportError:
     pyautogui = None
     pyperclip = None

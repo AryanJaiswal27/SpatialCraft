@@ -20,7 +20,7 @@ if str(ROOT_DIR) not in sys.path:
 try:
     import pyautogui
     import pyperclip
-    pyautogui.FAILSAFE = True
+    pyautogui.FAILSAFE = False
 except ImportError:
     pyautogui = None
     pyperclip = None
