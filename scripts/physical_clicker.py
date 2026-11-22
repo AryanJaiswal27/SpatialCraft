@@ -445,6 +445,10 @@ def execute_object_refinement(scene_id: str, obj: dict, scene_data: Optional[dic
         update_payload["materials"] = parsed["materials"]
     if "features" in parsed:
         update_payload["features"] = parsed["features"]
+    if "parts" in parsed:
+        update_payload["parts"] = parsed["parts"]
+    if "mesh_obj" in parsed:
+        update_payload["mesh_obj"] = parsed["mesh_obj"]
 
     try:
         put_data = json.dumps(update_payload).encode("utf-8")

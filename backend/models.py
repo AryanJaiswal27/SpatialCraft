@@ -45,6 +45,8 @@ class SceneObject(BaseModel):
     attached_to_id: Optional[str] = None # None or parent object ID or 'wall_north'/'wall_south'/'wall_east'/'wall_west'
     relative_position: Optional[Vector3D] = None
     relative_yaw: Optional[float] = None
+    parts: Optional[List[Dict[str, Any]]] = None
+    mesh_obj: Optional[str] = None
 
 class SceneGraph(BaseModel):
     model_config = ConfigDict(extra="allow")
@@ -73,6 +75,8 @@ class UpdateObjectRequest(BaseModel):
     color: Optional[str] = None
     materials: Optional[Dict[str, Any]] = None
     features: Optional[List[str]] = None
+    parts: Optional[List[Dict[str, Any]]] = None
+    mesh_obj: Optional[str] = None
     attached_to_id: Optional[str] = None
     relative_position: Optional[Vector3D] = None
     relative_yaw: Optional[float] = None

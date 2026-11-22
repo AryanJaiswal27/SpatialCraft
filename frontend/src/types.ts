@@ -29,6 +29,20 @@ export interface RoomConfig {
   ceiling: RoomSurface;
 }
 
+export interface MeshPart {
+  name?: string;
+  shape: 'box' | 'cylinder' | 'sphere' | 'cone' | 'torus' | 'plane';
+  args?: any[];
+  position?: [number, number, number];
+  rotation?: [number, number, number];
+  scale?: [number, number, number];
+  color?: string;
+  roughness?: number;
+  metalness?: number;
+  opacity?: number;
+  transparent?: boolean;
+}
+
 export interface SceneObject {
   id: string;
   name: string;
@@ -47,6 +61,8 @@ export interface SceneObject {
   relative_yaw?: number | null;
   materials?: Record<string, string>;
   features?: string[];
+  parts?: MeshPart[];
+  mesh_obj?: string;
 }
 
 export interface SceneGraph {

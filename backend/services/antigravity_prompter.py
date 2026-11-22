@@ -162,6 +162,30 @@ The attached image is an isolated, high-resolution cropped photograph of '{name}
 Analyze the cropped image carefully and execute these CAD refinements:
 {matched_directive}
 
+[3D MESH GENERATION REQUIREMENT]
+You must CONSTRUCT THE COMPLETE 3D MESH MODEL for '{name}' to mimic the cropped photograph as closely as possible.
+Decompose the object into its individual 3D structural components as an array of 'parts':
+- 'name': human-readable part name (e.g. 'tabletop', 'left_gable', 'modesty_panel', 'drawer_1', 'seat_cushion', 'backrest_mesh', 'caster_base', 'printer_chassis', 'keypad', etc.)
+- 'shape': one of 'box', 'cylinder', 'sphere', 'cone', 'torus', 'plane'
+- 'args': metric dimensions array:
+    * 'box': [width, height, depth]
+    * 'cylinder': [radiusTop, radiusBottom, height, radialSegments]
+    * 'sphere': [radius, widthSegments, heightSegments]
+    * 'cone': [radius, height, radialSegments]
+    * 'torus': [radius, tube, radialSegments, tubularSegments]
+    * 'plane': [width, height]
+- 'position': [x, y, z] relative to the base of the object:
+    * x is centered at 0 (-width/2 to +width/2)
+    * y = 0 is bottom resting surface, y goes up to height
+    * z is centered at 0 (-depth/2 to +depth/2)
+- 'rotation': [rx, ry, rz] in radians (optional, default [0, 0, 0])
+- 'color': hex color code (e.g. "#c5a785", "#18181b", "#e4e4e7")
+- 'roughness': 0.0 to 1.0 (e.g. 0.2 for shiny metal/glass, 0.7 for matte wood/fabric)
+- 'metalness': 0.0 to 1.0 (e.g. 0.9 for chrome/aluminum, 0.05 for wood/plastic)
+- 'opacity': 0.0 to 1.0 (optional, default 1.0; use 0.85 for breathable mesh or glass)
+
+Provide between 5 and 25 parts to construct a complete, high-fidelity 3D mesh that accurately reproduces the photographed piece.
+
 [STRICT OUTPUT FORMAT]
 Respond ONLY with a valid JSON block enclosed in ```json and ```. Do not include markdown preamble or conversational commentary.
 
@@ -184,6 +208,18 @@ Respond ONLY with a valid JSON block enclosed in ```json and ```. Do not include
   "features": [
     "feature_1",
     "feature_2"
+  ],
+  "parts": [
+    {{
+      "name": "part_name",
+      "shape": "box",
+      "args": [0.5, 0.03, 0.5],
+      "position": [0.0, 0.015, 0.0],
+      "rotation": [0.0, 0.0, 0.0],
+      "color": "{color}",
+      "roughness": 0.65,
+      "metalness": 0.05
+    }}
   ]
 }}
 ```

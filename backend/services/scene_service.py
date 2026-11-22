@@ -127,6 +127,10 @@ def update_object(scene_id: str, object_id: str, update: UpdateObjectRequest) ->
         setattr(target, "materials", update.materials)
     if getattr(update, "features", None) is not None:
         setattr(target, "features", update.features)
+    if getattr(update, "parts", None) is not None:
+        setattr(target, "parts", update.parts)
+    if getattr(update, "mesh_obj", None) is not None:
+        setattr(target, "mesh_obj", update.mesh_obj)
 
     # Handle attached_to_id explicitly (checking model_fields_set for null/None vs omitted)
     if hasattr(update, "model_fields_set") and "attached_to_id" in update.model_fields_set:

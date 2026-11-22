@@ -70,6 +70,183 @@
         "horizontal_grain_work_surface",
         "flush_grommetless_desktop",
         "concealed_floor_leveling_glides"
+      ],
+      "parts": [
+        {
+          "name": "tabletop_slab",
+          "shape": "box",
+          "args": [
+            1.6,
+            0.03,
+            0.75
+          ],
+          "position": [
+            0,
+            0.735,
+            0
+          ],
+          "color": "#c5a785",
+          "roughness": 0.65,
+          "metalness": 0.05
+        },
+        {
+          "name": "left_gable_end_panel",
+          "shape": "box",
+          "args": [
+            0.025,
+            0.72,
+            0.74
+          ],
+          "position": [
+            -0.787,
+            0.36,
+            0
+          ],
+          "color": "#c5a785",
+          "roughness": 0.7,
+          "metalness": 0.05
+        },
+        {
+          "name": "right_gable_end_panel",
+          "shape": "box",
+          "args": [
+            0.025,
+            0.72,
+            0.74
+          ],
+          "position": [
+            0.787,
+            0.36,
+            0
+          ],
+          "color": "#c5a785",
+          "roughness": 0.7,
+          "metalness": 0.05
+        },
+        {
+          "name": "full_height_modesty_panel",
+          "shape": "box",
+          "args": [
+            1.55,
+            0.48,
+            0.02
+          ],
+          "position": [
+            0,
+            0.48,
+            -0.22
+          ],
+          "color": "#c5a785",
+          "roughness": 0.72,
+          "metalness": 0.05
+        },
+        {
+          "name": "front_pvc_edge_trim",
+          "shape": "box",
+          "args": [
+            1.6,
+            0.004,
+            0.004
+          ],
+          "position": [
+            0,
+            0.72,
+            0.375
+          ],
+          "color": "#a3805f",
+          "roughness": 0.5,
+          "metalness": 0.1
+        },
+        {
+          "name": "leveling_glide_fl",
+          "shape": "cylinder",
+          "args": [
+            0.018,
+            0.018,
+            0.015,
+            16
+          ],
+          "position": [
+            -0.787,
+            0.0075,
+            0.32
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.8
+        },
+        {
+          "name": "leveling_glide_bl",
+          "shape": "cylinder",
+          "args": [
+            0.018,
+            0.018,
+            0.015,
+            16
+          ],
+          "position": [
+            -0.787,
+            0.0075,
+            -0.32
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.8
+        },
+        {
+          "name": "leveling_glide_fr",
+          "shape": "cylinder",
+          "args": [
+            0.018,
+            0.018,
+            0.015,
+            16
+          ],
+          "position": [
+            0.787,
+            0.0075,
+            0.32
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.8
+        },
+        {
+          "name": "leveling_glide_br",
+          "shape": "cylinder",
+          "args": [
+            0.018,
+            0.018,
+            0.015,
+            16
+          ],
+          "position": [
+            0.787,
+            0.0075,
+            -0.32
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.8
+        },
+        {
+          "name": "desktop_cable_grommet",
+          "shape": "cylinder",
+          "args": [
+            0.03,
+            0.03,
+            0.032,
+            24
+          ],
+          "position": [
+            0.65,
+            0.736,
+            -0.28
+          ],
+          "color": "#27272a",
+          "roughness": 0.3,
+          "metalness": 0.6
+        }
       ]
     },
     {

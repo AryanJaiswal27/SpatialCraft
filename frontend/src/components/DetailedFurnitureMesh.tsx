@@ -84,7 +84,56 @@ export const DetailedFurnitureMesh: React.FC<Props> = ({
     }
   };
 
+  const renderPartGeometry = (shape: string, args: any[] = []) => {
+    switch (shape?.toLowerCase()) {
+      case 'cylinder':
+        return <cylinderGeometry args={(args as any) || [0.05, 0.05, 0.1, 16]} />;
+      case 'sphere':
+        return <sphereGeometry args={(args as any) || [0.05, 16, 16]} />;
+      case 'cone':
+        return <coneGeometry args={(args as any) || [0.05, 0.1, 16]} />;
+      case 'torus':
+        return <torusGeometry args={(args as any) || [0.05, 0.015, 12, 24]} />;
+      case 'plane':
+        return <planeGeometry args={(args as any) || [0.1, 0.1]} />;
+      case 'box':
+      default:
+        return <boxGeometry args={(args as any) || [0.1, 0.1, 0.1]} />;
+    }
+  };
+
   const renderGeometry = () => {
+    // =========================================================================
+    // 0. LLM DYNAMIC 3D MESH (HIGHEST PRIORITY)
+    // When the LLM generates geometric parts, render the LLM's custom 3D model!
+    // =========================================================================
+    if (object.parts && Array.isArray(object.parts) && object.parts.length > 0) {
+      return (
+        <group position={[0, -height / 2, 0]}>
+          {object.parts.map((part, idx) => (
+            <mesh
+              key={idx}
+              position={part.position || [0, 0, 0]}
+              rotation={part.rotation || [0, 0, 0]}
+              scale={part.scale || [1, 1, 1]}
+              castShadow
+              receiveShadow
+            >
+              {renderPartGeometry(part.shape, part.args)}
+              <meshStandardMaterial
+                color={part.color || primaryColor}
+                roughness={part.roughness ?? 0.6}
+                metalness={part.metalness ?? 0.1}
+                transparent={Boolean(part.opacity !== undefined && part.opacity < 1)}
+                opacity={part.opacity ?? 1.0}
+                side={part.shape?.toLowerCase() === 'plane' ? THREE.DoubleSide : THREE.FrontSide}
+              />
+            </mesh>
+          ))}
+        </group>
+      );
+    }
+
     const cat = (object.category || 'decor').toLowerCase();
     const nameLower = (object.name || '').toLowerCase();
     const descLower = (object.description || '').toLowerCase();

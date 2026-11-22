@@ -321,6 +321,10 @@ def run_single_refinement_step(scene_id: str, step_index: int) -> bool:
             update_body["materials"] = parsed["materials"]
         if "features" in parsed:
             update_body["features"] = parsed["features"]
+        if "parts" in parsed:
+            update_body["parts"] = parsed["parts"]
+        if "mesh_obj" in parsed:
+            update_body["mesh_obj"] = parsed["mesh_obj"]
 
         put_data = json.dumps(update_body).encode("utf-8")
         put_req = urllib.request.Request(
