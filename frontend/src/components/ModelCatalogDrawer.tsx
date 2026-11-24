@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useSceneStore } from '../hooks/useSceneStore';
 import { MODEL_CATALOG, type CatalogModel } from '../data/modelCatalog';
+import { ModelRotatingPreview } from './ModelRotatingPreview';
 
 type CategoryFilter = 'ALL' | 'SEATING' | 'TABLES' | 'STORAGE' | 'LIGHTING' | 'PLANTS' | 'TECH & DECOR';
 
@@ -66,7 +67,7 @@ export const ModelCatalogDrawer: React.FC = () => {
         onClick={() => setActiveModal('none')}
       />
 
-      <div className="bg-zinc-950/98 border-t border-zinc-800 shadow-2xl flex flex-col max-h-[75vh] sm:max-h-[60vh] transition-all">
+      <div className="bg-zinc-950/98 border-t border-zinc-800 shadow-2xl flex flex-col max-h-[82vh] sm:max-h-[68vh] transition-all">
         {/* Header Bar */}
         <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-800/80 bg-zinc-900/40">
           <div className="flex items-center gap-2 min-w-0">
@@ -140,6 +141,14 @@ export const ModelCatalogDrawer: React.FC = () => {
                       />
                     </div>
                   </div>
+
+                  {/* Live 3D Rotating Turntable Preview */}
+                  <ModelRotatingPreview
+                    parts={model.parts}
+                    dimensions={model.dimensions}
+                    color={model.color}
+                    name={model.name}
+                  />
 
                   {/* Title & Description */}
                   <div className="space-y-1">
