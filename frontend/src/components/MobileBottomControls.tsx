@@ -15,6 +15,7 @@ import {
   Unlink,
   Layers,
   Sparkles,
+  BookOpen,
 } from 'lucide-react';
 import { useSceneStore } from '../hooks/useSceneStore';
 
@@ -300,6 +301,14 @@ export const MobileBottomControls: React.FC = () => {
           >
             <FileCode2 className="w-3.5 h-3.5 text-zinc-400" />
             <span>INGEST PAYLOAD</span>
+          </button>
+
+          <button
+            onClick={() => setActiveModal('guide')}
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-bold text-[10px] transition-colors"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-zinc-400" />
+            <span>OPERATIONAL GUIDE</span>
           </button>
 
           {hasExistingScenes && (

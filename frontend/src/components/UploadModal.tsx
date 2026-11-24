@@ -41,11 +41,9 @@ export const UploadModal: React.FC = () => {
   if (activeModal !== 'upload') return null;
 
   const targets: { id: LLMTarget; name: string; host: string }[] = [
-    { id: 'gemini', name: 'Gemini', host: 'gemini.google.com' },
-    { id: 'chatgpt', name: 'ChatGPT', host: 'chatgpt.com' },
-    { id: 'claude', name: 'Claude', host: 'claude.ai' },
-    { id: 'deepseek', name: 'DeepSeek', host: 'chat.deepseek.com' },
-    { id: 'physical', name: 'Physical Clicks', host: 'OS mouse driver' },
+    { id: 'gemini', name: 'Physical on Gemini', host: 'gemini.google.com' },
+    { id: 'chatgpt', name: 'Physical on ChatGPT', host: 'chatgpt.com' },
+    { id: 'deepseek', name: 'Physical on DeepSeek', host: 'chat.deepseek.com' },
   ];
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,27 +162,32 @@ export const UploadModal: React.FC = () => {
         <div className="p-4 overflow-y-auto space-y-4 text-xs">
           {/* Target Engine Selection */}
           <div>
-            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-2">
-              01. Select Web Engine
-            </span>
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">
+                01. Select Physical Click Target
+              </span>
+              <span className="text-[9px] text-zinc-600 font-mono">
+                OS Mouse & Keyboard Driver
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
               {targets.map((t) => (
                 <button
                   key={t.id}
                   type="button"
                   onClick={() => setTargetLLM(t.id)}
                   disabled={isUploading}
-                  className={`flex items-center justify-between px-3 py-2 border text-[11px] text-left transition-colors ${
+                  className={`flex flex-col justify-between p-2.5 border text-left transition-colors ${
                     targetLLM === t.id
-                      ? 'border-zinc-100 bg-zinc-900 text-zinc-100 font-bold'
-                      : 'border-zinc-800 bg-zinc-950 text-zinc-400 hover:border-zinc-700'
+                      ? 'border-zinc-100 bg-zinc-900 text-zinc-100 font-bold shadow-md'
+                      : 'border-zinc-800 bg-zinc-950 text-zinc-400 hover:border-zinc-700 hover:text-zinc-300'
                   }`}
                 >
-                  <div className="flex flex-col">
-                    <span>{t.name}</span>
-                    <span className="text-[9px] text-zinc-600">{t.host}</span>
+                  <div className="flex items-center justify-between w-full mb-1">
+                    <span className="text-[11px] uppercase tracking-wide">{t.name}</span>
+                    {targetLLM === t.id && <Check className="w-3.5 h-3.5 text-zinc-100 shrink-0" />}
                   </div>
-                  {targetLLM === t.id && <Check className="w-3.5 h-3.5 text-zinc-100" />}
+                  <span className="text-[9px] text-zinc-500 font-mono">{t.host}</span>
                 </button>
               ))}
             </div>

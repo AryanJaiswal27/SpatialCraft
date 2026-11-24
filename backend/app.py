@@ -372,48 +372,39 @@ async def upload_room_image(
     )
     save_scene(scene)
 
-    if target_llm == "physical":
-        job_id = f"job_{uuid.uuid4().hex[:8]}"
-        physical_jobs_queue.append({
-            "job_id": job_id,
-            "job_type": "initial_reconstruction",
-            "scene_id": scene_id,
-            "prompt": generate_spatial_prompt(),
-            "image_path": str(saved_path.resolve()),
-            "created_at": datetime.utcnow().isoformat()
-        })
-        cur_scene = get_scene(scene_id)
-        if cur_scene:
-            cur_scene.status_message = "Awaiting physical click execution on desktop daemon..."
-            save_scene(cur_scene)
-        asyncio.create_task(broadcast_status(scene_id, "[PHYSICAL] Job queued for desktop mouse execution...", "progress"))
-    elif auto_automate:
-        async def run_bg_automation():
-            try:
-                def cb(msg: str):
-                    asyncio.create_task(broadcast_status(scene_id, msg, stage="progress"))
+    # All room capture options are Physical Click Ingestions (Gemini, ChatGPT, DeepSeek)
+    preset_name = target_llm.lower() if target_llm.lower() in ("gemini", "chatgpt", "deepseek") else "gemini"
 
-                await broadcast_status(scene_id, f"Opening browser for {target_llm.upper()}...", "start")
-                result = await automate_llm_in_browser(
-                    target=target_llm,
-                    image_path=saved_path,
-                    scene_id=scene_id,
-                    status_callback=cb
-                )
-                if result:
-                    await broadcast_status(scene_id, "3D Room Reconstructed!", "done")
-                else:
-                    cur_scene = get_scene(scene_id)
-                    if cur_scene and cur_scene.status == "processing":
-                        cur_scene.status = "waiting_payload"
-                        cur_scene.status_message = f"{target_llm.upper()} login/verification required. Tap PAYLOAD to ingest output."
-                        save_scene(cur_scene)
-                    await broadcast_status(scene_id, "Awaiting prompt/login in browser.", "waiting")
-            except Exception as e:
-                print(f"Browser automation background error: {e}")
-                await broadcast_status(scene_id, f"Automation paused: {str(e)}", "error")
+    # Automatically activate this preset in physical_clicks_config.json
+    try:
+        if PHYSICAL_CONFIG_PATH.exists():
+            with open(PHYSICAL_CONFIG_PATH, "r", encoding="utf-8") as f:
+                cfg_data = json.load(f)
+            ensure_presets_in_config(cfg_data)
+            if preset_name in cfg_data.get("presets", {}):
+                cfg_data["active_preset"] = preset_name
+                cfg_data["targets"] = cfg_data["presets"][preset_name].get("targets", {})
+                cfg_data["delays"] = cfg_data["presets"][preset_name].get("delays", {})
+                with open(PHYSICAL_CONFIG_PATH, "w", encoding="utf-8") as f:
+                    json.dump(cfg_data, f, indent=2)
+    except Exception as e:
+        print(f"[PRESET SYNC ERROR] {e}")
 
-        asyncio.create_task(run_bg_automation())
+    job_id = f"job_{uuid.uuid4().hex[:8]}"
+    physical_jobs_queue.append({
+        "job_id": job_id,
+        "job_type": "initial_reconstruction",
+        "preset": preset_name,
+        "scene_id": scene_id,
+        "prompt": generate_spatial_prompt(),
+        "image_path": str(saved_path.resolve()),
+        "created_at": datetime.utcnow().isoformat()
+    })
+    cur_scene = get_scene(scene_id)
+    if cur_scene:
+        cur_scene.status_message = f"Awaiting physical click execution on desktop daemon for {preset_name.capitalize()}..."
+        save_scene(cur_scene)
+    asyncio.create_task(broadcast_status(scene_id, f"[PHYSICAL] Job queued for desktop mouse execution on {preset_name.capitalize()}...", "progress"))
 
     # 5-MINUTE BACKUP WATCHDOG: If no output is received from browser LLM within 5 minutes,
     # Antigravity autonomously builds the scene and executes the refinement loop over all objects!

@@ -327,10 +327,10 @@ def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional
 
     return ""
 
-def execute_initial_reconstruction(image_path: Path, scene_id: str) -> Optional[dict]:
+def execute_initial_reconstruction(image_path: Path, scene_id: str, preset: Optional[str] = None) -> Optional[dict]:
     """Phase 1: Prompts open browser to construct the full 3D room, with 5-minute Antigravity autonomous fallback."""
     from backend.services.browser_prompt import generate_spatial_prompt
-    cfg = load_config()
+    cfg = load_config(preset=preset)
     targets = cfg.get("targets", {})
     delays = cfg.get("delays", {})
 
@@ -418,7 +418,7 @@ def parse_refinement_json(raw_text: str) -> Optional[dict]:
             pass
     return None
 
-def execute_object_refinement(scene_id: str, obj: dict, scene_data: Optional[dict] = None, step_idx: int = 1, total_steps: int = 1) -> bool:
+def execute_object_refinement(scene_id: str, obj: dict, scene_data: Optional[dict] = None, step_idx: int = 1, total_steps: int = 1, preset: Optional[str] = None) -> bool:
     """Phase 2: Refines an individual object using Antigravity's tailored prompt and 2D crop."""
     crop_url = obj.get("crop_url")
     if not crop_url:
@@ -434,7 +434,7 @@ def execute_object_refinement(scene_id: str, obj: dict, scene_data: Optional[dic
         print(f"[PHYSICAL // SKIP] Crop file not found on disk: {crop_name}")
         return False
 
-    cfg = load_config()
+    cfg = load_config(preset=preset)
     targets = cfg.get("targets", {})
     delays = cfg.get("delays", {})
 
@@ -507,7 +507,7 @@ def execute_object_refinement(scene_id: str, obj: dict, scene_data: Optional[dic
         print(f"[PHYSICAL // ERROR] Updating refined object: {e}")
         return False
 
-def run_full_scene_refinement_loop(scene_id: str, max_items: Optional[int] = None):
+def run_full_scene_refinement_loop(scene_id: str, max_items: Optional[int] = None, preset: Optional[str] = None):
     """
     Antigravity iterates one-by-one through each object in the scene,
     generates a tailored prompt for each, and drives refinement
@@ -515,6 +515,8 @@ def run_full_scene_refinement_loop(scene_id: str, max_items: Optional[int] = Non
     """
     print("\n" + "=" * 65)
     print(f" [ANTIGRAVITY REFINEMENT LOOP] Starting Object-by-Object CAD Refinement for {scene_id}")
+    if preset:
+        print(f" Active Target LLM: {preset.upper()}")
     print("=" * 65)
 
     try:
@@ -551,7 +553,8 @@ def run_full_scene_refinement_loop(scene_id: str, max_items: Optional[int] = Non
             obj=obj,
             scene_data=scene_data,
             step_idx=idx,
-            total_steps=total_to_process
+            total_steps=total_to_process,
+            preset=preset
         )
         if success:
             refined_count += 1
@@ -587,26 +590,27 @@ def run_physical_daemon(preset: Optional[str] = None):
                     if job and job.get("job_id"):
                         job_id = job["job_id"]
                         job_type = job.get("job_type", "initial_reconstruction")
+                        job_preset = job.get("preset") or preset
                         scene_id = job.get("scene_id", f"scene_{int(time.time())}")
                         image_path_str = job.get("image_path")
                         image_path = Path(image_path_str) if image_path_str else None
 
-                        print(f"\n[DAEMON // JOB RECEIVED] Type: {job_type} | ID: {job_id} | Scene: {scene_id}")
+                        print(f"\n[DAEMON // JOB RECEIVED] Type: {job_type} | Preset: {job_preset or 'active'} | ID: {job_id} | Scene: {scene_id}")
 
                         if job_type == "initial_reconstruction" and image_path:
-                            # 1. Run initial room reconstruction
-                            scene_result = execute_initial_reconstruction(image_path, scene_id)
+                            # 1. Run initial room reconstruction with job preset
+                            scene_result = execute_initial_reconstruction(image_path, scene_id, preset=job_preset)
                             # 2. Automatically kick off the refinement loop for ALL objects!
                             if scene_result:
                                 print(f"\n[ANTIGRAVITY // PIPELINE] Ingested initial room. Beginning sequential refinement across ALL objects...")
-                                run_full_scene_refinement_loop(scene_id, max_items=None)
+                                run_full_scene_refinement_loop(scene_id, max_items=None, preset=job_preset)
 
                         elif job_type == "refine_loop":
-                            run_full_scene_refinement_loop(scene_id, max_items=job.get("max_items"))
+                            run_full_scene_refinement_loop(scene_id, max_items=job.get("max_items"), preset=job_preset)
 
                         elif job_type == "refine_single":
                             obj = job.get("object_data", {})
-                            execute_object_refinement(scene_id, obj)
+                            execute_object_refinement(scene_id, obj, preset=job_preset)
 
                         elif job_type == "screen_action":
                             # Antigravity screen-control directive

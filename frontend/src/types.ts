@@ -77,8 +77,8 @@ export interface SceneGraph {
   status_message?: string;
 }
 
-export type LLMTarget = 'chatgpt' | 'claude' | 'gemini' | 'deepseek' | 'physical';
+export type LLMTarget = 'gemini' | 'chatgpt' | 'deepseek' | 'physical' | 'claude';
 
-export type ActiveModal = 'none' | 'upload' | 'chat' | 'scenes' | 'manual_paste' | 'qr' | 'logs' | 'calibration' | 'antigravity';
+export type ActiveModal = 'none' | 'upload' | 'chat' | 'scenes' | 'manual_paste' | 'qr' | 'logs' | 'calibration' | 'antigravity' | 'guide';
 
 

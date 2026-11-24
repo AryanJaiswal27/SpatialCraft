@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Camera, ChevronDown, Check, QrCode, Terminal, Layers, Box, MousePointerClick } from 'lucide-react';
+import { Camera, ChevronDown, Check, QrCode, Terminal, Layers, Box, MousePointerClick, HelpCircle } from 'lucide-react';
 import { useSceneStore } from '../hooks/useSceneStore';
 import type { LLMTarget, SceneGraph } from '../types';
 
@@ -24,11 +24,9 @@ export const MobileHeader: React.FC = () => {
   const [showSceneMenu, setShowSceneMenu] = useState(false);
 
   const targets: { id: LLMTarget; name: string }[] = [
-    { id: 'gemini', name: 'Gemini' },
-    { id: 'chatgpt', name: 'ChatGPT' },
-    { id: 'claude', name: 'Claude' },
-    { id: 'deepseek', name: 'DeepSeek' },
-    { id: 'physical', name: 'Physical' },
+    { id: 'gemini', name: 'Gemini (Physical)' },
+    { id: 'chatgpt', name: 'ChatGPT (Physical)' },
+    { id: 'deepseek', name: 'DeepSeek (Physical)' },
   ];
 
   const currentTarget = targets.find((t) => t.id === targetLLM) || targets[0];
@@ -194,6 +192,15 @@ export const MobileHeader: React.FC = () => {
           title="Calibrate Physical Screen Click Coordinates"
         >
           <MousePointerClick className="w-3 h-3" />
+        </button>
+
+        {/* Operational Guide Trigger */}
+        <button
+          onClick={() => setActiveModal('guide')}
+          className="p-1.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 transition-colors shrink-0"
+          title="SpatialCraft Operational Guide"
+        >
+          <HelpCircle className="w-3 h-3" />
         </button>
 
         {/* QR Matrix Modal Trigger */}
