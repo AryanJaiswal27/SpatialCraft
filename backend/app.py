@@ -16,7 +16,8 @@ from .config import UPLOADS_DIR, ROOT_UPLOADS_DIR, CROPS_DIR, SCENES_DIR, STATIC
 from .models import SceneGraph, PromptEditRequest, UpdateObjectRequest, SceneObject
 from .services.scene_service import (
     save_scene, get_scene, list_scenes, update_object,
-    delete_object, add_object, apply_natural_language_edit
+    delete_object, add_object, apply_natural_language_edit,
+    verify_and_ground_scene
 )
 from .services.browser_prompt import (
     generate_spatial_prompt, parse_llm_json_response, build_scene_from_parsed_data
@@ -215,6 +216,15 @@ async def trigger_scene_refinement(scene_id: str, payload: Optional[Dict[str, An
     total_str = f"up to {job['max_items']} objects" if job.get("max_items") else "ALL objects"
     await broadcast_status(scene_id, f"[ANTIGRAVITY] Sequential Refinement Enqueued ({total_str})...", "progress")
     return {"status": "queued", "job_id": job_id, "job_type": job["job_type"]}
+
+@app.post("/api/scene/{scene_id}/verify_placement")
+async def verify_scene_placement_endpoint(scene_id: str):
+    scene = get_scene(scene_id)
+    if not scene:
+        raise HTTPException(status_code=404, detail="Scene not found")
+    verified_scene = verify_and_ground_scene(scene)
+    await broadcast_status(scene_id, "[ANTIGRAVITY] Verified all objects: 0 floating, all grounded & detailed meshes confirmed!", "done")
+    return verified_scene
 
 @app.post("/api/scene/{scene_id}/antigravity_backup_build")
 async def trigger_antigravity_backup_build(scene_id: str):

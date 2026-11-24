@@ -1,5 +1,5 @@
 {
-  "active_preset": "chatgpt",
+  "active_preset": "deepseek",
   "screen": {
     "width": 1920,
     "height": 1080
@@ -158,39 +158,39 @@
   },
   "targets": {
     "browser_tab": {
-      "name": "01. OPENAI CHATGPT TAB / HEADER",
-      "x": 385,
-      "y": 1053,
-      "description": "Hover over your ChatGPT browser tab or taskbar icon.\nAntigravity clicks here to bring OpenAI ChatGPT to the foreground."
+      "name": "01. DEEPSEEK CHAT TAB / HEADER",
+      "x": 384,
+      "y": 1048,
+      "description": "Hover over your DeepSeek browser tab or taskbar icon.\nAntigravity clicks here to bring DeepSeek Chat to the foreground."
     },
     "prompt_box": {
-      "name": "02. OPENAI CHATGPT CHAT INPUT",
-      "x": 908,
-      "y": 980,
-      "description": "Hover inside ChatGPT message input box (Ctrl+V paste target).\nAntigravity clicks here to paste images (Ctrl+V) and CAD prompts."
+      "name": "02. DEEPSEEK CHAT CHAT INPUT",
+      "x": 861,
+      "y": 910,
+      "description": "Hover inside DeepSeek message textarea (Ctrl+V paste target).\nAntigravity clicks here to paste images (Ctrl+V) and CAD prompts."
     },
     "send_button": {
-      "name": "03. OPENAI CHATGPT SEND BUTTON",
-      "x": 1490,
-      "y": 977,
-      "description": "Hover over ChatGPT send button arrow.\nAntigravity clicks here to dispatch prompts to OpenAI ChatGPT."
+      "name": "03. DEEPSEEK CHAT SEND BUTTON",
+      "x": 1450,
+      "y": 976,
+      "description": "Hover over DeepSeek send button arrow.\nAntigravity clicks here to dispatch prompts to DeepSeek Chat."
     },
     "copy_button": {
-      "name": "04. OPENAI CHATGPT COPY BUTTON",
-      "x": 757,
-      "y": 857,
-      "description": "Hover over ChatGPT Copy response button icon at bottom of message.\nAntigravity clicks here to extract the generated 3D CAD data."
+      "name": "04. DEEPSEEK CHAT COPY BUTTON",
+      "x": 724,
+      "y": 827,
+      "description": "Hover over DeepSeek Copy response button icon at bottom of message.\nAntigravity clicks here to extract the generated 3D CAD data."
     },
     "antigravity_header": {
       "name": "05. ANTIGRAVITY WINDOW / TOP HEADER",
-      "x": 337,
-      "y": 1052,
+      "x": 340,
+      "y": 1053,
       "description": "Hover over the top title bar or tab header of this Antigravity IDE window.\nAntigravity clicks here to bring the IDE window to the top/foreground."
     },
     "ide_chat_box": {
       "name": "06. ANTIGRAVITY IDE CHAT INPUT",
-      "x": 1457,
-      "y": 918,
+      "x": 1270,
+      "y": 915,
       "description": "Hover inside the chat input box at the bottom of this Antigravity IDE window.\nAntigravity clicks here to paste the browser's LLM response directly into this chat."
     }
   },

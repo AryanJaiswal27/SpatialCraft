@@ -182,6 +182,17 @@ Your objective is fine-grained, high-fidelity 3D CAD architectural refinement of
 {directive_header}
 {matched_directive}
 
+[PHYSICAL PLACEMENT & GROUNDING - ZERO FLOATING OBJECTS]
+Verify and refine the 3D position [x, y, z] and rotation [yaw] in meters:
+- ZERO FLOATING OBJECTS: If '{name}' rests on the floor (sofas, tables, chairs, rugs, bookshelves, floor lamps), its base MUST sit directly on the floor plane (Y=0), meaning position.y = height / 2.0.
+- SURFACE ATTACHMENT: If '{name}' rests on top of a desk/table/counter (laptops, mugs, books, phones, table lamps), its position.y MUST be set flush onto the parent's top surface: (parent_height + height / 2.0). Specify "attached_to_id": "<parent_id>".
+- WALL FLUSHNESS: If wall-mounted (art, mirrors), ensure it is flush against the corresponding wall.
+
+[MISSING OBJECTS SCAN]
+Carefully examine the original room photograph around '{name}'.
+Did the initial scan miss any items that belong on or directly next to this piece (e.g. throw pillows, blanket, desk lamp, cables, coffee cup, papers, footstool)?
+If so, list their names and rough dimensions in "missed_objects_detected".
+
 [3D MESH GENERATION REQUIREMENT - BUILD FROM FRESH]
 {fresh_header}
 - DO NOT use a generic pre-baked template. Build all mesh parts from scratch based on this specific item.
@@ -222,6 +233,15 @@ Respond ONLY with a valid JSON block enclosed in ```json and ```. Do not include
     "height": {h},
     "depth": {d}
   }},
+  "position": {{
+    "x": {pos.get('x', 0.0)},
+    "y": {pos.get('y', h / 2.0)},
+    "z": {pos.get('z', 0.0)}
+  }},
+  "rotation": {{
+    "yaw": {rot.get('yaw', 0.0)}
+  }},
+  "attached_to_id": {json.dumps(attached_to)},
   "color": "{color}",
   "description": "Exhaustive CAD description with geometry, materials, and legs/cushions...",
   "materials": {{
@@ -232,6 +252,7 @@ Respond ONLY with a valid JSON block enclosed in ```json and ```. Do not include
     "feature_1",
     "feature_2"
   ],
+  "missed_objects_detected": [],
   "parts": [
     {{
       "name": "part_name",
