@@ -25,14 +25,25 @@ if str(ROOT_DIR) not in sys.path:
 CONFIG_PATH = ROOT_DIR / "physical_clicks_config.json"
 BASE_URL = "http://localhost:8000"
 
-def load_config() -> dict:
+def load_config(preset: Optional[str] = None) -> dict:
     if CONFIG_PATH.exists():
         try:
             with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+            active_id = preset or data.get("active_preset", "gemini")
+            presets = data.get("presets", {})
+            if presets and active_id in presets:
+                pdata = presets[active_id]
+                data["targets"] = pdata.get("targets", data.get("targets", {}))
+                data["delays"] = pdata.get("delays", data.get("delays", {}))
+                data["active_preset"] = active_id
+                data["preset_label"] = pdata.get("label", active_id.capitalize())
+            else:
+                data["preset_label"] = data.get("active_preset", "gemini").capitalize()
+            return data
         except Exception:
             pass
-    return {}
+    return {"screen": {"width": 1920, "height": 1080}, "active_preset": "gemini", "preset_label": "Google Gemini", "targets": {}, "delays": {}}
 
 def copy_image_to_clipboard(image_path: Path) -> bool:
     """Copies image file directly to the Windows clipboard for instant Ctrl+V paste."""
@@ -519,16 +530,21 @@ def run_full_scene_refinement_loop(scene_id: str, max_items: Optional[int] = Non
     print(f" [ANTIGRAVITY COMPLETE] Successfully refined all {refined_count}/{total_to_process} objects in scene {scene_id}!")
     print("=" * 65)
 
-def run_physical_daemon():
+def run_physical_daemon(preset: Optional[str] = None):
     """
     Standing desktop daemon that runs on the user's interactive monitor.
     Polls /api/physical_clicks/queue for incoming jobs triggered by phone/web/watcher.
     """
+    cfg = load_config(preset=preset)
+    preset_label = cfg.get("preset_label", "Google Gemini")
+    preset_id = cfg.get("active_preset", "gemini")
+
     print("=" * 65)
     print("      SPATIALCRAFT // PHYSICAL CLICK & REFINEMENT DAEMON")
     print("=" * 65)
+    print(f"Active LLM Preset: {preset_label} [{preset_id}]")
     print("Monitoring incoming capture and refinement requests...")
-    print("Ready to paste into your open browser and refine models.")
+    print(f"Ready to drive {preset_label} in your browser and refine models.")
     print("Press Ctrl+C to terminate.\n")
 
     while True:
@@ -623,14 +639,28 @@ def run_physical_daemon():
         time.sleep(1.5)
 
 if __name__ == "__main__":
+    override_preset = None
+    for i, arg in enumerate(sys.argv):
+        if arg == "--preset" and i + 1 < len(sys.argv):
+            override_preset = sys.argv[i + 1]
+            break
+        elif arg.startswith("--preset="):
+            override_preset = arg.split("=", 1)[1]
+            break
+
     if "--daemon" in sys.argv:
-        run_physical_daemon()
+        run_physical_daemon(preset=override_preset)
     else:
         # Direct CLI status
-        cfg = load_config()
+        cfg = load_config(preset=override_preset)
         targets = cfg.get("targets", {})
-        print(f"SpatialCraft Physical Clicker ready. Loaded {len(targets)} calibrated targets.")
+        preset_label = cfg.get("preset_label", "Google Gemini")
+        preset_id = cfg.get("active_preset", "gemini")
+        print(f"SpatialCraft Physical Clicker ready. Active Preset: {preset_label} [{preset_id}]")
+        print(f"Loaded {len(targets)} calibrated targets:")
         for k, v in targets.items():
-            print(f"  - {v.get('name', k):28s} : X = {v.get('x')}, Y = {v.get('y')}")
+            print(f"  - {v.get('name', k):32s} : X = {v.get('x')}, Y = {v.get('y')}")
+        print("\nTo switch active preset, run:")
+        print("  .\\calibrate_clicks.bat [gemini | chatgpt | deepseek]")
         print("\nTo start the standing desktop listener, run:")
         print("  .\\run_physical_daemon.bat  (or python scripts/physical_clicker.py --daemon)")

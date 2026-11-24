@@ -28,14 +28,48 @@ except ImportError:
 CONFIG_PATH = ROOT_DIR / "physical_clicks_config.json"
 BASE_URL = "http://localhost:8000"
 
-def load_config() -> dict:
+def load_config(preset: Optional[str] = None) -> dict:
     if CONFIG_PATH.exists():
         try:
             with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+            active_id = preset or data.get("active_preset", "gemini")
+            presets = data.get("presets", {})
+            if presets and active_id in presets:
+                pdata = presets[active_id]
+                data["targets"] = pdata.get("targets", data.get("targets", {}))
+                data["delays"] = pdata.get("delays", data.get("delays", {}))
+                data["active_preset"] = active_id
+                data["preset_label"] = pdata.get("label", active_id.capitalize())
+            else:
+                data["preset_label"] = data.get("active_preset", "gemini").capitalize()
+            return data
         except Exception:
             pass
-    return {}
+    return {"screen": {"width": 1920, "height": 1080}, "active_preset": "gemini", "preset_label": "Google Gemini", "targets": {}, "delays": {}}
+
+def activate_preset(preset_name: str) -> bool:
+    if not CONFIG_PATH.exists():
+        return False
+    try:
+        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        pid = preset_name.lower().strip()
+        presets = data.get("presets", {})
+        if pid in presets:
+            data["active_preset"] = pid
+            data["targets"] = presets[pid].get("targets", {})
+            data["delays"] = presets[pid].get("delays", {})
+            with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2)
+            print(f"[PRESET] Successfully activated preset: {presets[pid].get('label', pid)} ({pid})")
+            return True
+        else:
+            print(f"[ERROR] Preset '{preset_name}' not found. Available presets: {list(presets.keys())}")
+            return False
+    except Exception as e:
+        print(f"[ERROR] Could not switch preset: {e}")
+        return False
 
 def copy_text_to_clipboard(text: str) -> bool:
     try:
@@ -365,6 +399,9 @@ def main():
     refine_parser.add_argument("scene_id", help="Scene ID")
     refine_parser.add_argument("step", type=int, help="Step index (1-based)")
 
+    preset_parser = subparsers.add_parser("preset")
+    preset_parser.add_argument("name", help="Preset identifier to activate (e.g. gemini, chatgpt, deepseek)")
+
     args = parser.parse_args()
 
     if args.command == "focus_browser":
@@ -377,6 +414,8 @@ def main():
         focus_target(args.target)
     elif args.command == "paste_to_ide":
         paste_to_ide_chat(args.text)
+    elif args.command == "preset":
+        activate_preset(args.name)
     elif args.command == "wait_response":
         res = wait_for_llm(timeout=args.timeout, min_wait=args.min_wait, expected_id=args.expected)
         print("\nExtracted Output:\n" + res)
@@ -385,9 +424,19 @@ def main():
     elif args.command == "status":
         cfg = load_config()
         targets = cfg.get("targets", {})
+        preset_label = cfg.get("preset_label", "Google Gemini")
+        preset_id = cfg.get("active_preset", "gemini")
         print(f"Antigravity Screen Controller ready. Screen: {cfg.get('screen')}")
+        print(f"Active Preset: {preset_label} [{preset_id}]")
+        print("Calibrated Targets for Active Preset:")
         for k, v in targets.items():
             print(f"  - {v.get('name', k):30s} : X = {v.get('x')}, Y = {v.get('y')}")
+        presets = cfg.get("presets", {})
+        if presets:
+            print("\nAvailable Presets:")
+            for pid, pdata in presets.items():
+                marker = " [ACTIVE]" if pid == preset_id else ""
+                print(f"  * {pdata.get('label', pid):20s} ({pid}){marker}")
     else:
         parser.print_help()
 

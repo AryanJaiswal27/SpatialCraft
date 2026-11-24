@@ -49,24 +49,89 @@ active_sockets: Dict[str, List[WebSocket]] = {}
 PHYSICAL_CONFIG_PATH = ROOT_DIR / "physical_clicks_config.json"
 physical_jobs_queue: List[Dict[str, Any]] = []
 
+def ensure_presets_in_config(data: Dict[str, Any]) -> Dict[str, Any]:
+    if "presets" not in data or not isinstance(data.get("presets"), dict):
+        old_targets = data.get("targets", {})
+        old_delays = data.get("delays", {})
+        data["active_preset"] = "gemini"
+        data["presets"] = {
+            "gemini": {
+                "id": "gemini",
+                "label": "Google Gemini",
+                "browser_url": "https://gemini.google.com",
+                "targets": old_targets,
+                "delays": old_delays,
+                "last_calibrated_at": data.get("last_calibrated_at")
+            },
+            "chatgpt": {
+                "id": "chatgpt",
+                "label": "OpenAI ChatGPT",
+                "browser_url": "https://chatgpt.com",
+                "targets": dict(old_targets),
+                "delays": dict(old_delays),
+                "last_calibrated_at": None
+            },
+            "deepseek": {
+                "id": "deepseek",
+                "label": "DeepSeek Chat",
+                "browser_url": "https://chat.deepseek.com",
+                "targets": dict(old_targets),
+                "delays": dict(old_delays),
+                "last_calibrated_at": None
+            }
+        }
+    active_id = data.get("active_preset", "gemini")
+    presets = data.get("presets", {})
+    if active_id in presets:
+        data["targets"] = presets[active_id].get("targets", data.get("targets", {}))
+        data["delays"] = presets[active_id].get("delays", data.get("delays", {}))
+    return data
+
 @app.get("/api/physical_clicks/config")
 async def get_physical_config():
     if PHYSICAL_CONFIG_PATH.exists():
         try:
             with open(PHYSICAL_CONFIG_PATH, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+            ensure_presets_in_config(data)
+            return data
         except Exception:
             pass
-    return {"screen": {"width": 1920, "height": 1080}, "targets": {}, "delays": {}}
+    return {"screen": {"width": 1920, "height": 1080}, "active_preset": "gemini", "presets": {}, "targets": {}, "delays": {}}
 
 @app.post("/api/physical_clicks/config")
 async def update_physical_config(data: Dict[str, Any]):
     try:
+        ensure_presets_in_config(data)
         with open(PHYSICAL_CONFIG_PATH, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
-        return {"status": "ok", "message": "Physical click calibration updated"}
+        return {"status": "ok", "message": "Physical click calibration updated", "active_preset": data.get("active_preset", "gemini")}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/physical_clicks/preset/{preset_name}/activate")
+async def activate_physical_preset(preset_name: str):
+    """Switches the active LLM calibration preset (gemini, chatgpt, deepseek)."""
+    if PHYSICAL_CONFIG_PATH.exists():
+        try:
+            with open(PHYSICAL_CONFIG_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            ensure_presets_in_config(data)
+            pid = preset_name.lower().strip()
+            if pid in data.get("presets", {}):
+                data["active_preset"] = pid
+                data["targets"] = data["presets"][pid].get("targets", {})
+                data["delays"] = data["presets"][pid].get("delays", {})
+                with open(PHYSICAL_CONFIG_PATH, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=2)
+                return {"status": "ok", "active_preset": pid, "message": f"Activated preset '{data['presets'][pid].get('label', pid)}'"}
+            else:
+                raise HTTPException(status_code=404, detail=f"Preset '{preset_name}' not found. Available: {list(data.get('presets', {}).keys())}")
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+    raise HTTPException(status_code=404, detail="Configuration file not found")
 
 @app.get("/api/physical_clicks/queue/poll")
 async def poll_physical_queue():
