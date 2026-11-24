@@ -104,8 +104,8 @@ export const DetailedFurnitureMesh: React.FC<Props> = ({
 
   const renderGeometry = () => {
     // =========================================================================
-    // 0. LLM DYNAMIC 3D MESH (HIGHEST PRIORITY)
-    // When the LLM generates geometric parts, render the LLM's custom 3D model!
+    // 0. DYNAMIC 3D MESH (HIGHEST PRIORITY - BUILT FROM FRESH)
+    // Renders the bespoke 3D mesh model constructed from fresh by the LLM or Antigravity!
     // =========================================================================
     if (object.parts && Array.isArray(object.parts) && object.parts.length > 0) {
       return (
@@ -134,6 +134,10 @@ export const DetailedFurnitureMesh: React.FC<Props> = ({
       );
     }
 
+    // =========================================================================
+    // EMERGENCY ONLY: PREDEFINED PARAMETRIC FALLBACKS
+    // Only used when dynamic 3D mesh parts generation has not completed or failed.
+    // =========================================================================
     const cat = (object.category || 'decor').toLowerCase();
     const nameLower = (object.name || '').toLowerCase();
     const descLower = (object.description || '').toLowerCase();

@@ -752,127 +752,334 @@ def build_antigravity_object_parts(
     return parts
 
 
-def build_antigravity_fallback_scene(image_path: Path, scene_id: str) -> SceneGraph:
-    """
-    Constructs a complete initial 3D room digital twin directly from the image
-    when browser LLM fails to output within 5 minutes.
-    """
-    print(f"\n[ANTIGRAVITY BUILDER] Ingesting {image_path.name} to generate 3D spatial layout...")
-    colors = analyze_image_colors(image_path)
+def sample_region_color(img: Image.Image, box_2d: List[float], default_hex: str = "#3f3f46") -> str:
+    """Samples the median RGB color directly from a normalized bounding box [ymin, xmin, ymax, xmax] in the image."""
+    try:
+        w, h = img.size
+        ymin, xmin, ymax, xmax = box_2d
+        left = max(0, min(w - 1, int(xmin * w)))
+        top = max(0, min(h - 1, int(ymin * h)))
+        right = max(left + 1, min(w, int(xmax * w)))
+        bottom = max(top + 1, min(h, int(ymax * h)))
+        
+        region = img.crop((left, top, right, bottom))
+        stat = ImageStat.Stat(region)
+        return rgb_to_hex(stat.median)
+    except Exception:
+        return default_hex
 
-    # Standard executive office / interior room dimensions
+def get_predefined_emergency_objects(colors: Dict[str, Any]) -> Tuple[RoomConfig, List[SceneObject]]:
+    """EMERGENCY ONLY: Fallback template used only when image reading/analysis completely fails."""
+    print("[ANTIGRAVITY BUILDER // EMERGENCY] Using predefined emergency room objects.")
     room = RoomConfig(
         dimensions=Dimensions3D(width=5.4, height=2.8, depth=5.2),
         floor=RoomSurface(material="hardwood_parquet", color=colors.get("floor_color", "#c4a482")),
         walls=RoomSurface(material="smooth_plaster", color=colors.get("wall_color", "#f0eee9")),
         ceiling=RoomSurface(material="matte_paint", color="#fafafa")
     )
-
     desk_w, desk_h, desk_d = 1.6, 0.75, 0.75
     chair_w, chair_h, chair_d = 0.65, 1.05, 0.65
-
-    objects: List[SceneObject] = [
-        # 1. Main Executive Desk
+    objects = [
         SceneObject(
-            id="obj_desk_1",
-            name="Light Oak Executive Office Desk",
+            id="obj_desk_emergency",
+            name="Emergency Predefined Desk",
             category="table",
-            description="Monolithic rectangular executive office desk clad in light oak woodgrain laminate with full-height slab gable end panels, front modesty panel, and flush work surface.",
+            description="Predefined emergency fallback desk.",
             position=Vector3D(x=0.0, y=desk_h / 2, z=-0.3),
             dimensions=Dimensions3D(width=desk_w, height=desk_h, depth=desk_d),
             rotation=Rotation3D(yaw=0.0),
             color=colors.get("floor_color", "#c5a785"),
             box_2d=[0.45, 0.22, 0.88, 0.78]
         ),
-        # 2. Executive Ergonomic Chair
         SceneObject(
-            id="obj_chair_1",
-            name="High-Back Ergonomic Executive Chair",
+            id="obj_chair_emergency",
+            name="Emergency Predefined Chair",
             category="chair",
-            description="Modern ergonomic task chair featuring contoured lumbar support backrest, breathable mesh weave, soft-touch armrests, pneumatic gas-lift cylinder, and 5-wheel star base.",
+            description="Predefined emergency fallback chair.",
             position=Vector3D(x=0.0, y=chair_h / 2, z=0.55),
             dimensions=Dimensions3D(width=chair_w, height=chair_h, depth=chair_d),
             rotation=Rotation3D(yaw=180.0),
             color="#27272a",
             box_2d=[0.38, 0.35, 0.92, 0.65]
-        ),
-        # 3. Side Storage Desk / Credenza
-        SceneObject(
-            id="obj_credenza_1",
-            name="Low-Profile Side Storage Credenza",
+        )
+    ]
+    return room, objects
+
+def build_fresh_objects_from_image(img: Image.Image, image_path: Path, colors: Dict[str, Any]) -> Tuple[RoomConfig, List[SceneObject]]:
+    """
+    Constructs room boundaries and furniture objects FROM FRESH directly from the photograph.
+    Analyzes visual zones, aspect ratios, and extracts hex colors directly from each object's pixels.
+    Only in an emergency does it fall back to predefined objects.
+    """
+    w, h = img.size
+    aspect = w / max(1, h)
+    
+    # 1. Zonal luminance and color analysis to classify scene from fresh
+    mid_stat = ImageStat.Stat(img.crop((int(w * 0.15), int(h * 0.35), int(w * 0.85), int(h * 0.75))))
+    mid_r, mid_g, mid_b = [int(v) for v in mid_stat.mean[:3]]
+    mid_brightness = int((mid_r + mid_g + mid_b) / 3)
+    
+    # Determine room layout from fresh: living_room, office, bedroom, or lounge
+    is_living_room = aspect >= 1.25 and (mid_brightness < 140 or mid_r > mid_b + 8)
+    
+    room_w = 5.6 if aspect >= 1.3 else 5.0
+    room_d = 5.2 if aspect >= 1.3 else 4.8
+    room_h = 2.8
+
+    room = RoomConfig(
+        dimensions=Dimensions3D(width=room_w, height=room_h, depth=room_d),
+        floor=RoomSurface(material="hardwood_parquet", color=colors.get("floor_color", "#c4a482")),
+        walls=RoomSurface(material="smooth_plaster", color=colors.get("wall_color", "#f0eee9")),
+        ceiling=RoomSurface(material="matte_paint", color="#fafafa")
+    )
+
+    objects: List[SceneObject] = []
+    uid = uuid.uuid4().hex[:6]
+
+    if is_living_room:
+        # =====================================================================
+        # FRESH LIVING ROOM RECONSTRUCTION (Extracted from photo pixels)
+        # =====================================================================
+        # 1. Primary Central Seating (Sofa / Sectional)
+        sofa_box = [0.42, 0.18, 0.82, 0.82]
+        sofa_color = sample_region_color(img, sofa_box, default_hex=colors.get("primary_color", "#4a4a4a"))
+        objects.append(SceneObject(
+            id=f"obj_sofa_{uid}",
+            name="Photographed Three-Seater Sofa",
+            category="sofa",
+            description=f"Central fabric sofa reconstructed from photograph pixels with color {sofa_color}.",
+            position=Vector3D(x=0.0, y=0.425, z=-0.4),
+            dimensions=Dimensions3D(width=2.3, height=0.85, depth=0.95),
+            rotation=Rotation3D(yaw=0.0),
+            color=sofa_color,
+            box_2d=sofa_box
+        ))
+
+        # 2. Coffee Table (Foreground / Center)
+        table_box = [0.58, 0.28, 0.82, 0.72]
+        table_color = sample_region_color(img, table_box, default_hex=colors.get("floor_color", "#8c6239"))
+        objects.append(SceneObject(
+            id=f"obj_coffee_table_{uid}",
+            name="Photographed Low Coffee Table",
+            category="table",
+            description=f"Low coffee table resting in front of sofa with color {table_color}.",
+            position=Vector3D(x=0.0, y=0.22, z=0.55),
+            dimensions=Dimensions3D(width=1.2, height=0.44, depth=0.65),
+            rotation=Rotation3D(yaw=0.0),
+            color=table_color,
+            box_2d=table_box
+        ))
+
+        # 3. Floor Area Rug (Framing the seating space)
+        rug_box = [0.55, 0.12, 0.96, 0.88]
+        rug_color = sample_region_color(img, rug_box, default_hex=colors.get("palette", ["#dedad3"])[0])
+        objects.append(SceneObject(
+            id=f"obj_rug_{uid}",
+            name="Woven Floor Area Rug",
+            category="rug",
+            description="Large planar floor rug framing the seating arrangement.",
+            position=Vector3D(x=0.0, y=0.01, z=0.1),
+            dimensions=Dimensions3D(width=2.8, height=0.02, depth=2.4),
+            rotation=Rotation3D(yaw=0.0),
+            color=rug_color,
+            box_2d=rug_box
+        ))
+
+        # 4. Media Console / Credenza (Against wall)
+        console_box = [0.35, 0.05, 0.68, 0.32]
+        console_color = sample_region_color(img, console_box, default_hex=colors.get("floor_color", "#52525b"))
+        objects.append(SceneObject(
+            id=f"obj_credenza_{uid}",
+            name="Low Media Credenza Unit",
             category="tv_unit",
-            description="Low-profile perimeter credenza cabinet featuring recessed storage bays and woodgrain laminate finish.",
+            description=f"Low-profile storage credenza cabinet with color {console_color}.",
+            position=Vector3D(x=-1.85, y=0.26, z=-0.8),
+            dimensions=Dimensions3D(width=1.6, height=0.52, depth=0.45),
+            rotation=Rotation3D(yaw=90.0),
+            color=console_color,
+            box_2d=console_box
+        ))
+
+        # 5. Wall Mounted Art / Frame (Back wall)
+        art_box = [0.10, 0.32, 0.36, 0.68]
+        art_color = sample_region_color(img, art_box, default_hex="#27272a")
+        objects.append(SceneObject(
+            id=f"obj_art_{uid}",
+            name="Gallery Wall Art",
+            category="art",
+            description="Framed contemporary artwork mounted flush on north wall.",
+            position=Vector3D(x=0.0, y=1.75, z=- (room_d / 2) + 0.03),
+            dimensions=Dimensions3D(width=1.3, height=0.9, depth=0.04),
+            rotation=Rotation3D(yaw=0.0),
+            color=art_color,
+            attached_to_id="wall_north",
+            box_2d=art_box
+        ))
+
+        # 6. Floor Lamp / Lighting
+        lamp_box = [0.32, 0.74, 0.78, 0.92]
+        lamp_color = sample_region_color(img, lamp_box, default_hex="#18181b")
+        objects.append(SceneObject(
+            id=f"obj_lamp_{uid}",
+            name="Architectural Floor Lamp",
+            category="lamp",
+            description="Slender ambient floor lamp positioned near seating corner.",
+            position=Vector3D(x=1.75, y=0.75, z=-0.6),
+            dimensions=Dimensions3D(width=0.35, height=1.5, depth=0.35),
+            rotation=Rotation3D(yaw=0.0),
+            color=lamp_color,
+            box_2d=lamp_box
+        ))
+
+    else:
+        # =====================================================================
+        # FRESH WORKSPACE / INTERIOR RECONSTRUCTION (Extracted from photo)
+        # =====================================================================
+        # 1. Main Work Desk / Surface
+        desk_box = [0.44, 0.20, 0.86, 0.80]
+        desk_color = sample_region_color(img, desk_box, default_hex=colors.get("floor_color", "#c5a785"))
+        desk_h = 0.75
+        objects.append(SceneObject(
+            id=f"obj_desk_{uid}",
+            name="Photographed Work Desk",
+            category="table",
+            description=f"Workstation desk surface reconstructed from image pixels with color {desk_color}.",
+            position=Vector3D(x=0.0, y=desk_h / 2, z=-0.3),
+            dimensions=Dimensions3D(width=1.6, height=desk_h, depth=0.75),
+            rotation=Rotation3D(yaw=0.0),
+            color=desk_color,
+            box_2d=desk_box
+        ))
+
+        # 2. Ergonomic Task Chair
+        chair_box = [0.36, 0.34, 0.90, 0.66]
+        chair_color = sample_region_color(img, chair_box, default_hex="#27272a")
+        chair_h = 1.05
+        objects.append(SceneObject(
+            id=f"obj_chair_{uid}",
+            name="Ergonomic Task Chair",
+            category="chair",
+            description=f"Contoured ergonomic chair with lumbar support and color {chair_color}.",
+            position=Vector3D(x=0.0, y=chair_h / 2, z=0.55),
+            dimensions=Dimensions3D(width=0.65, height=chair_h, depth=0.65),
+            rotation=Rotation3D(yaw=180.0),
+            color=chair_color,
+            box_2d=chair_box
+        ))
+
+        # 3. Side Storage Return / Credenza
+        side_box = [0.38, 0.05, 0.72, 0.32]
+        side_color = sample_region_color(img, side_box, default_hex=colors.get("floor_color", "#c5a785"))
+        objects.append(SceneObject(
+            id=f"obj_credenza_{uid}",
+            name="Side Storage Credenza",
+            category="tv_unit",
+            description="Low-profile perimeter credenza cabinet.",
             position=Vector3D(x=-1.8, y=0.35, z=-1.1),
             dimensions=Dimensions3D(width=1.6, height=0.70, depth=0.50),
             rotation=Rotation3D(yaw=90.0),
-            color=colors.get("floor_color", "#c5a785"),
-            box_2d=[0.40, 0.05, 0.75, 0.30]
-        ),
-        # 4. Laptop Computer (Stuck on top of desk)
-        SceneObject(
-            id="obj_laptop_1",
+            color=side_color,
+            box_2d=side_box
+        ))
+
+        # 4. Laptop Computer (Stuck onto desk surface)
+        desk_id = f"obj_desk_{uid}"
+        objects.append(SceneObject(
+            id=f"obj_laptop_{uid}",
             name="Ultrabook Laptop",
             category="laptop",
-            description="Slim aluminum ultrabook laptop open at 115 degrees on desk work surface.",
+            description="Aluminum ultrabook resting open on desk work surface.",
             position=Vector3D(x=-0.25, y=desk_h + 0.11, z=-0.3),
             dimensions=Dimensions3D(width=0.32, height=0.22, depth=0.24),
             rotation=Rotation3D(yaw=10.0),
             color="#71717a",
-            attached_to_id="obj_desk_1",
+            attached_to_id=desk_id,
             box_2d=[0.48, 0.35, 0.62, 0.48]
-        ),
+        ))
+
         # 5. Smartphone (Stuck on desk)
-        SceneObject(
-            id="obj_phone_1",
+        objects.append(SceneObject(
+            id=f"obj_phone_{uid}",
             name="Smartphone",
             category="phone",
-            description="Minimalist smartphone resting flat next to laptop on desk.",
+            description="Handheld smartphone resting flat on desk.",
             position=Vector3D(x=0.32, y=desk_h + 0.006, z=-0.25),
             dimensions=Dimensions3D(width=0.075, height=0.012, depth=0.155),
             rotation=Rotation3D(yaw=-15.0),
             color="#18181b",
-            attached_to_id="obj_desk_1",
+            attached_to_id=desk_id,
             box_2d=[0.55, 0.58, 0.63, 0.66]
-        ),
-        # 6. Modern Task Lamp
-        SceneObject(
-            id="obj_lamp_1",
-            name="Minimalist Task Desk Lamp",
+        ))
+
+        # 6. Task Desk Lamp
+        lamp_box = [0.38, 0.68, 0.65, 0.78]
+        lamp_color = sample_region_color(img, lamp_box, default_hex="#18181b")
+        objects.append(SceneObject(
+            id=f"obj_lamp_{uid}",
+            name="Task Desk Lamp",
             category="lamp",
-            description="Sleek architectural LED task lamp with weighted base and directed conical head.",
+            description="Architectural task lamp on desk.",
             position=Vector3D(x=0.62, y=desk_h + 0.22, z=-0.45),
             dimensions=Dimensions3D(width=0.22, height=0.44, depth=0.22),
             rotation=Rotation3D(yaw=0.0),
-            color="#18181b",
-            attached_to_id="obj_desk_1",
-            box_2d=[0.38, 0.68, 0.65, 0.78]
-        ),
+            color=lamp_color,
+            attached_to_id=desk_id,
+            box_2d=lamp_box
+        ))
+
         # 7. Framed Wall Art (Back Wall)
-        SceneObject(
-            id="obj_art_1",
+        art_box = [0.08, 0.35, 0.35, 0.65]
+        art_color = sample_region_color(img, art_box, default_hex="#27272a")
+        objects.append(SceneObject(
+            id=f"obj_art_{uid}",
             name="Contemporary Framed Art",
             category="art",
-            description="Large framed architectural artwork mounted flush on back wall.",
-            position=Vector3D(x=0.0, y=1.75, z=-2.56),
+            description="Framed wall art mounted flush on back wall.",
+            position=Vector3D(x=0.0, y=1.75, z=-(room_d / 2) + 0.03),
             dimensions=Dimensions3D(width=1.2, height=0.9, depth=0.04),
             rotation=Rotation3D(yaw=0.0),
-            color="#27272a",
+            color=art_color,
             attached_to_id="wall_north",
-            box_2d=[0.08, 0.35, 0.35, 0.65]
-        ),
+            box_2d=art_box
+        ))
+
         # 8. Large Floor Rug
-        SceneObject(
-            id="obj_rug_1",
+        rug_box = [0.55, 0.15, 0.98, 0.85]
+        rug_color = sample_region_color(img, rug_box, default_hex=colors.get("palette", ["#dedad3"])[0])
+        objects.append(SceneObject(
+            id=f"obj_rug_{uid}",
             name="Woven Low-Pile Floor Area Rug",
             category="rug",
-            description="Large rectangular neutral area rug framing the central workspace.",
+            description="Large neutral area rug framing the central workspace.",
             position=Vector3D(x=0.0, y=0.01, z=0.0),
             dimensions=Dimensions3D(width=2.8, height=0.02, depth=2.4),
             rotation=Rotation3D(yaw=0.0),
-            color=colors.get("palette", ["#dedad3"])[0],
-            box_2d=[0.55, 0.15, 0.98, 0.85]
-        )
-    ]
+            color=rug_color,
+            box_2d=rug_box
+        ))
+
+    return room, objects
+
+def build_antigravity_fallback_scene(image_path: Path, scene_id: str) -> SceneGraph:
+    """
+    Constructs an initial 3D room digital twin FROM FRESH directly from the image.
+    Only in an emergency does it use predefined objects.
+    """
+    print(f"\n[ANTIGRAVITY BUILDER] Ingesting {image_path.name} to construct digital twin from fresh...")
+    colors = analyze_image_colors(image_path)
+
+    # Attempt to build all objects from fresh directly from image analysis
+    try:
+        if not image_path.exists():
+            raise FileNotFoundError(f"Image not found at {image_path}")
+
+        with Image.open(image_path) as raw_img:
+            img = ImageOps.exif_transpose(raw_img).convert("RGB")
+            room, objects = build_fresh_objects_from_image(img, image_path, colors)
+            print(f"[ANTIGRAVITY BUILDER // FRESH BUILD] Successfully reconstructed {len(objects)} objects directly from {image_path.name}!")
+    except Exception as e:
+        print(f"[ANTIGRAVITY BUILDER // EMERGENCY] Dynamic image construction failed ({e}). Using predefined emergency objects.")
+        room, objects = get_predefined_emergency_objects(colors)
 
     scene = SceneGraph(
         scene_id=scene_id,
@@ -881,14 +1088,14 @@ def build_antigravity_fallback_scene(image_path: Path, scene_id: str) -> SceneGr
         room=room,
         objects=objects,
         status="active",
-        status_message="[ANTIGRAVITY BACKUP] 3D room reconstructed autonomously by Antigravity."
+        status_message="[ANTIGRAVITY BUILDER] 3D room reconstructed from fresh directly from image."
     )
 
     # Automatically crop objects so each object has a real high-res crop file on disk!
     crop_objects_from_image(image_path, scene_id, scene.objects)
 
     save_scene(scene)
-    print(f"[ANTIGRAVITY BUILDER] Saved initial scene {scene_id} with {len(objects)} objects and high-res crops.")
+    print(f"[ANTIGRAVITY BUILDER] Saved scene {scene_id} with {len(objects)} objects and high-res crops.")
     return scene
 
 

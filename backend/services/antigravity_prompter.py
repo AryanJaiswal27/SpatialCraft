@@ -162,9 +162,14 @@ The attached image is an isolated, high-resolution cropped photograph of '{name}
 Analyze the cropped image carefully and execute these CAD refinements:
 {matched_directive}
 
-[3D MESH GENERATION REQUIREMENT]
-You must CONSTRUCT THE COMPLETE 3D MESH MODEL for '{name}' to mimic the cropped photograph as closely as possible.
-Decompose the object into its individual 3D structural components as an array of 'parts':
+[3D MESH GENERATION REQUIREMENT - BUILD FROM FRESH]
+You must CONSTRUCT THE COMPLETE 3D MESH MODEL for '{name}' FROM FRESH to mimic the cropped photograph as closely as possible.
+- Build the 3D model directly from scratch based on THIS SPECIFIC PHOTOGRAPHED PIECE.
+- Inspect the cropped photo carefully: observe its specific joinery, leg design, cushions, handles, panels, and materials.
+- DO NOT use a generic pre-baked template. Build all mesh parts from scratch based on this specific item.
+- Only in an absolute emergency should default generic shapes be used.
+
+Decompose the photographed object into its individual 3D structural components as an array of 'parts':
 - 'name': human-readable part name (e.g. 'tabletop', 'left_gable', 'modesty_panel', 'drawer_1', 'seat_cushion', 'backrest_mesh', 'caster_base', 'printer_chassis', 'keypad', etc.)
 - 'shape': one of 'box', 'cylinder', 'sphere', 'cone', 'torus', 'plane'
 - 'args': metric dimensions array:

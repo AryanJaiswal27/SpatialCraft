@@ -43,6 +43,12 @@ CRITICAL 3D COORDINATE SYSTEM RULES:
 5. All dimensions ('width', 'height', 'depth') must be realistic real-world meters.
 6. Provide EVERY recognizable piece of furniture or decor in the room.
 
+CRITICAL INSTRUCTION - BUILD FROM FRESH EVERY TIME:
+- You must inspect THIS SPECIFIC PHOTOGRAPH and reconstruct the exact furniture and interior objects visible in the image from scratch.
+- DO NOT output a generic pre-baked template or assume predefined objects.
+- Detect the actual room type (living room, bedroom, office, dining, lounge, etc.) and identify every real piece of furniture with its true colors, dimensions, and bounding boxes.
+- Only in an absolute emergency if a detail is obscured should default assumptions be used.
+
 Respond with ONLY the JSON code block.
 """
 
