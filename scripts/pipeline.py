@@ -258,14 +258,11 @@ class SpatialCraftPipeline:
     def trigger_automation(self, image_path: Path):
         print(f"[PIPELINE // RUNNER] Ingesting {image_path.name} into automation pipeline...", flush=True)
         script = f"""
-import asyncio
 import json
 import urllib.request
 from pathlib import Path
-from backend.config import get_current_engine
-from backend.services.browser_automation import automate_llm_in_browser
+from backend.services.browser_prompt import generate_spatial_prompt
 
-target = get_current_engine()
 img = Path(r'{str(image_path)}')
 stem = img.stem
 if stem.startswith('scene_'):
@@ -274,21 +271,29 @@ if stem.startswith('scene_'):
 else:
     scene_id = f'scene_{{stem[:8]}}'
 
-print(f'Ingesting scene {{scene_id}} with engine: {{target}}', flush=True)
-if target == 'physical':
-    try:
-        data = json.dumps({{
-            'job_type': 'initial_reconstruction',
-            'scene_id': scene_id,
-            'image_path': str(img.resolve())
-        }}).encode('utf-8')
-        req = urllib.request.Request('http://localhost:8000/api/physical_clicks/queue', data=data, headers={{'Content-Type': 'application/json'}})
-        urllib.request.urlopen(req, timeout=5)
-        print(f'Enqueued physical click job for {{scene_id}}!', flush=True)
-    except Exception as e:
-        print(f'Physical queue error: {{e}}', flush=True)
-else:
-    asyncio.run(automate_llm_in_browser(target=target, image_path=img, scene_id=scene_id))
+# Load active preset from physical_clicks_config.json (gemini, chatgpt, deepseek)
+preset = 'gemini'
+try:
+    with open('physical_clicks_config.json', 'r', encoding='utf-8') as f:
+        cfg = json.load(f)
+        preset = cfg.get('active_preset', 'gemini')
+except Exception:
+    pass
+
+print(f'Ingesting scene {{scene_id}} with physical preset: {{preset}}', flush=True)
+try:
+    data = json.dumps({{
+        'job_type': 'initial_reconstruction',
+        'preset': preset,
+        'scene_id': scene_id,
+        'prompt': generate_spatial_prompt(),
+        'image_path': str(img.resolve())
+    }}).encode('utf-8')
+    req = urllib.request.Request('http://localhost:8000/api/physical_clicks/queue', data=data, headers={{'Content-Type': 'application/json'}})
+    with urllib.request.urlopen(req, timeout=5) as resp:
+        print(f'Successfully enqueued physical click job for {{scene_id}} (preset: {{preset}})!', flush=True)
+except Exception as e:
+    print(f'Physical queue error: {{e}}', flush=True)
 """
         cmd = [str(PYTHON_BIN), "-u", "-c", script]
         subprocess.Popen(cmd, cwd=str(ROOT_DIR))

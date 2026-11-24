@@ -12,7 +12,7 @@ from starlette.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 
-from .config import UPLOADS_DIR, ROOT_UPLOADS_DIR, CROPS_DIR, SCENES_DIR, STATIC_DIR, HOST, PORT, ROOT_DIR, TUNNEL_URL_FILE, get_current_engine, set_current_engine
+from .config import UPLOADS_DIR, ROOT_UPLOADS_DIR, CROPS_DIR, SCENES_DIR, STATIC_DIR, HOST, PORT, ROOT_DIR, TUNNEL_URL_FILE
 from .models import SceneGraph, PromptEditRequest, UpdateObjectRequest, SceneObject
 from .services.scene_service import (
     save_scene, get_scene, list_scenes, update_object,
@@ -22,7 +22,6 @@ from .services.browser_prompt import (
     generate_spatial_prompt, parse_llm_json_response, build_scene_from_parsed_data
 )
 from .services.cropper import crop_objects_from_image
-from .services.browser_automation import automate_llm_in_browser
 from .services.antigravity_prompter import (
     generate_antigravity_object_prompt,
     build_antigravity_scene_refinement_plan
@@ -137,6 +136,10 @@ async def activate_physical_preset(preset_name: str):
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
     raise HTTPException(status_code=404, detail="Configuration file not found")
+
+@app.get("/api/physical_clicks/queue")
+async def get_physical_queue():
+    return {"queue": physical_jobs_queue, "count": len(physical_jobs_queue)}
 
 @app.get("/api/physical_clicks/queue/poll")
 async def poll_physical_queue():
@@ -316,14 +319,30 @@ async def get_logs_endpoint(limit: int = 80):
         lines = ["[SYS] Pipeline daemon initialized. Ready for events."]
     return {"logs": lines, "count": len(lines)}
 
+# Physical LLM Presets (gemini, chatgpt, deepseek)
 @app.get("/api/engine")
 async def get_engine_endpoint():
-    return {"engine": get_current_engine()}
+    cfg = {}
+    if PHYSICAL_CONFIG_PATH.exists():
+        try:
+            with open(PHYSICAL_CONFIG_PATH, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+        except Exception:
+            pass
+    return {"engine": cfg.get("active_preset", "gemini")}
 
 @app.post("/api/engine")
 async def set_engine_endpoint(data: Dict[str, str]):
-    engine = data.get("engine", "gemini")
-    set_current_engine(engine)
+    engine = data.get("engine", "gemini").lower()
+    if PHYSICAL_CONFIG_PATH.exists():
+        try:
+            with open(PHYSICAL_CONFIG_PATH, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+            cfg["active_preset"] = engine
+            with open(PHYSICAL_CONFIG_PATH, "w", encoding="utf-8") as f:
+                json.dump(cfg, f, indent=2)
+        except Exception:
+            pass
     return {"engine": engine}
 
 @app.post("/api/upload")

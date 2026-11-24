@@ -51,6 +51,28 @@ def copy_image_to_clipboard(image_path: Path) -> bool:
         print(f"[PHYSICAL // ERROR] Image file not found: {image_path}")
         return False
 
+    # 1. Native Windows API via win32clipboard (Instant, zero focus-stealing)
+    try:
+        import io
+        from PIL import Image
+        import win32clipboard
+        img = Image.open(str(image_path.resolve()))
+        output = io.BytesIO()
+        img.convert("RGB").save(output, "BMP")
+        data = output.getvalue()[14:]  # Strip 14-byte BMP header to obtain raw CF_DIB
+        output.close()
+        win32clipboard.OpenClipboard()
+        try:
+            win32clipboard.EmptyClipboard()
+            win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
+            print(f"[PHYSICAL] Image copied to Windows clipboard natively (CF_DIB): {image_path.name}")
+            return True
+        finally:
+            win32clipboard.CloseClipboard()
+    except Exception as e_native:
+        pass
+
+    # 2. PowerShell SetImage fallback
     abs_path = str(image_path.resolve())
     ps_cmd = f"""
     Add-Type -AssemblyName System.Windows.Forms;
