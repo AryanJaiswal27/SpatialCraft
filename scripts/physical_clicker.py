@@ -622,10 +622,18 @@ def run_physical_daemon(preset: Optional[str] = None):
                         if job_type == "initial_reconstruction" and image_path:
                             # 1. Run initial room reconstruction with job preset
                             scene_result = execute_initial_reconstruction(image_path, scene_id, preset=job_preset)
-                            # 2. Automatically kick off the refinement loop for ALL objects!
+                            # 2. Instantly enhance all objects with custom 3D CAD parts in background (zero mouse hijacking!)
                             if scene_result:
-                                print(f"\n[ANTIGRAVITY // PIPELINE] Ingested initial room. Beginning sequential refinement across ALL objects...")
-                                run_full_scene_refinement_loop(scene_id, max_items=None, preset=job_preset)
+                                objs = scene_result.get("objects", [])
+                                print(f"\n[ANTIGRAVITY // PIPELINE] Ingested initial room with {len(objs)} objects.")
+                                print(f"[ANTIGRAVITY // PIPELINE] Enhancing all objects with bespoke 3D CAD meshes (instant background CAD)...")
+                                try:
+                                    from backend.services.antigravity_builder import refine_object_with_antigravity_cad
+                                    for obj in objs:
+                                        refine_object_with_antigravity_cad(scene_id, obj.get("id"))
+                                    print(f"[ANTIGRAVITY // PIPELINE] All {len(objs)} objects successfully enhanced with detailed 3D parts!\n")
+                                except Exception as e_cad:
+                                    print(f"[ANTIGRAVITY // CAD ERROR] {e_cad}")
 
                         elif job_type == "refine_loop":
                             run_full_scene_refinement_loop(scene_id, max_items=job.get("max_items"), preset=job_preset)
