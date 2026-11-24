@@ -441,36 +441,23 @@ def parse_refinement_json(raw_text: str) -> Optional[dict]:
     return None
 
 def execute_object_refinement(scene_id: str, obj: dict, scene_data: Optional[dict] = None, step_idx: int = 1, total_steps: int = 1, preset: Optional[str] = None) -> bool:
-    """Phase 2: Refines an individual object using Antigravity's tailored prompt and 2D crop."""
-    crop_url = obj.get("crop_url")
-    if not crop_url:
-        print(f"[PHYSICAL // SKIP] Object {obj.get('id')} has no cropped image.")
-        return False
-
-    crop_name = Path(crop_url).name
-    crop_path = ROOT_DIR / "backend" / "storage" / "crops" / crop_name
-    if not crop_path.exists():
-        crop_path = ROOT_DIR / "storage" / "crops" / crop_name
-
-    if not crop_path.exists():
-        print(f"[PHYSICAL // SKIP] Crop file not found on disk: {crop_name}")
-        return False
-
+    """Phase 2: Refines an individual object by referencing the room photo already in the active browser conversation (zero image re-upload)."""
     cfg = load_config(preset=preset)
     targets = cfg.get("targets", {})
     delays = cfg.get("delays", {})
 
     print(f"\n" + "=" * 65)
-    print(f" [ANTIGRAVITY // CAD AGENT] Step {step_idx}/{total_steps}: Analyzing '{obj.get('name')}'")
+    print(f" [ANTIGRAVITY // CAD AGENT] Step {step_idx}/{total_steps}: Refining '{obj.get('name')}'")
     print("=" * 65)
     focus_browser_tab(targets)
 
-    # Antigravity generates tailored prompt for this specific object
-    refine_prompt = generate_antigravity_object_prompt(obj, scene=scene_data, step_idx=step_idx, total_steps=total_steps)
-    print(f"[ANTIGRAVITY] Generated {len(refine_prompt)} chars tailored prompt for {obj.get('name')}.")
-    print(f"[PHYSICAL] Pasting image crop ({crop_path.name}) + Antigravity prompt to browser...")
+    # Antigravity generates tailored prompt referencing the photo already in the active thread
+    refine_prompt = generate_antigravity_object_prompt(obj, scene=scene_data, step_idx=step_idx, total_steps=total_steps, in_conversation=True)
+    print(f"[ANTIGRAVITY] Generated {len(refine_prompt)} chars tailored prompt for '{obj.get('name')}'.")
+    print(f"[PHYSICAL] Pasting text prompt into active conversation (NO image re-upload; photo is already in chat)...")
 
-    pasted = paste_and_send(refine_prompt, crop_path, targets, delays)
+    # Send ONLY the text prompt into the existing conversation thread (image_path=None)
+    pasted = paste_and_send(refine_prompt, image_path=None, targets=targets, delays=delays)
     raw_output = ""
     if pasted:
         raw_output = wait_and_extract_response(targets, delays, expected_id=obj.get("id"), timeout=300.0)
@@ -551,7 +538,7 @@ def run_full_scene_refinement_loop(scene_id: str, max_items: Optional[int] = Non
 
     # Use Antigravity's prioritized architectural plan
     plan = build_antigravity_scene_refinement_plan(scene_data)
-    candidates = [step for step in plan if step.get("crop_url")]
+    candidates = plan if plan else [{"object_id": o["id"]} for o in scene_data.get("objects", [])]
     
     if max_items is not None and max_items > 0:
         total_to_process = min(len(candidates), max_items)
@@ -559,7 +546,7 @@ def run_full_scene_refinement_loop(scene_id: str, max_items: Optional[int] = Non
         # Refine ALL objects in the scene!
         total_to_process = len(candidates)
 
-    print(f"[ANTIGRAVITY] Plan assembled: {len(plan)} total items, {len(candidates)} have crops. Refining ALL {total_to_process} objects...")
+    print(f"[ANTIGRAVITY] Plan assembled: {len(candidates)} items to refine in active conversation (zero image re-upload)...")
 
     refined_count = 0
     objects_by_id = {o["id"]: o for o in scene_data.get("objects", [])}

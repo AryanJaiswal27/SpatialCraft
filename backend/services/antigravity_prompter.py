@@ -84,10 +84,10 @@ DEFAULT_INSPECTION_DIRECTIVE = (
     "3. Provide a concise, highly detailed CAD description including form, base, joinery, and architectural styling."
 )
 
-def generate_antigravity_object_prompt(obj: Any, scene: Optional[Any] = None, step_idx: int = 1, total_steps: int = 1) -> str:
+def generate_antigravity_object_prompt(obj: Any, scene: Optional[Any] = None, step_idx: int = 1, total_steps: int = 1, in_conversation: bool = True) -> str:
     """
     Generates a deeply targeted, intelligent CAD prompt engineered by Antigravity
-    to refine a single furniture piece based on its cropped image and spatial relations.
+    to refine a single furniture piece based on the room image already in the active conversation.
     """
     if isinstance(obj, dict):
         obj_id = obj.get("id", "obj_1")
@@ -99,6 +99,7 @@ def generate_antigravity_object_prompt(obj: Any, scene: Optional[Any] = None, st
         color = obj.get("color", "#70757a")
         desc = obj.get("description", "")
         attached_to = obj.get("attached_to_id")
+        box_2d = obj.get("box_2d")
     else:
         obj_id = getattr(obj, "id", "obj_1")
         name = getattr(obj, "name", "Furniture Piece")
@@ -112,6 +113,7 @@ def generate_antigravity_object_prompt(obj: Any, scene: Optional[Any] = None, st
         color = getattr(obj, "color", "#70757a")
         desc = getattr(obj, "description", "")
         attached_to = getattr(obj, "attached_to_id", None)
+        box_2d = getattr(obj, "box_2d", None)
 
     w = dims.get("width", 1.0)
     h = dims.get("height", 1.0)
@@ -143,6 +145,25 @@ def generate_antigravity_object_prompt(obj: Any, scene: Optional[Any] = None, st
 
     context_str = "\n".join(context_notes) if context_notes else "- Freestanding in the room space."
 
+    box_info = f" (detected at 2D box coordinates: {box_2d})" if box_2d else ""
+
+    if in_conversation:
+        image_context_block = f"""[IMAGE REFERENCE IN THIS CONVERSATION]
+Refer back to the room photograph you analyzed at the beginning of this active conversation.
+Locate '{name}' (ID: '{obj_id}'){box_info} within that original photograph.
+Do not ask for the image again; it is already present in this conversation thread."""
+        directive_header = f"Inspect '{name}' in the room photograph above and execute these CAD refinements:"
+        fresh_header = f"""You must CONSTRUCT THE COMPLETE 3D MESH MODEL for '{name}' FROM FRESH to mimic the object in the room photograph as closely as possible.
+- Build the 3D model directly from scratch based on THIS SPECIFIC PHOTOGRAPHED PIECE in the room image above.
+- Inspect the piece in the photo carefully: observe its specific joinery, leg design, cushions, handles, panels, and materials."""
+    else:
+        image_context_block = f"""[IMAGE INPUT]
+The attached image is an isolated, high-resolution cropped photograph of '{name}' extracted directly from the room scan."""
+        directive_header = "Analyze the cropped image carefully and execute these CAD refinements:"
+        fresh_header = f"""You must CONSTRUCT THE COMPLETE 3D MESH MODEL for '{name}' FROM FRESH to mimic the cropped photograph as closely as possible.
+- Build the 3D model directly from scratch based on THIS SPECIFIC PHOTOGRAPHED PIECE.
+- Inspect the cropped photo carefully: observe its specific joinery, leg design, cushions, handles, panels, and materials."""
+
     prompt = f"""You are SpatialCraft AI CAD Director, powered by Google Antigravity.
 Your objective is fine-grained, high-fidelity 3D CAD architectural refinement of an individual furniture piece.
 
@@ -155,17 +176,14 @@ Your objective is fine-grained, high-fidelity 3D CAD architectural refinement of
 - Spatial Context:
 {context_str}
 
-[IMAGE INPUT]
-The attached image is an isolated, high-resolution cropped photograph of '{name}' extracted directly from the room scan.
+{image_context_block}
 
 [ANTIGRAVITY ARCHITECTURAL DIRECTIVES]
-Analyze the cropped image carefully and execute these CAD refinements:
+{directive_header}
 {matched_directive}
 
 [3D MESH GENERATION REQUIREMENT - BUILD FROM FRESH]
-You must CONSTRUCT THE COMPLETE 3D MESH MODEL for '{name}' FROM FRESH to mimic the cropped photograph as closely as possible.
-- Build the 3D model directly from scratch based on THIS SPECIFIC PHOTOGRAPHED PIECE.
-- Inspect the cropped photo carefully: observe its specific joinery, leg design, cushions, handles, panels, and materials.
+{fresh_header}
 - DO NOT use a generic pre-baked template. Build all mesh parts from scratch based on this specific item.
 - Only in an absolute emergency should default generic shapes be used.
 
