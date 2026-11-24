@@ -112,8 +112,8 @@ export const MobileBottomControls: React.FC = () => {
     );
 
     return (
-      <div className="absolute bottom-2 left-2 right-2 sm:left-auto sm:right-auto sm:w-96 sm:left-1/2 sm:-translate-x-1/2 z-20 pointer-events-auto font-mono pb-[max(0.25rem,env(safe-area-inset-bottom))]">
-        <div className="bg-zinc-950/98 border border-zinc-800 p-2 sm:p-2.5 shadow-2xl space-y-1.5 backdrop-blur-xs">
+      <div className="absolute bottom-2 left-0 right-0 z-20 flex justify-center px-2 pointer-events-none font-mono pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+        <div className="bg-zinc-950/98 border border-zinc-800 p-2 sm:p-2.5 shadow-2xl space-y-1.5 backdrop-blur-xs w-full max-w-sm sm:max-w-md pointer-events-auto">
           {/* Header Row: Label & Dismiss */}
           <div className="flex items-center justify-between pb-1 border-b border-zinc-800 text-[10px]">
             <div className="flex items-center gap-1.5 min-w-0 mr-1.5">
