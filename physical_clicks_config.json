@@ -50,7 +50,7 @@
       "delays": {
         "click_settle": 0.3,
         "image_upload_settle": 3.0,
-        "llm_generation_timeout": 120.0,
+        "llm_generation_timeout": 300.0,
         "move_duration": 0.4
       },
       "last_calibrated_at": "2026-11-21T23:41:16.642789"
@@ -100,7 +100,7 @@
       "delays": {
         "click_settle": 0.3,
         "image_upload_settle": 3.0,
-        "llm_generation_timeout": 120.0,
+        "llm_generation_timeout": 300.0,
         "move_duration": 0.4
       },
       "last_calibrated_at": null
@@ -150,7 +150,7 @@
       "delays": {
         "click_settle": 0.3,
         "image_upload_settle": 3.0,
-        "llm_generation_timeout": 120.0,
+        "llm_generation_timeout": 300.0,
         "move_duration": 0.4
       },
       "last_calibrated_at": null
@@ -197,7 +197,7 @@
   "delays": {
     "click_settle": 0.3,
     "image_upload_settle": 3.0,
-    "llm_generation_timeout": 120.0,
+    "llm_generation_timeout": 300.0,
     "move_duration": 0.4
   },
   "last_calibrated_at": "2026-11-21T23:41:16.642789"

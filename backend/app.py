@@ -27,6 +27,11 @@ from .services.antigravity_prompter import (
     generate_antigravity_object_prompt,
     build_antigravity_scene_refinement_plan
 )
+from .services.antigravity_builder import (
+    build_antigravity_fallback_scene,
+    refine_object_with_antigravity_cad,
+    run_antigravity_full_scene_build_and_refine
+)
 
 app = FastAPI(title="SpatialCraft Unified Studio", version="1.0.0")
 
@@ -145,12 +150,10 @@ async def enqueue_physical_job(data: Dict[str, Any]):
     job_id = f"job_{uuid.uuid4().hex[:8]}"
     job = {
         "job_id": job_id,
-        "job_type": data.get("job_type", "initial_reconstruction"),
-        "scene_id": data.get("scene_id"),
-        "prompt": data.get("prompt", ""),
-        "image_path": data.get("image_path"),
-        "created_at": datetime.utcnow().isoformat()
+        "created_at": datetime.utcnow().isoformat(),
+        **data
     }
+    job["job_id"] = job_id
     physical_jobs_queue.append(job)
     return {"status": "queued", "job_id": job_id}
 
@@ -209,6 +212,56 @@ async def trigger_scene_refinement(scene_id: str, payload: Optional[Dict[str, An
     total_str = f"up to {job['max_items']} objects" if job.get("max_items") else "ALL objects"
     await broadcast_status(scene_id, f"[ANTIGRAVITY] Sequential Refinement Enqueued ({total_str})...", "progress")
     return {"status": "queued", "job_id": job_id, "job_type": job["job_type"]}
+
+@app.post("/api/scene/{scene_id}/antigravity_backup_build")
+async def trigger_antigravity_backup_build(scene_id: str):
+    scene = get_scene(scene_id)
+    if not scene:
+        raise HTTPException(status_code=404, detail="Scene not found")
+
+    image_path = None
+    if scene.image_url:
+        img_name = Path(scene.image_url).name
+        for p in [UPLOADS_DIR / img_name, ROOT_UPLOADS_DIR / img_name]:
+            if p.exists():
+                image_path = p
+                break
+
+    if not image_path:
+        raise HTTPException(status_code=400, detail="Original room image not found for this scene")
+
+    def cb(msg: str):
+        asyncio.create_task(broadcast_status(scene_id, msg, "progress"))
+
+    await broadcast_status(scene_id, "[ANTIGRAVITY BACKUP] Beginning autonomous 3D reconstruction...", "start")
+    loop = asyncio.get_event_loop()
+    updated_scene = await loop.run_in_executor(
+        None,
+        lambda: run_antigravity_full_scene_build_and_refine(scene_id, image_path, status_cb=cb)
+    )
+    await broadcast_status(scene_id, "3D Room Reconstructed by Antigravity!", "done")
+    return updated_scene
+
+@app.post("/api/scene/{scene_id}/object/{object_id}/antigravity_refine")
+async def trigger_antigravity_object_refine(scene_id: str, object_id: str):
+    scene = get_scene(scene_id)
+    if not scene:
+        raise HTTPException(status_code=404, detail="Scene not found")
+
+    target = next((o for o in scene.objects if o.id == object_id), None)
+    if not target:
+        raise HTTPException(status_code=404, detail="Object not found")
+
+    loop = asyncio.get_event_loop()
+    updated_scene = await loop.run_in_executor(
+        None,
+        lambda: refine_object_with_antigravity_cad(scene_id, object_id)
+    )
+    if not updated_scene:
+        raise HTTPException(status_code=500, detail="Failed to refine object")
+
+    await broadcast_status(scene_id, f"[ANTIGRAVITY] Refined 3D mesh for '{target.name}'", "progress")
+    return updated_scene
 
 async def broadcast_status(scene_id: str, message: str, stage: str = "progress"):
     sockets = active_sockets.get(scene_id, [])
@@ -361,6 +414,24 @@ async def upload_room_image(
                 await broadcast_status(scene_id, f"Automation paused: {str(e)}", "error")
 
         asyncio.create_task(run_bg_automation())
+
+    # 5-MINUTE BACKUP WATCHDOG: If no output is received from browser LLM within 5 minutes,
+    # Antigravity autonomously builds the scene and executes the refinement loop over all objects!
+    async def scene_5min_backup_watchdog():
+        await asyncio.sleep(300)  # 300 seconds = 5 minutes
+        cur_scene = get_scene(scene_id)
+        if cur_scene and (cur_scene.status in ("processing", "waiting_payload") or len(cur_scene.objects) == 0):
+            print(f"\n[ANTIGRAVITY WATCHDOG // 5-MIN TIMEOUT] Scene {scene_id} received no browser LLM output within 5 minutes.")
+            print(f"[ANTIGRAVITY WATCHDOG] Activating autonomous 3D CAD reconstruction backup...")
+            def cb(msg: str):
+                asyncio.create_task(broadcast_status(scene_id, msg, "progress"))
+            loop = asyncio.get_event_loop()
+            await loop.run_in_executor(
+                None,
+                lambda: run_antigravity_full_scene_build_and_refine(scene_id, saved_path, status_cb=cb)
+            )
+
+    asyncio.create_task(scene_5min_backup_watchdog())
 
     return {
         "scene_id": scene_id,

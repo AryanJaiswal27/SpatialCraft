@@ -234,10 +234,10 @@ def paste_and_send(prompt_text: str, image_path: Optional[Path], targets: dict, 
     copy_text_to_clipboard("")  # Clear clipboard so copy check never reads stale clipboard data
     return True
 
-def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional[str] = None) -> str:
+def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional[str] = None, timeout: float = 300.0) -> str:
     """
     Waits for LLM generation with:
-    - 2-minute (120s) generation timeout.
+    - 5-minute (300s) generation timeout backup.
     - Continuous downward scrolling (scroll down + End key) to keep streaming tokens in view.
     - Clean, silent waiting: NO repeating Ctrl+A selection flashing.
     - Enforced 14-second minimum buffer before checking Copy button.
@@ -247,7 +247,7 @@ def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional
         return ""
 
     move_dur = delays.get("move_duration", 0.4)
-    gen_timeout = delays.get("llm_generation_timeout", 120.0)
+    gen_timeout = delays.get("llm_generation_timeout", timeout)
     copy_pos = targets.get("copy_button")
     prompt_pos = targets.get("prompt_box")
 
@@ -255,7 +255,7 @@ def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional
     scroll_x = prompt_pos["x"] if prompt_pos else 960
     scroll_y = max(120, (prompt_pos["y"] - 280)) if prompt_pos else 500
 
-    print(f"\n[PHYSICAL] Waiting for LLM generation (2-min timeout: {int(gen_timeout)}s)...")
+    print(f"\n[PHYSICAL] Waiting for LLM generation (5-min timeout: {int(gen_timeout)}s)...")
     if expected_id:
         print(f"[PHYSICAL] Expecting target identifier: '{expected_id}'")
     print(f"[PHYSICAL] Auto-scrolling active at ({scroll_x}, {scroll_y})...")
@@ -265,9 +265,15 @@ def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional
 
     start_time = time.time()
     min_wait = 14.0  # Give LLM time to generate before first copy attempt
+    last_milestone = start_time
 
     while (time.time() - start_time) < gen_timeout:
         elapsed = time.time() - start_time
+
+        # Periodic log every 30 seconds
+        if elapsed - (last_milestone - start_time) >= 30.0:
+            print(f"[PHYSICAL] Still waiting for LLM output... ({int(elapsed)}s / {int(gen_timeout)}s elapsed)")
+            last_milestone = time.time()
 
         # A. Continuous downward scroll to track streaming tokens
         try:
@@ -304,7 +310,7 @@ def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional
         time.sleep(3.5)
 
     # Final attempt on timeout
-    print("[PHYSICAL // TIMEOUT] 2-minute timeout reached. Attempting final extraction...")
+    print(f"[PHYSICAL // TIMEOUT] {int(gen_timeout)}s (5-minute) timeout reached. Attempting final extraction...")
     if copy_pos:
         try:
             pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
@@ -322,7 +328,7 @@ def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional
     return ""
 
 def execute_initial_reconstruction(image_path: Path, scene_id: str) -> Optional[dict]:
-    """Phase 1: Prompts open browser to construct the full 3D room."""
+    """Phase 1: Prompts open browser to construct the full 3D room, with 5-minute Antigravity autonomous fallback."""
     from backend.services.browser_prompt import generate_spatial_prompt
     cfg = load_config()
     targets = cfg.get("targets", {})
@@ -332,13 +338,25 @@ def execute_initial_reconstruction(image_path: Path, scene_id: str) -> Optional[
     focus_browser_tab(targets)
 
     prompt = generate_spatial_prompt()
-    if not paste_and_send(prompt, image_path, targets, delays):
-        return None
+    pasted = paste_and_send(prompt, image_path, targets, delays)
+    raw_output = ""
+    if pasted:
+        raw_output = wait_and_extract_response(targets, delays, expected_id="room", timeout=300.0)
 
-    raw_output = wait_and_extract_response(targets, delays, expected_id="room")
+    # 5-MINUTE BACKUP: If no output received in 5 minutes, Antigravity builds the scene itself!
     if not raw_output:
-        print("[PHYSICAL // ERROR] No output extracted from browser.")
-        return None
+        print("\n" + "=" * 65)
+        print("[ANTIGRAVITY BACKUP // 5-MIN TIMEOUT] No output received from browser LLM within 5 minutes.")
+        print(f"[ANTIGRAVITY BACKUP] Antigravity is now autonomously building 3D scene directly from {image_path.name}...")
+        print("=" * 65)
+        try:
+            from backend.services.antigravity_builder import build_antigravity_fallback_scene
+            fallback_scene = build_antigravity_fallback_scene(image_path, scene_id)
+            print(f"[ANTIGRAVITY BACKUP // SUCCESS] Scene {scene_id} created with {len(fallback_scene.objects)} objects and high-res crops!")
+            return fallback_scene.model_dump()
+        except Exception as e:
+            print(f"[ANTIGRAVITY BACKUP // ERROR] Failed fallback scene build: {e}")
+            return None
 
     # Step 1: Dispatch to Antigravity IDE Chat Composer if calibrated
     paste_to_antigravity_ide(raw_output, targets, delays, label=f"Initial Room CAD Reconstruction ({scene_id})")
@@ -360,7 +378,9 @@ def execute_initial_reconstruction(image_path: Path, scene_id: str) -> Optional[
             return scene_data
     except Exception as e:
         print(f"[PHYSICAL // ERROR] Ingesting initial reconstruction: {e}")
-        return None
+        from backend.services.antigravity_builder import build_antigravity_fallback_scene
+        fallback_scene = build_antigravity_fallback_scene(image_path, scene_id)
+        return fallback_scene.model_dump()
 
 from backend.services.antigravity_prompter import generate_antigravity_object_prompt, build_antigravity_scene_refinement_plan
 
@@ -428,20 +448,31 @@ def execute_object_refinement(scene_id: str, obj: dict, scene_data: Optional[dic
     print(f"[ANTIGRAVITY] Generated {len(refine_prompt)} chars tailored prompt for {obj.get('name')}.")
     print(f"[PHYSICAL] Pasting image crop ({crop_path.name}) + Antigravity prompt to browser...")
 
-    if not paste_and_send(refine_prompt, crop_path, targets, delays):
-        return False
+    pasted = paste_and_send(refine_prompt, crop_path, targets, delays)
+    raw_output = ""
+    if pasted:
+        raw_output = wait_and_extract_response(targets, delays, expected_id=obj.get("id"), timeout=300.0)
 
-    raw_output = wait_and_extract_response(targets, delays, expected_id=obj.get("id"))
-    if not raw_output:
-        print(f"[PHYSICAL // WARN] Could not extract refinement output for {obj.get('id')}")
-        return False
+    parsed = None
+    if raw_output:
+        # Dispatch to Antigravity IDE Chat Composer if calibrated
+        paste_to_antigravity_ide(raw_output, targets, delays, label=f"Refinement Step {step_idx}/{total_steps} for '{obj.get('name')}'")
+        parsed = parse_refinement_json(raw_output)
 
-    # Dispatch to Antigravity IDE Chat Composer if calibrated
-    paste_to_antigravity_ide(raw_output, targets, delays, label=f"Refinement Step {step_idx}/{total_steps} for '{obj.get('name')}'")
-
-    parsed = parse_refinement_json(raw_output)
+    # 5-MINUTE BACKUP: If no output or invalid JSON received within 5 minutes, Antigravity constructs 3D mesh itself!
     if not parsed:
-        print(f"[PHYSICAL // WARN] Could not parse refined JSON for {obj.get('id')}")
+        print("\n" + "=" * 65)
+        print(f"[ANTIGRAVITY BACKUP // 5-MIN TIMEOUT] No output received from browser LLM for '{obj.get('name')}' within 5 minutes.")
+        print(f"[ANTIGRAVITY BACKUP] Antigravity is now autonomously constructing the 3D mesh model for '{obj.get('name')}' from its crop...")
+        print("=" * 65)
+        try:
+            from backend.services.antigravity_builder import refine_object_with_antigravity_cad
+            refined_scene = refine_object_with_antigravity_cad(scene_id, obj.get("id"))
+            if refined_scene:
+                print(f"[ANTIGRAVITY BACKUP // SUCCESS] Object '{obj.get('name')}' refined with custom 3D mesh parts!")
+                return True
+        except Exception as e:
+            print(f"[ANTIGRAVITY BACKUP // ERROR] Failed autonomous object refinement: {e}")
         return False
 
     # Apply update to object in SpatialCraft

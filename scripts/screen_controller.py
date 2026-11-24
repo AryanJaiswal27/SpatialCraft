@@ -145,10 +145,10 @@ def scroll_down(amount: int = -450):
         pyautogui.press("end")
         print(f"[SCREEN CONTROL] Scrolled down at ({scroll_x}, {scroll_y}) with [End] key.")
 
-def wait_for_llm(timeout: float = 120.0, min_wait: float = 14.0, expected_id: Optional[str] = None) -> str:
+def wait_for_llm(timeout: float = 300.0, min_wait: float = 14.0, expected_id: Optional[str] = None) -> str:
     """
     Waits for LLM generation:
-    - 2-minute (120s) generation timeout.
+    - 5-minute (300s) generation timeout.
     - Continuous downward scrolling (scroll down + End key) to keep streaming tokens in view.
     - Clean, silent waiting: NO repeating Ctrl+A selection flashing.
     - Enforced 14-second minimum buffer before checking Copy button.
@@ -332,10 +332,19 @@ def run_single_refinement_step(scene_id: str, step_index: int) -> bool:
     copy_text_to_clipboard("") # Clear clipboard
     print(f"[SCREEN CONTROL] Dispatched prompt for '{obj_name}' to Gemini!")
 
-    # 5. Wait up to 2 min with auto-scroll & min wait
-    raw_response = wait_for_llm(timeout=120.0, min_wait=14.0, expected_id=obj_id)
+    # 5. Wait up to 5 min with auto-scroll & min wait
+    raw_response = wait_for_llm(timeout=300.0, min_wait=14.0, expected_id=obj_id)
     if not raw_response:
-        print(f"[WARN] No response captured for {obj_id}.")
+        print(f"\n[ANTIGRAVITY BACKUP // 5-MIN TIMEOUT] No response captured from browser LLM for {obj_id} within 5 minutes.")
+        print(f"[ANTIGRAVITY BACKUP] Constructing 3D CAD mesh model autonomously from crop...")
+        try:
+            from backend.services.antigravity_builder import refine_object_with_antigravity_cad
+            refined = refine_object_with_antigravity_cad(scene_id, obj_id)
+            if refined:
+                print(f"[ANTIGRAVITY BACKUP // SUCCESS] '{obj_name}' refined with custom 3D mesh parts!")
+                return True
+        except Exception as e:
+            print(f"[ANTIGRAVITY BACKUP // ERROR] {e}")
         return False
 
     # 6. Switch to Antigravity IDE and paste response into this chat!
@@ -391,7 +400,7 @@ def main():
     paste_parser.add_argument("text", help="Text to paste into Antigravity IDE chat")
 
     wait_parser = subparsers.add_parser("wait_response")
-    wait_parser.add_argument("--timeout", type=float, default=120.0)
+    wait_parser.add_argument("--timeout", type=float, default=300.0)
     wait_parser.add_argument("--min-wait", type=float, default=15.0)
     wait_parser.add_argument("--expected", type=str, default=None)
 
