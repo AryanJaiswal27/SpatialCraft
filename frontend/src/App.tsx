@@ -10,6 +10,7 @@ import { LogsModal } from './components/LogsModal';
 import { CalibrationModal } from './components/CalibrationModal';
 import { AntigravityModal } from './components/AntigravityModal';
 import { GuideModal } from './components/GuideModal';
+import { ModelCatalogDrawer } from './components/ModelCatalogDrawer';
 import { useSceneStore } from './hooks/useSceneStore';
 import type { SceneGraph } from './types';
 
@@ -74,6 +75,7 @@ export default function App() {
       <CalibrationModal />
       <AntigravityModal />
       <GuideModal />
+      <ModelCatalogDrawer />
     </main>
   );
 }

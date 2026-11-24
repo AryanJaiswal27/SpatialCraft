@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import * as THREE from 'three';
 import { exportSceneGlb, exportSceneJson } from '../utils/exporter';
-import type { SceneGraph, LLMTarget, Vector3D, ActiveModal } from '../types';
+import type { SceneGraph, LLMTarget, Vector3D, ActiveModal, SceneObject, Dimensions3D } from '../types';
 
 interface SceneState {
   scene: SceneGraph | null;
@@ -37,6 +37,7 @@ interface SceneState {
   attachObject: (childId: string, parentId: string) => Promise<void>;
   detachObject: (childId: string) => Promise<void>;
   deleteObject: (objId: string) => Promise<void>;
+  addObject: (template: Partial<SceneObject> & { dimensions: Dimensions3D; category?: string; name?: string }, position?: Vector3D) => Promise<void>;
   sendPromptEdit: (prompt: string) => Promise<void>;
 }
 
@@ -277,6 +278,84 @@ export const useSceneStore = create<SceneState>((set, get) => ({
       });
     } catch (e) {
       console.error('Failed to delete object:', e);
+    }
+  },
+
+  addObject: async (template, position) => {
+    let currentScene = get().scene;
+    if (!currentScene || currentScene.scene_id === 'home') {
+      const newSceneId = `scene_${Date.now().toString(36)}`;
+      currentScene = {
+        scene_id: newSceneId,
+        name: 'CUSTOM ROOM TWIN',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        status: 'ready',
+        room: {
+          dimensions: { width: 5.0, height: 2.8, depth: 5.0 },
+          floor: { material: 'slate', color: '#18181b' },
+          walls: { material: 'matte_plaster', color: '#27272a' },
+          ceiling: { material: 'matte_plaster', color: '#3f3f46' },
+        },
+        objects: [],
+      };
+      set({ scene: currentScene });
+    }
+
+    const h = template.dimensions?.height || 0.8;
+    const defaultY = Number((h / 2).toFixed(3));
+
+    const dropPos: Vector3D = position
+      ? {
+          x: Number(position.x.toFixed(2)),
+          y: Math.max(defaultY, Number(position.y.toFixed(2))),
+          z: Number(position.z.toFixed(2)),
+        }
+      : {
+          x: Number(((Math.random() - 0.5) * 0.4).toFixed(2)),
+          y: defaultY,
+          z: Number(((Math.random() - 0.5) * 0.4).toFixed(2)),
+        };
+
+    const newObj: SceneObject = {
+      id: `obj_${template.category || 'decor'}_${Date.now().toString(36)}`,
+      name: template.name || 'New Object',
+      category: template.category || 'decor',
+      description: template.description || '',
+      position: dropPos,
+      rotation: { yaw: 0 },
+      dimensions: template.dimensions,
+      color: template.color || '#71717a',
+      parts: template.parts || [],
+    };
+
+    const updatedObjects = [...(currentScene.objects || []), newObj];
+    const updatedScene: SceneGraph = {
+      ...currentScene,
+      objects: updatedObjects,
+      updated_at: new Date().toISOString(),
+    };
+
+    set({ scene: updatedScene, selectedObjectId: newObj.id });
+
+    try {
+      await fetch(`/api/scene/${updatedScene.scene_id}/object`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newObj),
+      });
+
+      const verifyRes = await fetch(`/api/scene/${updatedScene.scene_id}/verify_placement`, {
+        method: 'POST',
+      });
+      if (verifyRes.ok) {
+        const verifiedData = await verifyRes.json();
+        if (verifiedData?.scene) {
+          set({ scene: verifiedData.scene });
+        }
+      }
+    } catch (e) {
+      console.error('Failed to sync added object with server:', e);
     }
   },
 

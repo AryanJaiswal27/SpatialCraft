@@ -1,10 +1,12 @@
 import React, { Suspense, useEffect } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
+import * as THREE from 'three';
 import { useSceneStore } from '../hooks/useSceneStore';
 import { DetailedFurnitureMesh } from './DetailedFurnitureMesh';
 import { RoomMesh } from './RoomMesh';
 import { GeodeMatrix3D } from './GeodeMatrix3D';
+import type { Vector3D } from '../types';
 
 const SceneBridge: React.FC = () => {
   const { scene } = useThree();
@@ -12,6 +14,66 @@ const SceneBridge: React.FC = () => {
   useEffect(() => {
     setSceneThreeRef(scene);
   }, [scene, setSceneThreeRef]);
+  return null;
+};
+
+const DropHandler: React.FC = () => {
+  const { camera, gl } = useThree();
+  const addObject = useSceneStore((state) => state.addObject);
+
+  useEffect(() => {
+    const canvas = gl.domElement;
+
+    const handleDragOver = (e: DragEvent) => {
+      e.preventDefault();
+      if (e.dataTransfer) {
+        e.dataTransfer.dropEffect = 'copy';
+      }
+    };
+
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault();
+      try {
+        const raw = e.dataTransfer?.getData('application/json');
+        if (!raw) return;
+        const catalogItem = JSON.parse(raw);
+        if (!catalogItem || !catalogItem.dimensions) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+
+        const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        const intersectPoint = new THREE.Vector3();
+        const hit = raycaster.ray.intersectPlane(groundPlane, intersectPoint);
+
+        const dropY = catalogItem.dimensions.height / 2;
+        const dropPos: Vector3D = hit
+          ? {
+              x: Number(intersectPoint.x.toFixed(2)),
+              y: Number(dropY.toFixed(2)),
+              z: Number(intersectPoint.z.toFixed(2)),
+            }
+          : { x: 0, y: Number(dropY.toFixed(2)), z: 0 };
+
+        addObject(catalogItem, dropPos);
+      } catch (err) {
+        console.error('Failed to parse dropped 3D model:', err);
+      }
+    };
+
+    canvas.addEventListener('dragover', handleDragOver);
+    canvas.addEventListener('drop', handleDrop);
+
+    return () => {
+      canvas.removeEventListener('dragover', handleDragOver);
+      canvas.removeEventListener('drop', handleDrop);
+    };
+  }, [camera, gl, addObject]);
+
   return null;
 };
 
@@ -36,6 +98,7 @@ export const SceneViewport3D: React.FC = () => {
       >
         <Suspense fallback={null}>
           <SceneBridge />
+          <DropHandler />
           {/* Neutral studio lighting */}
           <ambientLight intensity={0.9} />
           <directionalLight

@@ -16,6 +16,8 @@ import {
   Layers,
   Sparkles,
   BookOpen,
+  PackagePlus,
+  Plus,
 } from 'lucide-react';
 import { useSceneStore } from '../hooks/useSceneStore';
 
@@ -30,6 +32,7 @@ export const MobileBottomControls: React.FC = () => {
     attachObject,
     detachObject,
     sendPromptEdit,
+    activeModal,
     setActiveModal,
     exportGlb,
     exportJson,
@@ -113,10 +116,10 @@ export const MobileBottomControls: React.FC = () => {
 
     return (
       <div className="absolute bottom-2 left-0 right-0 z-20 flex justify-center px-2 pointer-events-none font-mono pb-[max(0.25rem,env(safe-area-inset-bottom))]">
-        <div className="bg-zinc-950/98 border border-zinc-800 p-2 sm:p-2.5 shadow-2xl space-y-1.5 backdrop-blur-xs w-full max-w-sm sm:max-w-md pointer-events-auto">
+        <div className="bg-zinc-950/98 border border-zinc-800 p-2 sm:p-2.5 shadow-2xl space-y-1.5 backdrop-blur-xs w-full max-w-[calc(100vw-1rem)] sm:max-w-md pointer-events-auto">
           {/* Header Row: Label & Dismiss */}
-          <div className="flex items-center justify-between pb-1 border-b border-zinc-800 text-[10px]">
-            <div className="flex items-center gap-1.5 min-w-0 mr-1.5">
+          <div className="flex items-center justify-between pb-1 border-b border-zinc-800 text-[10px] gap-1">
+            <div className="flex items-center gap-1.5 min-w-0 mr-1 overflow-hidden">
               <span className="w-1.5 h-1.5 bg-zinc-200 shrink-0" />
               <span className="font-bold text-zinc-100 uppercase tracking-wider truncate">
                 {selectedObject.name}
@@ -129,22 +132,22 @@ export const MobileBottomControls: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveModal('antigravity')}
-                className="flex items-center gap-1 px-1.5 py-0.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold text-[9px] transition-colors"
+                className="flex items-center gap-1 px-1.5 py-0.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold text-[9px] shrink-0 transition-colors"
                 title="Inspect Antigravity CAD prompt for this object"
               >
                 <Sparkles className="w-2.5 h-2.5 text-zinc-300" />
-                <span>AGY PROMPT</span>
+                <span className="whitespace-nowrap">AGY PROMPT</span>
               </button>
               {selectedObject.crop_url && (
                 <button
                   type="button"
                   onClick={triggerSingleRefine}
                   disabled={isRefining}
-                  className="flex items-center gap-1 px-1.5 py-0.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-100 font-bold text-[9px] transition-colors"
+                  className="flex items-center gap-1 px-1.5 py-0.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-100 font-bold text-[9px] shrink-0 transition-colors"
                   title="Refine object details using cropped image"
                 >
                   <Sparkles className="w-2.5 h-2.5 text-zinc-300" />
-                  <span>{isRefining ? 'QUEUED' : 'REFINE'}</span>
+                  <span className="whitespace-nowrap">{isRefining ? 'QUEUED' : 'REFINE'}</span>
                 </button>
               )}
               <button
@@ -261,10 +264,19 @@ export const MobileBottomControls: React.FC = () => {
             {/* Rotate Button */}
             <button
               onClick={() => rotateObject(selectedObject.id, 45)}
-              className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 text-[10px] font-bold active:bg-zinc-700 transition-colors"
+              className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 text-[10px] font-bold active:bg-zinc-700 transition-colors whitespace-nowrap"
             >
-              <RotateCw className="w-3 h-3" />
+              <RotateCw className="w-3 h-3 shrink-0" />
               <span>YAW +45°</span>
+            </button>
+
+            {/* Catalog Button */}
+            <button
+              onClick={() => setActiveModal('models')}
+              className="p-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-zinc-100 text-[10px] active:bg-zinc-700 transition-colors shrink-0"
+              title="Add 3D Model"
+            >
+              <Plus className="w-3.5 h-3.5" />
             </button>
 
             {/* Delete Button */}
@@ -289,7 +301,7 @@ export const MobileBottomControls: React.FC = () => {
         <div className="flex flex-wrap items-center justify-center gap-1.5 bg-zinc-950/95 border border-zinc-800 p-1.5 shadow-2xl pointer-events-auto backdrop-blur-xs max-w-md w-full">
           <button
             onClick={() => setActiveModal('upload')}
-            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-100 hover:bg-white text-zinc-950 font-bold text-[11px] transition-colors"
+            className="flex-1 min-w-[130px] flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-100 hover:bg-white text-zinc-950 font-bold text-[11px] transition-colors"
           >
             <Camera className="w-3.5 h-3.5" />
             <span>CAPTURE ROOM</span>
@@ -297,15 +309,23 @@ export const MobileBottomControls: React.FC = () => {
 
           <button
             onClick={() => setActiveModal('manual_paste')}
-            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-bold text-[11px] transition-colors"
+            className="flex-1 min-w-[130px] flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-bold text-[11px] transition-colors"
           >
             <FileCode2 className="w-3.5 h-3.5 text-zinc-400" />
             <span>INGEST PAYLOAD</span>
           </button>
 
           <button
+            onClick={() => setActiveModal('models')}
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-bold text-[10px] transition-colors"
+          >
+            <PackagePlus className="w-3.5 h-3.5 text-zinc-300" />
+            <span>+ ASSEMBLE 3D ROOM (CATALOG)</span>
+          </button>
+
+          <button
             onClick={() => setActiveModal('guide')}
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-bold text-[10px] transition-colors"
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-1 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-bold text-[10px] transition-colors"
           >
             <BookOpen className="w-3.5 h-3.5 text-zinc-400" />
             <span>OPERATIONAL GUIDE</span>
@@ -314,10 +334,10 @@ export const MobileBottomControls: React.FC = () => {
           {hasExistingScenes && (
             <button
               onClick={() => loadSceneById(availableScenes[0].scene_id)}
-              className="w-full flex items-center justify-center gap-1 px-3 py-1 bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800/80 text-zinc-400 text-[9px] transition-colors"
+              className="w-full flex items-center justify-center gap-1 px-3 py-1 bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800/80 text-zinc-400 text-[9px] transition-colors truncate"
             >
-              <Layers className="w-3 h-3 text-zinc-500" />
-              <span>LOAD LATEST TWIN: {availableScenes[0].name || availableScenes[0].scene_id}</span>
+              <Layers className="w-3 h-3 text-zinc-500 shrink-0" />
+              <span className="truncate">LOAD LATEST TWIN: {availableScenes[0].name || availableScenes[0].scene_id}</span>
             </button>
           )}
         </div>
@@ -326,54 +346,69 @@ export const MobileBottomControls: React.FC = () => {
   }
 
   // 3. RECONSTRUCTED ROOM DOCK (Responsive, Monochromatic CAD Bar)
+  const isModelsActive = activeModal === 'models';
+
   return (
     <div className="absolute bottom-2 left-0 right-0 z-20 flex justify-center px-2 pointer-events-none font-mono pb-[max(0.25rem,env(safe-area-inset-bottom))]">
-      <div className="flex items-center gap-1 bg-zinc-950/98 border border-zinc-800 p-1 shadow-2xl pointer-events-auto backdrop-blur-xs max-w-sm sm:max-w-md">
+      <div className="flex items-center gap-1 bg-zinc-950/98 border border-zinc-800 p-1 shadow-2xl pointer-events-auto backdrop-blur-xs max-w-[calc(100vw-1rem)] overflow-x-auto no-scrollbar">
         <button
           onClick={() => setActiveModal('chat')}
-          className="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-100 hover:bg-white text-zinc-950 font-bold text-[10px] transition-colors"
+          className="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-100 hover:bg-white text-zinc-950 font-bold text-[10px] shrink-0 whitespace-nowrap transition-colors"
         >
-          <Terminal className="w-3 h-3" />
+          <Terminal className="w-3 h-3 shrink-0" />
           <span>COMMAND</span>
         </button>
 
         <button
-          onClick={() => setActiveModal('upload')}
-          className="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-bold text-[10px] transition-colors"
+          onClick={() => setActiveModal(isModelsActive ? 'none' : 'models')}
+          className={`flex items-center gap-1 px-2.5 py-1.5 font-bold text-[10px] shrink-0 whitespace-nowrap transition-colors border ${
+            isModelsActive
+              ? 'bg-zinc-100 text-zinc-950 border-zinc-100'
+              : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-200'
+          }`}
+          title="Open 3D Model Catalog to drag and drop assets"
         >
-          <Camera className="w-3 h-3" />
+          <PackagePlus className="w-3 h-3 shrink-0" />
+          <span>+ ADD</span>
+        </button>
+
+        <button
+          onClick={() => setActiveModal('upload')}
+          className="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-bold text-[10px] shrink-0 whitespace-nowrap transition-colors"
+        >
+          <Camera className="w-3 h-3 shrink-0" />
           <span>CAPTURE</span>
         </button>
 
         <button
           onClick={() => setActiveModal('manual_paste')}
-          className="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-bold text-[10px] transition-colors"
+          className="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-bold text-[10px] shrink-0 whitespace-nowrap transition-colors"
         >
-          <FileCode2 className="w-3 h-3" />
+          <FileCode2 className="w-3 h-3 shrink-0" />
           <span>PAYLOAD</span>
         </button>
 
         <button
           onClick={() => setActiveModal('antigravity')}
-          className="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-bold text-[10px] transition-colors"
+          className="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-bold text-[10px] shrink-0 whitespace-nowrap transition-colors"
           title="Inspect Antigravity CAD Prompts & Plan"
         >
-          <Sparkles className="w-3 h-3 text-zinc-300" />
+          <Sparkles className="w-3 h-3 text-zinc-300 shrink-0" />
           <span>AGY PLAN</span>
         </button>
 
         <button
           onClick={triggerRefinementLoop}
           disabled={isRefining}
-          className="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-bold text-[10px] transition-colors"
+          className="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-bold text-[10px] shrink-0 whitespace-nowrap transition-colors"
           title="Trigger Iterative Object Refinement Loop"
         >
-          <Sparkles className="w-3 h-3 text-zinc-400" />
+          <Sparkles className="w-3 h-3 text-zinc-400 shrink-0" />
           <span>{isRefining ? 'LOOPING...' : 'REFINE'}</span>
         </button>
 
         {/* Export Dropdown */}
-        <div className="relative">
+        <div className="relative shrink-0">
           {showExportMenu && (
             <div
               className="fixed inset-0 z-40 bg-transparent"
@@ -382,9 +417,9 @@ export const MobileBottomControls: React.FC = () => {
           )}
           <button
             onClick={() => setShowExportMenu(!showExportMenu)}
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-bold text-[10px] transition-colors"
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-bold text-[10px] shrink-0 whitespace-nowrap transition-colors"
           >
-            <Download className="w-3 h-3" />
+            <Download className="w-3 h-3 shrink-0" />
             <span>EXPORT</span>
           </button>
 

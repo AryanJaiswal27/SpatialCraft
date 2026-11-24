@@ -165,6 +165,7 @@ def add_object(scene_id: str, obj: SceneObject) -> Optional[SceneGraph]:
         return None
 
     scene.objects.append(obj)
+    scene = verify_and_ground_scene(scene)
     save_scene(scene)
     return scene
 
