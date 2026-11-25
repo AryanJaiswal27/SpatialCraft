@@ -41,6 +41,8 @@ export interface MeshPart {
   metalness?: number;
   opacity?: number;
   transparent?: boolean;
+  emissive?: string;
+  emissiveIntensity?: number;
 }
 
 export interface SceneObject {

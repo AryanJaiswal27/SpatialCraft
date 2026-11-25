@@ -65,6 +65,8 @@ const RotatingTurntable: React.FC<{
                 color={part.color || fallbackColor}
                 roughness={part.roughness ?? 0.6}
                 metalness={part.metalness ?? 0.1}
+                emissive={part.emissive || '#000000'}
+                emissiveIntensity={part.emissive ? (part.emissiveIntensity ?? 0.7) : 0}
                 transparent={Boolean(part.opacity !== undefined && part.opacity < 1)}
                 opacity={part.opacity ?? 1.0}
                 side={part.shape?.toLowerCase() === 'plane' ? THREE.DoubleSide : THREE.FrontSide}

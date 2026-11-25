@@ -562,29 +562,37 @@ def verify_and_ground_scene(scene: SceneGraph) -> SceneGraph:
                 pd2 = (parent.dimensions.depth / 2.0) + 0.1
                 if abs(obj.position.x - parent.position.x) <= pw2 and abs(obj.position.z - parent.position.z) <= pd2:
                     p_top_y = parent.position.y + (parent.dimensions.height / 2.0)
-                    if abs(obj.position.y - p_top_y) <= 0.45 or obj.position.y < p_top_y:
+                    obj_bottom_y = obj.position.y - (h / 2.0)
+                    # Only snap to parent's top surface if it sits near that top plane (never teleport interior shelf decor to roof!)
+                    if abs(obj_bottom_y - p_top_y) <= 0.22 or (parent.dimensions.height <= 0.95 and abs(obj.position.y - p_top_y) <= 0.35):
                         obj.attached_to_id = parent_id
                         attached = parent_id
                         break
 
-        # A. Tabletop / Attached Surface Grounding (Never floating above, never sinking inside)
+        # A. Tabletop / Attached Surface Grounding (Never floating above, never teleporting shelf items to 2m+ roofs)
         if attached and attached in surfaces:
             parent = surfaces[attached]
             p_top_y = parent.position.y + (parent.dimensions.height / 2.0)
-            target_y = round(p_top_y + (h / 2.0), 3)
-            obj.position.y = target_y
+            obj_bottom_y = obj.position.y - (h / 2.0)
+            if parent.dimensions.height <= 1.0 or abs(obj_bottom_y - p_top_y) <= 0.35:
+                obj.position.y = round(p_top_y + (h / 2.0), 3)
 
-        # B. Wall-mounted items
-        elif attached and attached.startswith("wall_"):
-            if obj.position.y < 0.5:
+        # B. Wall-mounted, TV screen, or ceiling-mounted items (NEVER ground to floor!)
+        is_wall_or_ceiling = (
+            (attached and attached.startswith("wall_")) or
+            any(k in name for k in ("wall-mounted", "wall mounted", "ceiling", "chandelier", "fan", "pendant", "sconce", "television", "flat-screen", "smart tv")) or
+            (cat == "tv_unit" and d <= 0.16 and not any(k in name for k in ("unit", "console", "credenza", "stand", "media", "cabinet")))
+        )
+        if is_wall_or_ceiling:
+            if attached and attached.startswith("wall_") and obj.position.y < 0.5:
                 obj.position.y = round(max(1.2, (h / 2.0) + 0.5), 3)
 
-        # C. Floor-based objects (sofa, chair, table, rug, bookshelf, lamp, floor plant)
+        # C. Floor-based objects (sofa, chair, table, rug, bookshelf, console, floor lamp, tall floor plant)
         else:
             is_floor_item = (
                 cat in ("sofa", "chair", "table", "desk", "rug", "bed", "tv_unit", "bookshelf", "wardrobe") or
-                any(k in name for k in ("chair", "sofa", "couch", "desk", "table", "credenza", "rug", "carpet", "shelf", "cabinet")) or
-                h >= 0.70
+                any(k in name for k in ("chair", "sofa", "couch", "desk", "table", "credenza", "rug", "carpet", "bookshelf", "cabinet")) or
+                (h >= 0.70 and obj.position.y < 1.2)
             )
             if is_floor_item:
                 if attached and not attached.startswith("wall_"):

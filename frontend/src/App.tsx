@@ -31,7 +31,7 @@ const HOME_GEODE_SCENE: SceneGraph = {
 };
 
 export default function App() {
-  const { scene, setScene, setAvailableScenes } = useSceneStore();
+  const { scene, setScene, fetchScene, setAvailableScenes } = useSceneStore();
 
   useEffect(() => {
     // Populate scene history for the room dropdown
@@ -61,6 +61,29 @@ export default function App() {
       setScene(HOME_GEODE_SCENE);
     }
   }, [setScene, setAvailableScenes]);
+
+  // Persistent live-sync WebSocket so background refinements immediately update the 3D canvas
+  const activeSceneId = scene?.scene_id;
+  useEffect(() => {
+    if (!activeSceneId || activeSceneId === 'home') return;
+
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws/${activeSceneId}`;
+    const ws = new WebSocket(wsUrl);
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    ws.onmessage = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        fetchScene(activeSceneId);
+      }, 250);
+    };
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      ws.close();
+    };
+  }, [activeSceneId, fetchScene]);
 
   return (
     <main className="w-full h-full relative overflow-hidden select-none bg-zinc-950 font-mono">

@@ -533,7 +533,7 @@ async def submit_raw_output(scene_id: str, payload: Dict[str, Any]):
     raw_text = payload.get("raw_text", "")
     target_id = f"scene_{uuid.uuid4().hex[:8]}" if (not scene_id or scene_id == "home") else scene_id
     scene = get_scene(target_id)
-    image_url = scene.image_url if (scene and scene.image_url) else ""
+    image_url = payload.get("image_url") or (scene.image_url if (scene and scene.image_url) else "")
 
     parsed_data = parse_llm_json_response(raw_text)
     if not parsed_data:
@@ -547,6 +547,9 @@ async def submit_raw_output(scene_id: str, payload: Dict[str, Any]):
         if local_img.exists():
             crop_objects_from_image(local_img, target_id, new_scene.objects)
 
+    # Immediately ground objects cleanly and synthesize multi-part CSG geometry so
+    # initial 3D reconstruction renders faithfully with zero blank/black boxes!
+    new_scene = verify_and_ground_scene(new_scene)
     save_scene(new_scene)
     await broadcast_status(target_id, "3D Room Updated!", "done")
     return new_scene

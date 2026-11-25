@@ -175,8 +175,14 @@ def build_scene_from_parsed_data(scene_id: str, image_url: str, data: Dict[str, 
             color=obj.get("color", "#70757a"),
             model_type="procedural",
             box_2d=obj.get("box_2d"),
-            attached_to_id=obj.get("attached_to_id")
+            attached_to_id=obj.get("attached_to_id"),
+            parts=obj.get("parts"),
+            mesh_obj=obj.get("mesh_obj")
         )
+        if obj.get("materials"):
+            setattr(scene_obj, "materials", obj.get("materials"))
+        if obj.get("features"):
+            setattr(scene_obj, "features", obj.get("features"))
         objects_list.append(scene_obj)
 
     # Auto-detect tabletop attachments for items resting on tables/desks

@@ -92,23 +92,37 @@ export const SceneViewport3D: React.FC = () => {
       <Canvas
         shadows
         dpr={[1, 1.5]}
-        gl={{ antialias: true, alpha: false, powerPreference: 'default' }}
-        camera={{ position: [0, 3.8, 6.2], fov: 45, near: 0.1, far: 50 }}
+        gl={{
+          antialias: true,
+          alpha: false,
+          powerPreference: 'default',
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 1.08,
+        }}
+        camera={{ position: [0.4, 2.4, 5.2], fov: 45, near: 0.1, far: 50 }}
         onPointerMissed={handlePointerMissed}
       >
+        <color attach="background" args={['#121216']} />
         <Suspense fallback={null}>
           <SceneBridge />
           <DropHandler />
-          {/* Neutral studio lighting */}
-          <ambientLight intensity={0.9} />
+          {/* Balanced Warm Interior Architectural Studio Lighting */}
+          <ambientLight intensity={0.65} color="#fffaf2" />
+          <hemisphereLight args={['#fff9ef', '#d6cec4', 0.85]} />
           <directionalLight
-            position={[5, 8, 4]}
-            intensity={1.2}
+            position={[3.5, 6.5, 4.5]}
+            intensity={1.15}
+            color="#fffcf5"
             castShadow
-            shadow-mapSize-width={1024}
-            shadow-mapSize-height={1024}
-            shadow-bias={-0.0001}
+            shadow-mapSize-width={2048}
+            shadow-mapSize-height={2048}
+            shadow-bias={-0.0003}
+            shadow-normalBias={0.02}
           />
+          <directionalLight position={[-4, 4, 3]} intensity={0.45} color="#f1f5f9" />
+          {!isHomeState && (
+            <pointLight position={[0, 2.4, -1.0]} intensity={1.1} distance={8} decay={1.5} color="#ffe8c2" />
+          )}
 
           {/* Conditional 3D Render: Home Geode vs Reconstructed Room */}
           {isHomeState ? (
@@ -135,9 +149,10 @@ export const SceneViewport3D: React.FC = () => {
           <OrbitControls
             makeDefault
             enabled={!isInteracting}
+            target={isHomeState ? [0, 0, 0] : [0, 0.95, -0.5]}
             minDistance={1.2}
             maxDistance={14}
-            maxPolarAngle={Math.PI / 2 - 0.05}
+            maxPolarAngle={Math.PI / 2 - 0.04}
             enableDamping
             dampingFactor={0.08}
             rotateSpeed={0.7}

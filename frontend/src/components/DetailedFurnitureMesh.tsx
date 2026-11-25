@@ -124,6 +124,8 @@ export const DetailedFurnitureMesh: React.FC<Props> = ({
                 color={part.color || primaryColor}
                 roughness={part.roughness ?? 0.6}
                 metalness={part.metalness ?? 0.1}
+                emissive={part.emissive || '#000000'}
+                emissiveIntensity={part.emissive ? (part.emissiveIntensity ?? 0.7) : 0}
                 transparent={Boolean(part.opacity !== undefined && part.opacity < 1)}
                 opacity={part.opacity ?? 1.0}
                 side={part.shape?.toLowerCase() === 'plane' ? THREE.DoubleSide : THREE.FrontSide}
@@ -220,18 +222,67 @@ export const DetailedFurnitureMesh: React.FC<Props> = ({
     }
 
     // =========================================================================
-    // 2. OFFICE STORAGE CREDENZA / LOW CABINETS (Drawers, doors, plinth, metal pulls)
+    // 2A. OPEN BOOKSHELF / DISPLAY TOWER (Hollow cubbies, horizontal shelves)
+    // =========================================================================
+    const isBookshelf =
+      cat === 'bookshelf' ||
+      nameLower.includes('bookshelf') ||
+      nameLower.includes('shelving') ||
+      nameLower.includes('bookcase') ||
+      nameLower.includes('shelf tower');
+
+    if (isBookshelf) {
+      const woodColor = primaryColor && primaryColor !== '#888888' ? primaryColor : '#6d482f';
+      const frameT = 0.03;
+      const tiers = 4;
+      const tierH = (height - frameT) / tiers;
+
+      return (
+        <group position={[0, -height / 2, 0]}>
+          {/* Left & Right Stile Side Panels */}
+          <mesh position={[-width / 2 + frameT / 2, height / 2, 0]} castShadow receiveShadow>
+            <boxGeometry args={[frameT, height, depth]} />
+            <meshStandardMaterial color={woodColor} roughness={0.62} />
+          </mesh>
+          <mesh position={[width / 2 - frameT / 2, height / 2, 0]} castShadow receiveShadow>
+            <boxGeometry args={[frameT, height, depth]} />
+            <meshStandardMaterial color={woodColor} roughness={0.62} />
+          </mesh>
+          {/* Thin Recessed Back Panel */}
+          <mesh position={[0, height / 2, -depth / 2 + 0.01]} receiveShadow>
+            <boxGeometry args={[width - frameT * 2, height - frameT, 0.018]} />
+            <meshStandardMaterial color="#593a25" roughness={0.68} />
+          </mesh>
+          {/* Vertical Center Divider */}
+          <mesh position={[0, height / 2, 0]} castShadow receiveShadow>
+            <boxGeometry args={[0.025, height - frameT * 2, depth * 0.92]} />
+            <meshStandardMaterial color={woodColor} roughness={0.62} />
+          </mesh>
+          {/* Open Horizontal Shelves */}
+          {Array.from({ length: tiers + 1 }).map((_, idx) => {
+            const sy = frameT / 2 + idx * tierH;
+            return (
+              <mesh key={idx} position={[0, sy, 0]} castShadow receiveShadow>
+                <boxGeometry args={[width - frameT * 2, frameT, depth * 0.96]} />
+                <meshStandardMaterial color={woodColor} roughness={0.6} />
+              </mesh>
+            );
+          })}
+        </group>
+      );
+    }
+
+    // =========================================================================
+    // 2B. OFFICE STORAGE CREDENZA / LOW CABINETS (Drawers, doors, plinth, metal pulls)
     // =========================================================================
     const isCredenza =
-      cat === 'bookshelf' ||
       nameLower.includes('credenza') ||
       nameLower.includes('cabinet') ||
       descLower.includes('credenza') ||
       descLower.includes('cabinet') ||
-      nameLower.includes('storage') ||
-      descLower.includes('storage');
+      nameLower.includes('storage');
 
-    if (isCredenza && (cat === 'bookshelf' || cat === 'table' || cat === 'decor')) {
+    if (isCredenza && (cat === 'table' || cat === 'decor')) {
       const woodColor = primaryColor || '#c5a785';
       const plinthH = 0.05;
       const topThick = 0.025;
@@ -995,9 +1046,68 @@ export const DetailedFurnitureMesh: React.FC<Props> = ({
     }
 
     // =========================================================================
-    // 17. LAMP
+    // 17. CHANDELIER / PENDANT / FLOOR & TABLE LAMP
     // =========================================================================
-    if (cat === 'lamp') {
+    if (cat === 'lamp' || nameLower.includes('chandelier') || nameLower.includes('pendant')) {
+      const isChandelier =
+        nameLower.includes('chandelier') ||
+        nameLower.includes('pendant') ||
+        nameLower.includes('globe') ||
+        descLower.includes('ceiling') ||
+        descLower.includes('chandelier');
+
+      if (isChandelier) {
+        const armRadius = Math.min(width, depth) * 0.34;
+        const globeR = Math.max(0.055, Math.min(width, depth) * 0.11);
+        const brass = primaryColor && primaryColor !== '#888888' ? primaryColor : '#d4af37';
+
+        return (
+          <group position={[0, -height / 2, 0]}>
+            {/* Ceiling Canopy Plate */}
+            <mesh position={[0, height - 0.015, 0]}>
+              <cylinderGeometry args={[0.08, 0.09, 0.03, 24]} />
+              <meshStandardMaterial color={brass} metalness={0.85} roughness={0.22} />
+            </mesh>
+            {/* Brass Downrod */}
+            <mesh position={[0, height * 0.65, 0]}>
+              <cylinderGeometry args={[0.014, 0.014, height * 0.7, 16]} />
+              <meshStandardMaterial color={brass} metalness={0.85} roughness={0.22} />
+            </mesh>
+            {/* Central Brass Hub */}
+            <mesh position={[0, height * 0.3, 0]}>
+              <cylinderGeometry args={[0.045, 0.045, 0.05, 20]} />
+              <meshStandardMaterial color={brass} metalness={0.85} roughness={0.22} />
+            </mesh>
+            {/* 6 Radiating Arms + Glowing Frosted Glass Globes */}
+            {[0, 1, 2, 3, 4, 5].map((i) => {
+              const rad = (i * Math.PI * 2) / 6;
+              const gx = Math.cos(rad) * armRadius;
+              const gz = Math.sin(rad) * armRadius;
+              const armLen = armRadius;
+              return (
+                <group key={i}>
+                  <mesh position={[gx * 0.5, height * 0.3, gz * 0.5]} rotation={[0, -rad, Math.PI / 2]}>
+                    <cylinderGeometry args={[0.008, 0.008, armLen, 12]} />
+                    <meshStandardMaterial color={brass} metalness={0.85} roughness={0.22} />
+                  </mesh>
+                  <mesh position={[gx, height * 0.24, gz]}>
+                    <sphereGeometry args={[globeR, 20, 20]} />
+                    <meshStandardMaterial
+                      color="#fff9ec"
+                      emissive="#ffe2ad"
+                      emissiveIntensity={0.85}
+                      roughness={0.25}
+                      transparent
+                      opacity={0.94}
+                    />
+                  </mesh>
+                </group>
+              );
+            })}
+          </group>
+        );
+      }
+
       return (
         <group position={[0, -height / 2, 0]}>
           <mesh position={[0, 0.02, 0]} castShadow>
@@ -1012,34 +1122,141 @@ export const DetailedFurnitureMesh: React.FC<Props> = ({
             <cylinderGeometry args={[width * 0.4, width * 0.45, height * 0.25, 32, 1, true]} />
             <meshStandardMaterial color="#f4f4f5" roughness={0.8} side={THREE.DoubleSide} />
           </mesh>
-          <pointLight position={[0, height * 0.85, 0]} intensity={1.5} distance={5} color="#fff8f0" castShadow />
+          <pointLight position={[0, height * 0.85, 0]} intensity={1.1} distance={4.5} color="#fff8f0" />
         </group>
       );
     }
 
     // =========================================================================
-    // 18. TV UNIT
+    // 17B. CEILING FAN
     // =========================================================================
-    if (cat === 'tv_unit') {
-      const consoleH = height * 0.45;
+    if (nameLower.includes('fan') || descLower.includes('ceiling fan')) {
+      const fanR = Math.max(width, depth) * 0.48;
+      const bladeColor = primaryColor && primaryColor !== '#888888' ? primaryColor : '#ebe9e4';
       return (
         <group position={[0, -height / 2, 0]}>
+          <mesh position={[0, height - 0.02, 0]}>
+            <cylinderGeometry args={[0.07, 0.07, 0.03, 20]} />
+            <meshStandardMaterial color={bladeColor} roughness={0.4} />
+          </mesh>
+          <mesh position={[0, height * 0.6, 0]}>
+            <cylinderGeometry args={[0.018, 0.018, height * 0.65, 16]} />
+            <meshStandardMaterial color={bladeColor} roughness={0.35} />
+          </mesh>
+          <mesh position={[0, height * 0.22, 0]} castShadow>
+            <cylinderGeometry args={[0.11, 0.1, 0.09, 24]} />
+            <meshStandardMaterial color={bladeColor} roughness={0.3} />
+          </mesh>
+          <mesh position={[0, height * 0.175, 0]}>
+            <cylinderGeometry args={[0.105, 0.105, 0.018, 24]} />
+            <meshStandardMaterial color="#d4af37" metalness={0.85} roughness={0.25} />
+          </mesh>
+          {[0, 1, 2].map((i) => {
+            const rad = (i * Math.PI * 2) / 3;
+            const bx = Math.cos(rad) * (fanR * 0.55);
+            const bz = Math.sin(rad) * (fanR * 0.55);
+            return (
+              <mesh
+                key={i}
+                position={[bx, height * 0.23, bz]}
+                rotation={[0.08, -rad, 0]}
+                castShadow
+              >
+                <boxGeometry args={[fanR * 0.85, 0.012, 0.14]} />
+                <meshStandardMaterial color={bladeColor} roughness={0.45} />
+              </mesh>
+            );
+          })}
+        </group>
+      );
+    }
+
+    // =========================================================================
+    // 18. WALL-MOUNTED FLAT-SCREEN TV vs FULL MEDIA WALL UNIT
+    // =========================================================================
+    if (cat === 'tv_unit' || nameLower.includes('television') || descLower.includes('television')) {
+      const isFlatTvScreen =
+        (depth <= 0.16 || nameLower.includes('flat-screen') || nameLower.includes('television') || nameLower.includes('smart tv')) &&
+        !nameLower.includes('unit') &&
+        !nameLower.includes('console') &&
+        !nameLower.includes('credenza') &&
+        !nameLower.includes('media wall') &&
+        !nameLower.includes('stand');
+
+      if (isFlatTvScreen) {
+        const tvD = Math.max(0.03, depth);
+        return (
+          <group position={[0, -height / 2, 0]}>
+            {/* Outer Slim Black Aluminum Frame */}
+            <mesh position={[0, height / 2, 0]} castShadow>
+              <boxGeometry args={[width, height, tvD]} />
+              <meshStandardMaterial color="#18181b" roughness={0.35} metalness={0.5} />
+            </mesh>
+            {/* Glossy LED Screen Surface */}
+            <mesh position={[0, height / 2, tvD / 2 + 0.002]}>
+              <boxGeometry args={[width * 0.96, height * 0.94, 0.004]} />
+              <meshStandardMaterial
+                color="#11141a"
+                emissive="#1a202c"
+                emissiveIntensity={0.25}
+                roughness={0.1}
+                metalness={0.65}
+              />
+            </mesh>
+          </group>
+        );
+      }
+
+      const woodColor = primaryColor && primaryColor !== '#18181b' ? primaryColor : '#6d482f';
+      const consoleH = height >= 1.2 ? 0.45 : height;
+
+      return (
+        <group position={[0, -height / 2, 0]}>
+          {/* Walnut Lower Credenza Carcass */}
           <mesh position={[0, consoleH / 2, 0]} castShadow receiveShadow>
             <boxGeometry args={[width, consoleH, depth]} />
-            <meshStandardMaterial color="#18181b" roughness={0.5} />
+            <meshStandardMaterial color={woodColor} roughness={0.62} metalness={0.05} />
           </mesh>
-          <mesh position={[0, consoleH + 0.015, 0]} castShadow>
-            <boxGeometry args={[width * 0.4, 0.015, depth * 0.35]} />
-            <meshStandardMaterial color="#27272a" metalness={0.9} roughness={0.2} />
-          </mesh>
-          <mesh position={[0, consoleH + 0.1, 0]} castShadow>
-            <cylinderGeometry args={[0.015, 0.015, 0.16, 16]} />
-            <meshStandardMaterial color="#27272a" metalness={0.9} />
-          </mesh>
-          <mesh position={[0, consoleH + height * 0.35, 0]} castShadow>
-            <boxGeometry args={[width * 0.88, height * 0.5, 0.02]} />
-            <meshStandardMaterial color="#09090b" roughness={0.05} metalness={0.9} />
-          </mesh>
+          {/* White Drawer Fronts + Brass Pulls */}
+          {[-0.3, -0.1, 0.1, 0.3].map((rx, idx) => (
+            <group key={idx} position={[rx * width, consoleH * 0.52, depth / 2 + 0.005]}>
+              <mesh>
+                <boxGeometry args={[width * 0.18, consoleH * 0.65, 0.015]} />
+                <meshStandardMaterial color="#f2efe9" roughness={0.35} />
+              </mesh>
+              <mesh position={[0, 0, 0.012]}>
+                <boxGeometry args={[width * 0.04, 0.016, 0.015]} />
+                <meshStandardMaterial color="#d4af37" metalness={0.85} roughness={0.25} />
+              </mesh>
+            </group>
+          ))}
+          {height >= 1.2 && (
+            <>
+              {/* Upper Feature Backdrop + Floating Marble Panel */}
+              <mesh position={[-width * 0.34, consoleH + (height - consoleH) * 0.48, -depth * 0.38]} receiveShadow>
+                <boxGeometry args={[width * 0.28, (height - consoleH) * 0.92, 0.04]} />
+                <meshStandardMaterial color="#5e3d27" roughness={0.68} />
+              </mesh>
+              <mesh position={[-0.02, consoleH + (height - consoleH) * 0.48, -depth * 0.32]}>
+                <boxGeometry args={[width * 0.56, (height - consoleH) * 0.62, 0.025]} />
+                <meshStandardMaterial
+                  color="#ffd685"
+                  emissive="#ffb84d"
+                  emissiveIntensity={0.65}
+                  roughness={0.2}
+                />
+              </mesh>
+              <mesh position={[-0.02, consoleH + (height - consoleH) * 0.48, -depth * 0.27]} castShadow receiveShadow>
+                <boxGeometry args={[width * 0.54, (height - consoleH) * 0.58, 0.03]} />
+                <meshStandardMaterial color="#f0ece4" roughness={0.22} />
+              </mesh>
+              {/* Overhead Walnut Canopy */}
+              <mesh position={[0, height - 0.025, -depth * 0.12]} castShadow>
+                <boxGeometry args={[width, 0.05, depth * 0.72]} />
+                <meshStandardMaterial color={woodColor} roughness={0.6} />
+              </mesh>
+            </>
+          )}
         </group>
       );
     }
@@ -1048,25 +1265,28 @@ export const DetailedFurnitureMesh: React.FC<Props> = ({
     // 19. PLANT
     // =========================================================================
     if (cat === 'plant') {
-      const potH = height * 0.4;
+      const potH = height * 0.42;
+      const potColor = nameLower.includes('white') || descLower.includes('white') ? '#f2efe9' : '#d6cfc7';
       return (
         <group position={[0, -height / 2, 0]}>
-          <mesh position={[0, potH / 2, 0]} castShadow>
-            <cylinderGeometry args={[width * 0.35, width * 0.28, potH, 24]} />
-            <meshStandardMaterial color="#52525b" roughness={0.8} />
+          <mesh position={[0, potH / 2, 0]} castShadow receiveShadow>
+            <cylinderGeometry args={[width * 0.36, width * 0.26, potH, 24]} />
+            <meshStandardMaterial color={potColor} roughness={0.45} />
           </mesh>
-          <mesh position={[0, potH * 0.95, 0]}>
-            <cylinderGeometry args={[width * 0.33, width * 0.33, 0.02, 24]} />
-            <meshStandardMaterial color="#18181b" roughness={0.9} />
+          <mesh position={[0, potH * 0.94, 0]}>
+            <cylinderGeometry args={[width * 0.33, width * 0.33, 0.015, 24]} />
+            <meshStandardMaterial color="#271c15" roughness={0.95} />
           </mesh>
           {[
-            [0, potH + 0.15, 0, 0],
-            [-0.08, potH + 0.22, 0.06, 0.25],
-            [0.08, potH + 0.25, -0.05, -0.2],
-          ].map(([fx, fy, fz, rotZ], idx) => (
-            <mesh key={idx} position={[fx, fy, fz]} rotation={[0, idx * 1.5, rotZ]} castShadow>
-              <sphereGeometry args={[width * 0.22, 12, 12]} scale={[1, 1.3, 0.25]} />
-              <meshStandardMaterial color="#3f4e43" roughness={0.6} />
+            [0, potH + height * 0.22, 0, 0.2, 0, 0],
+            [-width * 0.18, potH + height * 0.2, width * 0.1, 0.4, 0.7, 0.35],
+            [width * 0.18, potH + height * 0.2, -width * 0.1, -0.35, -0.7, -0.3],
+            [width * 0.08, potH + height * 0.24, width * 0.16, 0.45, 2.2, 0.2],
+            [-width * 0.1, potH + height * 0.24, -width * 0.15, -0.4, 3.8, -0.2],
+          ].map(([fx, fy, fz, rx, ry, rz], idx) => (
+            <mesh key={idx} position={[fx, fy, fz]} rotation={[rx, ry, rz]} scale={[1, 0.28, 1.55]} castShadow>
+              <sphereGeometry args={[width * 0.22, 12, 12]} />
+              <meshStandardMaterial color="#3c6e31" roughness={0.55} />
             </mesh>
           ))}
         </group>
@@ -1107,13 +1327,65 @@ export const DetailedFurnitureMesh: React.FC<Props> = ({
     }
 
     // =========================================================================
-    // 22. DEFAULT ARCHITECTURAL FALLBACK
+    // 22. SCULPTURAL DECOR FALLBACK (Vase, Mug, Clock, Figurine)
     // =========================================================================
+    if (nameLower.includes('mug') || nameLower.includes('cup')) {
+      const r = Math.min(width, depth) * 0.42;
+      return (
+        <group position={[0, -height / 2, 0]}>
+          <mesh position={[0, height * 0.5, 0]} castShadow>
+            <cylinderGeometry args={[r, r * 0.88, height, 20]} />
+            <meshStandardMaterial color={primaryColor} roughness={0.25} />
+          </mesh>
+          <mesh position={[r, height * 0.5, 0]} rotation={[0, 0, Math.PI / 2]}>
+            <torusGeometry args={[height * 0.26, 0.008, 10, 20]} />
+            <meshStandardMaterial color={primaryColor} roughness={0.25} />
+          </mesh>
+        </group>
+      );
+    }
+
+    if (nameLower.includes('vase') || nameLower.includes('urn') || nameLower.includes('jar')) {
+      const r = Math.min(width, depth) * 0.42;
+      return (
+        <group position={[0, -height / 2, 0]}>
+          <mesh position={[0, height * 0.35, 0]} castShadow>
+            <cylinderGeometry args={[r, r * 0.65, height * 0.7, 24]} />
+            <meshStandardMaterial color={primaryColor} roughness={0.4} metalness={0.25} />
+          </mesh>
+          <mesh position={[0, height * 0.82, 0]} castShadow>
+            <cylinderGeometry args={[r * 0.55, r * 0.85, height * 0.35, 24]} />
+            <meshStandardMaterial color={primaryColor} roughness={0.4} metalness={0.25} />
+          </mesh>
+        </group>
+      );
+    }
+
+    if (nameLower.includes('clock') || nameLower.includes('plaque') || nameLower.includes('round')) {
+      const r = Math.min(width, height) * 0.45;
+      return (
+        <group position={[0, -height / 2, 0]}>
+          <mesh position={[0, height / 2, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+            <cylinderGeometry args={[r, r, depth * 0.8, 28]} />
+            <meshStandardMaterial color="#d4af37" metalness={0.85} roughness={0.25} />
+          </mesh>
+          <mesh position={[0, height / 2, depth * 0.42]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[r * 0.84, r * 0.84, 0.01, 28]} />
+            <meshStandardMaterial color="#f5f2ec" roughness={0.5} />
+          </mesh>
+        </group>
+      );
+    }
+
     return (
       <group position={[0, -height / 2, 0]}>
-        <mesh position={[0, height / 2, 0]} castShadow receiveShadow>
-          <boxGeometry args={[width, height, depth]} />
-          <meshStandardMaterial color={primaryColor} roughness={0.5} />
+        <mesh position={[0, 0.012, 0]} castShadow>
+          <boxGeometry args={[width, 0.024, depth]} />
+          <meshStandardMaterial color="#1f1a17" roughness={0.5} />
+        </mesh>
+        <mesh position={[0, height * 0.55, 0]} scale={[1, 1.35, 0.85]} castShadow>
+          <sphereGeometry args={[Math.min(width, depth) * 0.38, 16, 16]} />
+          <meshStandardMaterial color={primaryColor} roughness={0.35} metalness={0.35} />
         </mesh>
       </group>
     );
