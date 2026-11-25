@@ -310,42 +310,67 @@ def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional
             time.sleep(2.5)
             continue
 
-        # B. Check Copy button cleanly without selecting page
+        # B. Check Copy button cleanly with adaptive vertical probing (handles banners/popups)
         if copy_pos:
-            try:
-                pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=move_dur)
-                pyautogui.click()
-                time.sleep(0.4)
-                clip_text = get_clipboard_text()
-                
-                if clip_text and "{" in clip_text and "}" in clip_text:
-                    if clip_text.count("{") <= clip_text.count("}"):
-                        has_schema = any(k in clip_text for k in ("room", "dimensions", "objects", "name", "category", "materials"))
-                        matches_id = True if not expected_id else (expected_id in clip_text)
-                        
-                        if has_schema and matches_id:
-                            print(f"[PHYSICAL // GENERATION COMPLETE] Captured finished response via Copy button ({len(clip_text)} chars)!")
-                            return clip_text
-            except Exception:
-                pass
+            probe_offsets = [0, -65, -80, -50, -120]
+            for dy in probe_offsets:
+                try:
+                    pyautogui.moveTo(copy_pos["x"], copy_pos["y"] + dy, duration=0.15)
+                    pyautogui.click()
+                    time.sleep(0.35)
+                    clip_text = get_clipboard_text()
+                    
+                    if clip_text and "{" in clip_text and "}" in clip_text:
+                        if clip_text.count("{") <= clip_text.count("}"):
+                            has_schema = any(k in clip_text for k in ("room", "dimensions", "objects", "name", "category", "materials"))
+                            matches_id = True if not expected_id else (expected_id in clip_text)
+                            
+                            if has_schema and matches_id:
+                                offset_str = f" (offset {dy}px due to banner)" if dy != 0 else ""
+                                print(f"[PHYSICAL // GENERATION COMPLETE] Captured finished response via Copy button{offset_str} ({len(clip_text)} chars)!")
+                                return clip_text
+                except Exception:
+                    pass
 
         time.sleep(3.5)
 
     # Final attempt on timeout
     print(f"[PHYSICAL // TIMEOUT] {int(gen_timeout)}s (5-minute) timeout reached. Attempting final extraction...")
     if copy_pos:
-        try:
-            pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
-            pyautogui.press("end")
-            time.sleep(0.3)
-            pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=move_dur)
-            pyautogui.click()
-            time.sleep(0.8)
-            final_text = get_clipboard_text()
-            if final_text and "{" in final_text and "}" in final_text:
-                return final_text
-        except Exception:
-            pass
+        for dy in [0, -65, -80, -50, -120]:
+            try:
+                pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
+                pyautogui.press("end")
+                time.sleep(0.3)
+                pyautogui.moveTo(copy_pos["x"], copy_pos["y"] + dy, duration=move_dur)
+                pyautogui.click()
+                time.sleep(0.8)
+                final_text = get_clipboard_text()
+                if final_text and "{" in final_text and "}" in final_text:
+                    return final_text
+            except Exception:
+                pass
+
+    # Fallback: full-page selection extraction if copy button was displaced by persistent popups
+    try:
+        print("[PHYSICAL // FALLBACK] Attempting full-page text extraction to salvage response...")
+        pyautogui.moveTo(scroll_x, scroll_y, duration=0.2)
+        pyautogui.click()
+        time.sleep(0.2)
+        pyautogui.hotkey("ctrl", "a")
+        time.sleep(0.25)
+        pyautogui.hotkey("ctrl", "c")
+        time.sleep(0.4)
+        pyautogui.press("escape")
+        salvage_text = get_clipboard_text()
+        if salvage_text and "{" in salvage_text and "}" in salvage_text:
+            from backend.services.browser_prompt import parse_llm_json_response
+            parsed = parse_llm_json_response(salvage_text)
+            if parsed and (not expected_id or expected_id in salvage_text):
+                print(f"[PHYSICAL // SALVAGED] Successfully recovered {len(salvage_text)} chars from page fallback!")
+                return salvage_text
+    except Exception as e:
+        print(f"[PHYSICAL // ERROR] Page fallback failed: {e}")
 
     return ""
 

@@ -535,9 +535,12 @@ def verify_and_ground_scene(scene: SceneGraph) -> SceneGraph:
     for obj in scene.objects:
         cat = (obj.category or "").lower()
         name = (obj.name or "").lower()
+        if cat in ("decor", "plant", "art", "lamp", "phone", "laptop"):
+            continue
         if (cat in ("table", "desk", "tv_unit", "bookshelf") or 
-            any(k in name for k in ("table", "desk", "credenza", "counter", "shelf", "stand"))):
-            surfaces[obj.id] = obj
+            any(k in name for k in ("table", "desk", "credenza", "counter", "cabinet", "stand"))):
+            if obj.dimensions.width >= 0.4 and obj.dimensions.depth >= 0.25:
+                surfaces[obj.id] = obj
 
     for obj in scene.objects:
         cat = (obj.category or "").lower()
@@ -552,6 +555,8 @@ def verify_and_ground_scene(scene: SceneGraph) -> SceneGraph:
             any(k in name for k in ("book", "phone", "laptop", "plant", "mug", "pen", "charger", "award", "bottle", "frame", "booklet", "vase"))):
             for parent_id, parent in surfaces.items():
                 if parent_id == obj.id:
+                    continue
+                if h >= parent.dimensions.height or w > parent.dimensions.width:
                     continue
                 pw2 = (parent.dimensions.width / 2.0) + 0.1
                 pd2 = (parent.dimensions.depth / 2.0) + 0.1
@@ -582,6 +587,9 @@ def verify_and_ground_scene(scene: SceneGraph) -> SceneGraph:
                 h >= 0.70
             )
             if is_floor_item:
+                if attached and not attached.startswith("wall_"):
+                    obj.attached_to_id = None
+                    attached = None
                 target_y = round(h / 2.0, 3)
                 if cat == "rug" or "rug" in name or "carpet" in name:
                     target_y = 0.01  # Rugs sit flush at 1cm above floor
@@ -591,10 +599,28 @@ def verify_and_ground_scene(scene: SceneGraph) -> SceneGraph:
         if not getattr(obj, "parts", None) or len(obj.parts) == 0:
             try:
                 from .antigravity_builder import build_antigravity_object_parts
-                sampled_colors = [obj.color or "#b0a090"]
-                obj.parts = build_antigravity_object_parts(obj, None, sampled_colors)
-            except Exception:
-                pass
+                dim_dict = {
+                    "width": obj.dimensions.width,
+                    "height": obj.dimensions.height,
+                    "depth": obj.dimensions.depth,
+                }
+                crop_p = None
+                if getattr(obj, "crop_url", None):
+                    crop_cand = Path(obj.crop_url.lstrip("/"))
+                    if crop_cand.exists():
+                        crop_p = crop_cand
+                raw_parts = build_antigravity_object_parts(
+                    category=obj.category,
+                    name=obj.name,
+                    dimensions=dim_dict,
+                    primary_color=obj.color or "#b0a090",
+                    crop_path=crop_p,
+                )
+                if raw_parts:
+                    obj.parts = raw_parts
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"Failed to synthesize CSG parts for {obj.name}: {e}")
 
     save_scene(scene)
     return scene

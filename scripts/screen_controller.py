@@ -185,40 +185,62 @@ def wait_for_llm(timeout: float = 300.0, min_wait: float = 14.0, expected_id: Op
             time.sleep(2.5)
             continue
 
-        # Periodically check Copy button cleanly without selecting page
+        # Periodically check Copy button cleanly with adaptive vertical probing (handles banners/popups)
         if copy_pos:
-            try:
-                pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=0.3)
-                pyautogui.click()
-                time.sleep(0.4)
-                clip_text = get_clipboard_text()
-                if clip_text and "{" in clip_text and "}" in clip_text:
-                    if clip_text.count("{") <= clip_text.count("}"):
-                        has_schema = any(k in clip_text for k in ("room", "dimensions", "objects", "name", "category", "materials"))
-                        matches_id = True if not expected_id else (expected_id in clip_text)
-                        if has_schema and matches_id:
-                            print(f"[SUCCESS] Captured response via Copy button ({len(clip_text)} chars)!")
-                            return clip_text
-            except Exception:
-                pass
+            probe_offsets = [0, -65, -80, -50, -120]
+            for dy in probe_offsets:
+                try:
+                    pyautogui.moveTo(copy_pos["x"], copy_pos["y"] + dy, duration=0.15)
+                    pyautogui.click()
+                    time.sleep(0.35)
+                    clip_text = get_clipboard_text()
+                    if clip_text and "{" in clip_text and "}" in clip_text:
+                        if clip_text.count("{") <= clip_text.count("}"):
+                            has_schema = any(k in clip_text for k in ("room", "dimensions", "objects", "name", "category", "materials"))
+                            matches_id = True if not expected_id else (expected_id in clip_text)
+                            if has_schema and matches_id:
+                                offset_str = f" (offset {dy}px due to banner)" if dy != 0 else ""
+                                print(f"[SUCCESS] Captured response via Copy button{offset_str} ({len(clip_text)} chars)!")
+                                return clip_text
+                except Exception:
+                    pass
 
         time.sleep(3.5)
 
     # Final attempt on timeout
     print(f"[TIMEOUT] {int(timeout)}s reached. Taking final copy...")
     if copy_pos:
-        try:
-            pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
-            pyautogui.press("end")
-            time.sleep(0.3)
-            pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=0.3)
-            pyautogui.click()
-            time.sleep(0.8)
-            final_clip = get_clipboard_text()
-            if final_clip and "{" in final_clip and "}" in final_clip:
-                return final_clip
-        except Exception:
-            pass
+        for dy in [0, -65, -80, -50, -120]:
+            try:
+                pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
+                pyautogui.press("end")
+                time.sleep(0.3)
+                pyautogui.moveTo(copy_pos["x"], copy_pos["y"] + dy, duration=0.3)
+                pyautogui.click()
+                time.sleep(0.8)
+                final_clip = get_clipboard_text()
+                if final_clip and "{" in final_clip and "}" in final_clip:
+                    return final_clip
+            except Exception:
+                pass
+
+    # Fallback: full-page selection extraction if copy button was displaced by persistent popups
+    try:
+        print("[FALLBACK] Attempting full-page text extraction to salvage response...")
+        pyautogui.moveTo(scroll_x, scroll_y, duration=0.2)
+        pyautogui.click()
+        time.sleep(0.2)
+        pyautogui.hotkey("ctrl", "a")
+        time.sleep(0.25)
+        pyautogui.hotkey("ctrl", "c")
+        time.sleep(0.4)
+        pyautogui.press("escape")
+        salvage_text = get_clipboard_text()
+        if salvage_text and "{" in salvage_text and "}" in salvage_text:
+            return salvage_text
+    except Exception as e:
+        print(f"[ERROR] Page fallback failed: {e}")
+
     return ""
 
 def paste_to_ide_chat(text: str) -> bool:
