@@ -45,9 +45,7 @@ export const CalibrationModal: React.FC = () => {
         setConfig(data);
         const curActive = data.active_preset || 'gemini';
         setActivePreset(curActive);
-        if (!selectedPreset) {
-          setSelectedPreset(curActive);
-        }
+        setSelectedPreset(curActive);
         if (data.presets) {
           setPresets(data.presets);
         }
@@ -58,9 +56,24 @@ export const CalibrationModal: React.FC = () => {
   };
 
   useEffect(() => {
-    if (activeModal === 'calibration') {
-      fetchConfig();
-    }
+    if (activeModal !== 'calibration') return;
+    let cancelled = false;
+    fetch('/api/physical_clicks/config')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data) return;
+        setConfig(data);
+        const curActive = data.active_preset || 'gemini';
+        setActivePreset(curActive);
+        setSelectedPreset(curActive);
+        if (data.presets) {
+          setPresets(data.presets);
+        }
+      })
+      .catch((e) => console.error('Failed to load physical config:', e));
+    return () => {
+      cancelled = true;
+    };
   }, [activeModal]);
 
   if (activeModal !== 'calibration') return null;

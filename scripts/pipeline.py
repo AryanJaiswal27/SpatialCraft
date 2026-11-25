@@ -7,6 +7,7 @@ import shutil
 import socket
 import threading
 import subprocess
+import urllib.request
 from pathlib import Path
 
 # Force unbuffered output
@@ -261,7 +262,7 @@ class SpatialCraftPipeline:
 import json
 import urllib.request
 from pathlib import Path
-from backend.services.browser_prompt import generate_spatial_prompt
+from backend.services.browser_prompt import generate_spatial_prompt, generate_antigravity_direct_build_prompt
 
 img = Path(r'{str(image_path)}')
 stem = img.stem
@@ -271,7 +272,7 @@ if stem.startswith('scene_'):
 else:
     scene_id = f'scene_{{stem[:8]}}'
 
-# Load active preset from physical_clicks_config.json (gemini, chatgpt, deepseek)
+# Load active preset from physical_clicks_config.json (gemini, chatgpt, deepseek, antigravity)
 preset = 'gemini'
 try:
     with open('physical_clicks_config.json', 'r', encoding='utf-8') as f:
@@ -280,13 +281,14 @@ try:
 except Exception:
     pass
 
+prompt_txt = generate_antigravity_direct_build_prompt(scene_id, img.name) if preset == 'antigravity' else generate_spatial_prompt()
 print(f'Ingesting scene {{scene_id}} with physical preset: {{preset}}', flush=True)
 try:
     data = json.dumps({{
         'job_type': 'initial_reconstruction',
         'preset': preset,
         'scene_id': scene_id,
-        'prompt': generate_spatial_prompt(),
+        'prompt': prompt_txt,
         'image_path': str(img.resolve())
     }}).encode('utf-8')
     req = urllib.request.Request('http://localhost:8000/api/physical_clicks/queue', data=data, headers={{'Content-Type': 'application/json'}})

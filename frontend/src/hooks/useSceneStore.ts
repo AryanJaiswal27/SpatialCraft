@@ -350,8 +350,10 @@ export const useSceneStore = create<SceneState>((set, get) => ({
       });
       if (verifyRes.ok) {
         const verifiedData = await verifyRes.json();
-        if (verifiedData?.scene) {
-          set({ scene: verifiedData.scene });
+        const syncedScene = verifiedData?.scene_id ? verifiedData : verifiedData?.scene;
+        if (syncedScene) {
+          set({ scene: syncedScene });
+          get().refreshAvailableScenes();
         }
       }
     } catch (e) {

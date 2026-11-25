@@ -57,7 +57,185 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "tabletop_slab",
+          "shape": "box",
+          "args": [
+            2.35,
+            0.03,
+            1.25
+          ],
+          "position": [
+            0.0,
+            0.745,
+            0.0
+          ],
+          "color": "#c4a276",
+          "roughness": 0.65,
+          "metalness": 0.05
+        },
+        {
+          "name": "front_edge_banding",
+          "shape": "box",
+          "args": [
+            2.354,
+            0.032,
+            0.004
+          ],
+          "position": [
+            0.0,
+            0.745,
+            0.627
+          ],
+          "color": "#aba597",
+          "roughness": 0.5,
+          "metalness": 0.05
+        },
+        {
+          "name": "left_gable_panel",
+          "shape": "box",
+          "args": [
+            0.025,
+            0.73,
+            1.2
+          ],
+          "position": [
+            -1.1625,
+            0.365,
+            0.0
+          ],
+          "color": "#c4a276",
+          "roughness": 0.65,
+          "metalness": 0.05
+        },
+        {
+          "name": "right_gable_panel",
+          "shape": "box",
+          "args": [
+            0.025,
+            0.73,
+            1.2
+          ],
+          "position": [
+            1.1625,
+            0.365,
+            0.0
+          ],
+          "color": "#c4a276",
+          "roughness": 0.65,
+          "metalness": 0.05
+        },
+        {
+          "name": "recessed_modesty_panel",
+          "shape": "box",
+          "args": [
+            2.2600000000000002,
+            0.5256,
+            0.02
+          ],
+          "position": [
+            0.0,
+            0.4672,
+            -0.275
+          ],
+          "color": "#c4a276",
+          "roughness": 0.7,
+          "metalness": 0.05
+        },
+        {
+          "name": "cable_grommet_ring",
+          "shape": "cylinder",
+          "args": [
+            0.035,
+            0.035,
+            0.006,
+            24
+          ],
+          "position": [
+            0.8225,
+            0.763,
+            -0.375
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.6
+        },
+        {
+          "name": "glide_L_B",
+          "shape": "cylinder",
+          "args": [
+            0.016,
+            0.018,
+            0.012,
+            16
+          ],
+          "position": [
+            -1.1625,
+            0.006,
+            -0.5
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "glide_L_F",
+          "shape": "cylinder",
+          "args": [
+            0.016,
+            0.018,
+            0.012,
+            16
+          ],
+          "position": [
+            -1.1625,
+            0.006,
+            0.5
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "glide_R_B",
+          "shape": "cylinder",
+          "args": [
+            0.016,
+            0.018,
+            0.012,
+            16
+          ],
+          "position": [
+            1.1625,
+            0.006,
+            -0.5
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "glide_R_F",
+          "shape": "cylinder",
+          "args": [
+            0.016,
+            0.018,
+            0.012,
+            16
+          ],
+          "position": [
+            1.1625,
+            0.006,
+            0.5
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_back_storage_desk",
@@ -66,7 +244,7 @@
       "description": "Long light oak wooden office counter positioned against the rear wall beneath the window, featuring multiple built-in drawers, lower storage cabinets, metal handles and an open drawer.",
       "position": {
         "x": -0.07733149631413366,
-        "y": 1.17,
+        "y": 0.41,
         "z": 0.5325833117743501
       },
       "rotation": {
@@ -91,7 +269,185 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "tabletop_slab",
+          "shape": "box",
+          "args": [
+            3.25,
+            0.03,
+            0.6
+          ],
+          "position": [
+            0.0,
+            0.8049999999999999,
+            0.0
+          ],
+          "color": "#b99a70",
+          "roughness": 0.65,
+          "metalness": 0.05
+        },
+        {
+          "name": "front_edge_banding",
+          "shape": "box",
+          "args": [
+            3.254,
+            0.032,
+            0.004
+          ],
+          "position": [
+            0.0,
+            0.8049999999999999,
+            0.302
+          ],
+          "color": "#b0ada6",
+          "roughness": 0.5,
+          "metalness": 0.05
+        },
+        {
+          "name": "left_gable_panel",
+          "shape": "box",
+          "args": [
+            0.025,
+            0.7899999999999999,
+            0.576
+          ],
+          "position": [
+            -1.6125,
+            0.39499999999999996,
+            0.0
+          ],
+          "color": "#b99a70",
+          "roughness": 0.65,
+          "metalness": 0.05
+        },
+        {
+          "name": "right_gable_panel",
+          "shape": "box",
+          "args": [
+            0.025,
+            0.7899999999999999,
+            0.576
+          ],
+          "position": [
+            1.6125,
+            0.39499999999999996,
+            0.0
+          ],
+          "color": "#b99a70",
+          "roughness": 0.65,
+          "metalness": 0.05
+        },
+        {
+          "name": "recessed_modesty_panel",
+          "shape": "box",
+          "args": [
+            3.16,
+            0.5688,
+            0.02
+          ],
+          "position": [
+            0.0,
+            0.5055999999999999,
+            -0.132
+          ],
+          "color": "#b99a70",
+          "roughness": 0.7,
+          "metalness": 0.05
+        },
+        {
+          "name": "cable_grommet_ring",
+          "shape": "cylinder",
+          "args": [
+            0.035,
+            0.035,
+            0.006,
+            24
+          ],
+          "position": [
+            1.1375,
+            0.823,
+            -0.18
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.6
+        },
+        {
+          "name": "glide_L_B",
+          "shape": "cylinder",
+          "args": [
+            0.016,
+            0.018,
+            0.012,
+            16
+          ],
+          "position": [
+            -1.6125,
+            0.006,
+            -0.24
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "glide_L_F",
+          "shape": "cylinder",
+          "args": [
+            0.016,
+            0.018,
+            0.012,
+            16
+          ],
+          "position": [
+            -1.6125,
+            0.006,
+            0.24
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "glide_R_B",
+          "shape": "cylinder",
+          "args": [
+            0.016,
+            0.018,
+            0.012,
+            16
+          ],
+          "position": [
+            1.6125,
+            0.006,
+            -0.24
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "glide_R_F",
+          "shape": "cylinder",
+          "args": [
+            0.016,
+            0.018,
+            0.012,
+            16
+          ],
+          "position": [
+            1.6125,
+            0.006,
+            0.24
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_executive_chair",
@@ -125,7 +481,360 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "seat_cushion",
+          "shape": "box",
+          "args": [
+            0.5984,
+            0.06,
+            0.5712
+          ],
+          "position": [
+            0.0,
+            0.47840000000000005,
+            0.0
+          ],
+          "color": "#777b7b",
+          "roughness": 0.8,
+          "metalness": 0.05
+        },
+        {
+          "name": "backrest_panel",
+          "shape": "box",
+          "args": [
+            0.5576,
+            0.5115999999999999,
+            0.045
+          ],
+          "position": [
+            0.0,
+            0.7742,
+            -0.24480000000000002
+          ],
+          "color": "#777b7b",
+          "roughness": 0.85,
+          "metalness": 0.05
+        },
+        {
+          "name": "lumbar_support_pad",
+          "shape": "box",
+          "args": [
+            0.4624000000000001,
+            0.12,
+            0.03
+          ],
+          "position": [
+            0.0,
+            0.642112,
+            -0.23120000000000004
+          ],
+          "color": "#b1aea7",
+          "roughness": 0.9,
+          "metalness": 0.05
+        },
+        {
+          "name": "left_armrest_stalk",
+          "shape": "box",
+          "args": [
+            0.025,
+            0.2288,
+            0.04
+          ],
+          "position": [
+            -0.2856,
+            0.5928,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "left_armrest_pad",
+          "shape": "box",
+          "args": [
+            0.065,
+            0.025,
+            0.3536
+          ],
+          "position": [
+            -0.2856,
+            0.7192000000000001,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.6,
+          "metalness": 0.1
+        },
+        {
+          "name": "right_armrest_stalk",
+          "shape": "box",
+          "args": [
+            0.025,
+            0.2288,
+            0.04
+          ],
+          "position": [
+            0.2856,
+            0.5928,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "right_armrest_pad",
+          "shape": "box",
+          "args": [
+            0.065,
+            0.025,
+            0.3536
+          ],
+          "position": [
+            0.2856,
+            0.7192000000000001,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.6,
+          "metalness": 0.1
+        },
+        {
+          "name": "gas_lift_cylinder",
+          "shape": "cylinder",
+          "args": [
+            0.026,
+            0.026,
+            0.39840000000000003,
+            24
+          ],
+          "position": [
+            0.0,
+            0.2592,
+            0.0
+          ],
+          "color": "#d4d4d8",
+          "roughness": 0.2,
+          "metalness": 0.9
+        },
+        {
+          "name": "star_base_center_hub",
+          "shape": "cylinder",
+          "args": [
+            0.05,
+            0.06,
+            0.045,
+            24
+          ],
+          "position": [
+            0.0,
+            0.07,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "star_leg_1",
+          "shape": "box",
+          "args": [
+            0.035,
+            0.022,
+            0.2856
+          ],
+          "position": [
+            0.1428,
+            0.055,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            -0.0,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "caster_wheel_1",
+          "shape": "sphere",
+          "args": [
+            0.026,
+            16,
+            16
+          ],
+          "position": [
+            0.2856,
+            0.026,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.5
+        },
+        {
+          "name": "star_leg_2",
+          "shape": "box",
+          "args": [
+            0.035,
+            0.022,
+            0.2856
+          ],
+          "position": [
+            0.0441276267967425,
+            0.055,
+            0.13581087052694793
+          ],
+          "rotation": [
+            0.0,
+            -1.2566370614359172,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "caster_wheel_2",
+          "shape": "sphere",
+          "args": [
+            0.026,
+            16,
+            16
+          ],
+          "position": [
+            0.088255253593485,
+            0.026,
+            0.27162174105389586
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.5
+        },
+        {
+          "name": "star_leg_3",
+          "shape": "box",
+          "args": [
+            0.035,
+            0.022,
+            0.2856
+          ],
+          "position": [
+            -0.11552762679674249,
+            0.055,
+            0.08393573402736519
+          ],
+          "rotation": [
+            0.0,
+            -2.5132741228718345,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "caster_wheel_3",
+          "shape": "sphere",
+          "args": [
+            0.026,
+            16,
+            16
+          ],
+          "position": [
+            -0.23105525359348497,
+            0.026,
+            0.16787146805473038
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.5
+        },
+        {
+          "name": "star_leg_4",
+          "shape": "box",
+          "args": [
+            0.035,
+            0.022,
+            0.2856
+          ],
+          "position": [
+            -0.1155276267967425,
+            0.055,
+            -0.08393573402736515
+          ],
+          "rotation": [
+            0.0,
+            -3.7699111843077517,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "caster_wheel_4",
+          "shape": "sphere",
+          "args": [
+            0.026,
+            16,
+            16
+          ],
+          "position": [
+            -0.231055253593485,
+            0.026,
+            -0.1678714680547303
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.5
+        },
+        {
+          "name": "star_leg_5",
+          "shape": "box",
+          "args": [
+            0.035,
+            0.022,
+            0.2856
+          ],
+          "position": [
+            0.04412762679674247,
+            0.055,
+            -0.13581087052694796
+          ],
+          "rotation": [
+            0.0,
+            -5.026548245743669,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "caster_wheel_5",
+          "shape": "sphere",
+          "args": [
+            0.026,
+            16,
+            16
+          ],
+          "position": [
+            0.08825525359348493,
+            0.026,
+            -0.2716217410538959
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.5
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_visitor_chair_1",
@@ -159,7 +868,360 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "seat_cushion",
+          "shape": "box",
+          "args": [
+            0.5984,
+            0.06,
+            0.588
+          ],
+          "position": [
+            0.0,
+            0.47840000000000005,
+            0.0
+          ],
+          "color": "#777b7b",
+          "roughness": 0.8,
+          "metalness": 0.05
+        },
+        {
+          "name": "backrest_panel",
+          "shape": "box",
+          "args": [
+            0.5576,
+            0.5115999999999999,
+            0.045
+          ],
+          "position": [
+            0.0,
+            0.7742,
+            -0.252
+          ],
+          "color": "#777b7b",
+          "roughness": 0.85,
+          "metalness": 0.05
+        },
+        {
+          "name": "lumbar_support_pad",
+          "shape": "box",
+          "args": [
+            0.4624000000000001,
+            0.12,
+            0.03
+          ],
+          "position": [
+            0.0,
+            0.642112,
+            -0.238
+          ],
+          "color": "#a29d8f",
+          "roughness": 0.9,
+          "metalness": 0.05
+        },
+        {
+          "name": "left_armrest_stalk",
+          "shape": "box",
+          "args": [
+            0.025,
+            0.2288,
+            0.04
+          ],
+          "position": [
+            -0.2856,
+            0.5928,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "left_armrest_pad",
+          "shape": "box",
+          "args": [
+            0.065,
+            0.025,
+            0.364
+          ],
+          "position": [
+            -0.2856,
+            0.7192000000000001,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.6,
+          "metalness": 0.1
+        },
+        {
+          "name": "right_armrest_stalk",
+          "shape": "box",
+          "args": [
+            0.025,
+            0.2288,
+            0.04
+          ],
+          "position": [
+            0.2856,
+            0.5928,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "right_armrest_pad",
+          "shape": "box",
+          "args": [
+            0.065,
+            0.025,
+            0.364
+          ],
+          "position": [
+            0.2856,
+            0.7192000000000001,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.6,
+          "metalness": 0.1
+        },
+        {
+          "name": "gas_lift_cylinder",
+          "shape": "cylinder",
+          "args": [
+            0.026,
+            0.026,
+            0.39840000000000003,
+            24
+          ],
+          "position": [
+            0.0,
+            0.2592,
+            0.0
+          ],
+          "color": "#d4d4d8",
+          "roughness": 0.2,
+          "metalness": 0.9
+        },
+        {
+          "name": "star_base_center_hub",
+          "shape": "cylinder",
+          "args": [
+            0.05,
+            0.06,
+            0.045,
+            24
+          ],
+          "position": [
+            0.0,
+            0.07,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "star_leg_1",
+          "shape": "box",
+          "args": [
+            0.035,
+            0.022,
+            0.2856
+          ],
+          "position": [
+            0.1428,
+            0.055,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            -0.0,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "caster_wheel_1",
+          "shape": "sphere",
+          "args": [
+            0.026,
+            16,
+            16
+          ],
+          "position": [
+            0.2856,
+            0.026,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.5
+        },
+        {
+          "name": "star_leg_2",
+          "shape": "box",
+          "args": [
+            0.035,
+            0.022,
+            0.2856
+          ],
+          "position": [
+            0.0441276267967425,
+            0.055,
+            0.13581087052694793
+          ],
+          "rotation": [
+            0.0,
+            -1.2566370614359172,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "caster_wheel_2",
+          "shape": "sphere",
+          "args": [
+            0.026,
+            16,
+            16
+          ],
+          "position": [
+            0.088255253593485,
+            0.026,
+            0.27162174105389586
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.5
+        },
+        {
+          "name": "star_leg_3",
+          "shape": "box",
+          "args": [
+            0.035,
+            0.022,
+            0.2856
+          ],
+          "position": [
+            -0.11552762679674249,
+            0.055,
+            0.08393573402736519
+          ],
+          "rotation": [
+            0.0,
+            -2.5132741228718345,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "caster_wheel_3",
+          "shape": "sphere",
+          "args": [
+            0.026,
+            16,
+            16
+          ],
+          "position": [
+            -0.23105525359348497,
+            0.026,
+            0.16787146805473038
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.5
+        },
+        {
+          "name": "star_leg_4",
+          "shape": "box",
+          "args": [
+            0.035,
+            0.022,
+            0.2856
+          ],
+          "position": [
+            -0.1155276267967425,
+            0.055,
+            -0.08393573402736515
+          ],
+          "rotation": [
+            0.0,
+            -3.7699111843077517,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "caster_wheel_4",
+          "shape": "sphere",
+          "args": [
+            0.026,
+            16,
+            16
+          ],
+          "position": [
+            -0.231055253593485,
+            0.026,
+            -0.1678714680547303
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.5
+        },
+        {
+          "name": "star_leg_5",
+          "shape": "box",
+          "args": [
+            0.035,
+            0.022,
+            0.2856
+          ],
+          "position": [
+            0.04412762679674247,
+            0.055,
+            -0.13581087052694796
+          ],
+          "rotation": [
+            0.0,
+            -5.026548245743669,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "caster_wheel_5",
+          "shape": "sphere",
+          "args": [
+            0.026,
+            16,
+            16
+          ],
+          "position": [
+            0.08825525359348493,
+            0.026,
+            -0.2716217410538959
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.5
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_visitor_chair_2",
@@ -168,7 +1230,7 @@
       "description": "Grey upholstered office chair with black armrests and wheeled base, partially covered in transparent protective plastic, positioned behind the other visitor chair.",
       "position": {
         "x": -1.507732105936895,
-        "y": 0.52,
+        "y": 0.51,
         "z": 1.6336886717167154
       },
       "rotation": {
@@ -193,7 +1255,360 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "seat_cushion",
+          "shape": "box",
+          "args": [
+            0.5720000000000001,
+            0.06,
+            0.5712
+          ],
+          "position": [
+            0.0,
+            0.4692,
+            0.0
+          ],
+          "color": "#a5a7a3",
+          "roughness": 0.8,
+          "metalness": 0.05
+        },
+        {
+          "name": "backrest_panel",
+          "shape": "box",
+          "args": [
+            0.533,
+            0.5007999999999999,
+            0.045
+          ],
+          "position": [
+            0.0,
+            0.7596,
+            -0.24480000000000002
+          ],
+          "color": "#a5a7a3",
+          "roughness": 0.85,
+          "metalness": 0.05
+        },
+        {
+          "name": "lumbar_support_pad",
+          "shape": "box",
+          "args": [
+            0.44200000000000006,
+            0.12,
+            0.03
+          ],
+          "position": [
+            0.0,
+            0.629456,
+            -0.23120000000000004
+          ],
+          "color": "#9b9588",
+          "roughness": 0.9,
+          "metalness": 0.05
+        },
+        {
+          "name": "left_armrest_stalk",
+          "shape": "box",
+          "args": [
+            0.025,
+            0.22440000000000002,
+            0.04
+          ],
+          "position": [
+            -0.273,
+            0.5814,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "left_armrest_pad",
+          "shape": "box",
+          "args": [
+            0.065,
+            0.025,
+            0.3536
+          ],
+          "position": [
+            -0.273,
+            0.7056,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.6,
+          "metalness": 0.1
+        },
+        {
+          "name": "right_armrest_stalk",
+          "shape": "box",
+          "args": [
+            0.025,
+            0.22440000000000002,
+            0.04
+          ],
+          "position": [
+            0.273,
+            0.5814,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "right_armrest_pad",
+          "shape": "box",
+          "args": [
+            0.065,
+            0.025,
+            0.3536
+          ],
+          "position": [
+            0.273,
+            0.7056,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.6,
+          "metalness": 0.1
+        },
+        {
+          "name": "gas_lift_cylinder",
+          "shape": "cylinder",
+          "args": [
+            0.026,
+            0.026,
+            0.3892,
+            24
+          ],
+          "position": [
+            0.0,
+            0.2546,
+            0.0
+          ],
+          "color": "#d4d4d8",
+          "roughness": 0.2,
+          "metalness": 0.9
+        },
+        {
+          "name": "star_base_center_hub",
+          "shape": "cylinder",
+          "args": [
+            0.05,
+            0.06,
+            0.045,
+            24
+          ],
+          "position": [
+            0.0,
+            0.07,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "star_leg_1",
+          "shape": "box",
+          "args": [
+            0.035,
+            0.022,
+            0.273
+          ],
+          "position": [
+            0.1365,
+            0.055,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            -0.0,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "caster_wheel_1",
+          "shape": "sphere",
+          "args": [
+            0.026,
+            16,
+            16
+          ],
+          "position": [
+            0.273,
+            0.026,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.5
+        },
+        {
+          "name": "star_leg_2",
+          "shape": "box",
+          "args": [
+            0.035,
+            0.022,
+            0.273
+          ],
+          "position": [
+            0.04218081973218033,
+            0.055,
+            0.12981921447428846
+          ],
+          "rotation": [
+            0.0,
+            -1.2566370614359172,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "caster_wheel_2",
+          "shape": "sphere",
+          "args": [
+            0.026,
+            16,
+            16
+          ],
+          "position": [
+            0.08436163946436066,
+            0.026,
+            0.2596384289485769
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.5
+        },
+        {
+          "name": "star_leg_3",
+          "shape": "box",
+          "args": [
+            0.035,
+            0.022,
+            0.273
+          ],
+          "position": [
+            -0.11043081973218032,
+            0.055,
+            0.0802326869379226
+          ],
+          "rotation": [
+            0.0,
+            -2.5132741228718345,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "caster_wheel_3",
+          "shape": "sphere",
+          "args": [
+            0.026,
+            16,
+            16
+          ],
+          "position": [
+            -0.22086163946436063,
+            0.026,
+            0.1604653738758452
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.5
+        },
+        {
+          "name": "star_leg_4",
+          "shape": "box",
+          "args": [
+            0.035,
+            0.022,
+            0.273
+          ],
+          "position": [
+            -0.11043081973218033,
+            0.055,
+            -0.08023268693792257
+          ],
+          "rotation": [
+            0.0,
+            -3.7699111843077517,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "caster_wheel_4",
+          "shape": "sphere",
+          "args": [
+            0.026,
+            16,
+            16
+          ],
+          "position": [
+            -0.22086163946436066,
+            0.026,
+            -0.16046537387584514
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.5
+        },
+        {
+          "name": "star_leg_5",
+          "shape": "box",
+          "args": [
+            0.035,
+            0.022,
+            0.273
+          ],
+          "position": [
+            0.0421808197321803,
+            0.055,
+            -0.12981921447428849
+          ],
+          "rotation": [
+            0.0,
+            -5.026548245743669,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "caster_wheel_5",
+          "shape": "sphere",
+          "args": [
+            0.026,
+            16,
+            16
+          ],
+          "position": [
+            0.0843616394643606,
+            0.026,
+            -0.25963842894857697
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.5
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_window",
@@ -227,7 +1642,66 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "primary_base_plinth",
+          "shape": "box",
+          "args": [
+            2.4,
+            0.025,
+            0.1
+          ],
+          "position": [
+            0.0,
+            0.0125,
+            0.0
+          ],
+          "color": "#1f1b18",
+          "roughness": 0.45,
+          "metalness": 0.2
+        },
+        {
+          "name": "sculpted_figure_body",
+          "shape": "sphere",
+          "args": [
+            0.038000000000000006,
+            18,
+            18
+          ],
+          "position": [
+            0.0,
+            0.6887500000000001,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            17.643540669856456,
+            0.85
+          ],
+          "color": "#454b4b",
+          "roughness": 0.32,
+          "metalness": 0.45
+        },
+        {
+          "name": "sculpted_figure_crest",
+          "shape": "sphere",
+          "args": [
+            0.020900000000000005,
+            16,
+            16
+          ],
+          "position": [
+            0.0,
+            1.2345,
+            0.0
+          ],
+          "color": "#454b4b",
+          "roughness": 0.3,
+          "metalness": 0.5
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_printer",
@@ -261,7 +1735,66 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "primary_base_plinth",
+          "shape": "box",
+          "args": [
+            0.43,
+            0.025,
+            0.38
+          ],
+          "position": [
+            0.0,
+            0.0125,
+            0.0
+          ],
+          "color": "#1f1b18",
+          "roughness": 0.45,
+          "metalness": 0.2
+        },
+        {
+          "name": "sculpted_figure_body",
+          "shape": "sphere",
+          "args": [
+            0.1444,
+            18,
+            18
+          ],
+          "position": [
+            0.0,
+            0.14875,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            0.8656509695290857,
+            0.85
+          ],
+          "color": "#6c7070",
+          "roughness": 0.32,
+          "metalness": 0.45
+        },
+        {
+          "name": "sculpted_figure_crest",
+          "shape": "sphere",
+          "args": [
+            0.07942,
+            16,
+            16
+          ],
+          "position": [
+            0.0,
+            0.25049999999999994,
+            0.0
+          ],
+          "color": "#6c7070",
+          "roughness": 0.3,
+          "metalness": 0.5
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_laptop",
@@ -270,7 +1803,7 @@
       "description": "Open silver HP laptop with black keyboard, large display and visible HP logo on the back of the screen, placed near the center of the main desk.",
       "position": {
         "x": -0.12,
-        "y": 0.78,
+        "y": 0.84,
         "z": 0.62
       },
       "rotation": {
@@ -293,9 +1826,107 @@
         0.77,
         0.6
       ],
-      "attached_to_id": null,
+      "attached_to_id": "obj_back_storage_desk",
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "base_aluminum_chassis",
+          "shape": "box",
+          "args": [
+            0.34,
+            0.012,
+            0.22
+          ],
+          "position": [
+            0.0,
+            0.006,
+            0.0
+          ],
+          "color": "#aeb9c2",
+          "roughness": 0.35,
+          "metalness": 0.85
+        },
+        {
+          "name": "recessed_keyboard_well",
+          "shape": "box",
+          "args": [
+            0.2856,
+            0.002,
+            0.105
+          ],
+          "position": [
+            0.0,
+            0.013000000000000001,
+            -0.03
+          ],
+          "color": "#18181b",
+          "roughness": 0.7,
+          "metalness": 0.2
+        },
+        {
+          "name": "glass_trackpad",
+          "shape": "box",
+          "args": [
+            0.119,
+            0.002,
+            0.065
+          ],
+          "position": [
+            0.0,
+            0.013000000000000001,
+            0.065
+          ],
+          "color": "#a1a1aa",
+          "roughness": 0.2,
+          "metalness": 0.5
+        },
+        {
+          "name": "display_lid_back",
+          "shape": "box",
+          "args": [
+            0.34,
+            0.05,
+            0.006
+          ],
+          "position": [
+            0.0,
+            0.03465769467591625,
+            -0.12056545654351748
+          ],
+          "rotation": [
+            0.4363323129985824,
+            0.0,
+            0.0
+          ],
+          "color": "#aeb9c2",
+          "roughness": 0.35,
+          "metalness": 0.85
+        },
+        {
+          "name": "glass_retina_screen",
+          "shape": "box",
+          "args": [
+            0.3196,
+            0.046000000000000006,
+            0.002
+          ],
+          "position": [
+            0.0,
+            0.03465769467591625,
+            -0.11656545654351748
+          ],
+          "rotation": [
+            0.4363323129985824,
+            0.0,
+            0.0
+          ],
+          "color": "#09090b",
+          "roughness": 0.1,
+          "metalness": 0.9
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_smartphone",
@@ -327,9 +1958,63 @@
         0.78,
         0.64
       ],
-      "attached_to_id": null,
+      "attached_to_id": "obj_main_desk",
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "chassis_frame",
+          "shape": "box",
+          "args": [
+            0.08,
+            0.008,
+            0.16
+          ],
+          "position": [
+            0.0,
+            0.004,
+            0.0
+          ],
+          "color": "#17191c",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "oled_screen_surface",
+          "shape": "box",
+          "args": [
+            0.0752,
+            0.001,
+            0.1536
+          ],
+          "position": [
+            0.0,
+            0.0085,
+            0.0
+          ],
+          "color": "#09090b",
+          "roughness": 0.05,
+          "metalness": 0.95
+        },
+        {
+          "name": "camera_island_bump",
+          "shape": "box",
+          "args": [
+            0.0336,
+            0.002,
+            0.044800000000000006
+          ],
+          "position": [
+            -0.0176,
+            0.009000000000000001,
+            -0.048
+          ],
+          "color": "#18181b",
+          "roughness": 0.2,
+          "metalness": 0.9
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_landline_phone",
@@ -363,7 +2048,61 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "chassis_frame",
+          "shape": "box",
+          "args": [
+            0.24,
+            0.008,
+            0.23
+          ],
+          "position": [
+            0.0,
+            0.004,
+            0.0
+          ],
+          "color": "#282c30",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "oled_screen_surface",
+          "shape": "box",
+          "args": [
+            0.22559999999999997,
+            0.001,
+            0.2208
+          ],
+          "position": [
+            0.0,
+            0.0085,
+            0.0
+          ],
+          "color": "#09090b",
+          "roughness": 0.05,
+          "metalness": 0.95
+        },
+        {
+          "name": "camera_island_bump",
+          "shape": "box",
+          "args": [
+            0.10079999999999999,
+            0.002,
+            0.06440000000000001
+          ],
+          "position": [
+            -0.0528,
+            0.009000000000000001,
+            -0.069
+          ],
+          "color": "#18181b",
+          "roughness": 0.2,
+          "metalness": 0.9
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_award_1",
@@ -397,7 +2136,66 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "primary_base_plinth",
+          "shape": "box",
+          "args": [
+            0.17,
+            0.025,
+            0.06
+          ],
+          "position": [
+            0.0,
+            0.0125,
+            0.0
+          ],
+          "color": "#1f1b18",
+          "roughness": 0.45,
+          "metalness": 0.2
+        },
+        {
+          "name": "sculpted_figure_body",
+          "shape": "sphere",
+          "args": [
+            0.0228,
+            18,
+            18
+          ],
+          "position": [
+            0.0,
+            0.12625,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            4.485645933014354,
+            0.85
+          ],
+          "color": "#c7c5b8",
+          "roughness": 0.32,
+          "metalness": 0.45
+        },
+        {
+          "name": "sculpted_figure_crest",
+          "shape": "sphere",
+          "args": [
+            0.01254,
+            16,
+            16
+          ],
+          "position": [
+            0.0,
+            0.2095,
+            0.0
+          ],
+          "color": "#c7c5b8",
+          "roughness": 0.3,
+          "metalness": 0.5
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_award_2",
@@ -431,7 +2229,85 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "clock_brass_bezel",
+          "shape": "cylinder",
+          "args": [
+            0.069,
+            0.069,
+            0.0675,
+            32
+          ],
+          "position": [
+            0.0,
+            0.15,
+            0.0
+          ],
+          "rotation": [
+            1.5708,
+            0.0,
+            0.0
+          ],
+          "color": "#d4af37",
+          "roughness": 0.22,
+          "metalness": 0.85
+        },
+        {
+          "name": "clock_cream_dial",
+          "shape": "cylinder",
+          "args": [
+            0.057960000000000005,
+            0.057960000000000005,
+            0.01,
+            28
+          ],
+          "position": [
+            0.0,
+            0.15,
+            0.0342
+          ],
+          "rotation": [
+            1.5708,
+            0.0,
+            0.0
+          ],
+          "color": "#f6f3ed",
+          "roughness": 0.45
+        },
+        {
+          "name": "clock_hand_hour",
+          "shape": "box",
+          "args": [
+            0.008,
+            0.033120000000000004,
+            0.004
+          ],
+          "position": [
+            0.0,
+            0.16104,
+            0.039599999999999996
+          ],
+          "color": "#18181b"
+        },
+        {
+          "name": "clock_hand_minute",
+          "shape": "box",
+          "args": [
+            0.031050000000000005,
+            0.006,
+            0.004
+          ],
+          "position": [
+            0.011040000000000001,
+            0.15,
+            0.039599999999999996
+          ],
+          "color": "#18181b"
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_photo_frame",
@@ -465,7 +2341,61 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "gallery_outer_frame",
+          "shape": "box",
+          "args": [
+            0.11,
+            0.22,
+            0.03
+          ],
+          "position": [
+            0.0,
+            0.11,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.5,
+          "metalness": 0.3
+        },
+        {
+          "name": "archival_matting_border",
+          "shape": "box",
+          "args": [
+            0.03,
+            0.14,
+            0.032
+          ],
+          "position": [
+            0.0,
+            0.11,
+            0.001
+          ],
+          "color": "#f4f4f5",
+          "roughness": 0.8,
+          "metalness": 0.05
+        },
+        {
+          "name": "art_canvas_artwork",
+          "shape": "box",
+          "args": [
+            0.07919999999999999,
+            0.15839999999999999,
+            0.034
+          ],
+          "position": [
+            0.0,
+            0.11,
+            0.002
+          ],
+          "color": "#bda58a",
+          "roughness": 0.7,
+          "metalness": 0.1
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_documents_1",
@@ -499,7 +2429,66 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "primary_base_plinth",
+          "shape": "box",
+          "args": [
+            0.48,
+            0.0192,
+            0.34
+          ],
+          "position": [
+            0.0,
+            0.0096,
+            0.0
+          ],
+          "color": "#1f1b18",
+          "roughness": 0.45,
+          "metalness": 0.2
+        },
+        {
+          "name": "sculpted_figure_body",
+          "shape": "sphere",
+          "args": [
+            0.1292,
+            18,
+            18
+          ],
+          "position": [
+            0.0,
+            0.06456,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            0.8,
+            0.85
+          ],
+          "color": "#d5bb70",
+          "roughness": 0.32,
+          "metalness": 0.45
+        },
+        {
+          "name": "sculpted_figure_crest",
+          "shape": "sphere",
+          "args": [
+            0.07106000000000001,
+            16,
+            16
+          ],
+          "position": [
+            0.0,
+            0.10185599999999999,
+            0.0
+          ],
+          "color": "#d5bb70",
+          "roughness": 0.3,
+          "metalness": 0.5
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_black_bag",
@@ -533,7 +2522,66 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "primary_base_plinth",
+          "shape": "box",
+          "args": [
+            0.55,
+            0.025,
+            0.36
+          ],
+          "position": [
+            0.0,
+            0.0125,
+            0.0
+          ],
+          "color": "#1f1b18",
+          "roughness": 0.45,
+          "metalness": 0.2
+        },
+        {
+          "name": "sculpted_figure_body",
+          "shape": "sphere",
+          "args": [
+            0.1368,
+            18,
+            18
+          ],
+          "position": [
+            0.0,
+            0.09925,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            0.8,
+            0.85
+          ],
+          "color": "#17191b",
+          "roughness": 0.32,
+          "metalness": 0.45
+        },
+        {
+          "name": "sculpted_figure_crest",
+          "shape": "sphere",
+          "args": [
+            0.07524000000000002,
+            16,
+            16
+          ],
+          "position": [
+            0.0,
+            0.1603,
+            0.0
+          ],
+          "color": "#17191b",
+          "roughness": 0.3,
+          "metalness": 0.5
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_water_bottle",
@@ -567,7 +2615,66 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "primary_base_plinth",
+          "shape": "box",
+          "args": [
+            0.09,
+            0.025,
+            0.09
+          ],
+          "position": [
+            0.0,
+            0.0125,
+            0.0
+          ],
+          "color": "#1f1b18",
+          "roughness": 0.45,
+          "metalness": 0.2
+        },
+        {
+          "name": "sculpted_figure_body",
+          "shape": "sphere",
+          "args": [
+            0.0342,
+            18,
+            18
+          ],
+          "position": [
+            0.0,
+            0.22974999999999998,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            6.047315257841572,
+            0.85
+          ],
+          "color": "#a5aaa8",
+          "roughness": 0.32,
+          "metalness": 0.45
+        },
+        {
+          "name": "sculpted_figure_crest",
+          "shape": "sphere",
+          "args": [
+            0.018810000000000004,
+            16,
+            16
+          ],
+          "position": [
+            0.0,
+            0.39809999999999995,
+            0.0
+          ],
+          "color": "#a5aaa8",
+          "roughness": 0.3,
+          "metalness": 0.5
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_brochure",
@@ -601,7 +2708,66 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "primary_base_plinth",
+          "shape": "box",
+          "args": [
+            0.35,
+            0.008,
+            0.23
+          ],
+          "position": [
+            0.0,
+            0.004,
+            0.0
+          ],
+          "color": "#1f1b18",
+          "roughness": 0.45,
+          "metalness": 0.2
+        },
+        {
+          "name": "sculpted_figure_body",
+          "shape": "sphere",
+          "args": [
+            0.0874,
+            18,
+            18
+          ],
+          "position": [
+            0.0,
+            0.0269,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            0.8,
+            0.85
+          ],
+          "color": "#34383a",
+          "roughness": 0.32,
+          "metalness": 0.45
+        },
+        {
+          "name": "sculpted_figure_crest",
+          "shape": "sphere",
+          "args": [
+            0.04807000000000001,
+            16,
+            16
+          ],
+          "position": [
+            0.0,
+            0.04244,
+            0.0
+          ],
+          "color": "#34383a",
+          "roughness": 0.3,
+          "metalness": 0.5
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_wall_notice",
@@ -635,7 +2801,61 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "gallery_outer_frame",
+          "shape": "box",
+          "args": [
+            0.17,
+            0.29,
+            0.03
+          ],
+          "position": [
+            0.0,
+            0.145,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.5,
+          "metalness": 0.3
+        },
+        {
+          "name": "archival_matting_border",
+          "shape": "box",
+          "args": [
+            0.09000000000000001,
+            0.20999999999999996,
+            0.032
+          ],
+          "position": [
+            0.0,
+            0.145,
+            0.001
+          ],
+          "color": "#f4f4f5",
+          "roughness": 0.8,
+          "metalness": 0.05
+        },
+        {
+          "name": "art_canvas_artwork",
+          "shape": "box",
+          "args": [
+            0.12240000000000001,
+            0.20879999999999999,
+            0.034
+          ],
+          "position": [
+            0.0,
+            0.145,
+            0.002
+          ],
+          "color": "#e8e6df",
+          "roughness": 0.7,
+          "metalness": 0.1
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_electrical_socket",
@@ -669,7 +2889,66 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "primary_base_plinth",
+          "shape": "box",
+          "args": [
+            0.22,
+            0.024,
+            0.05
+          ],
+          "position": [
+            0.0,
+            0.012,
+            0.0
+          ],
+          "color": "#1f1b18",
+          "roughness": 0.45,
+          "metalness": 0.2
+        },
+        {
+          "name": "sculpted_figure_body",
+          "shape": "sphere",
+          "args": [
+            0.019000000000000003,
+            18,
+            18
+          ],
+          "position": [
+            0.0,
+            0.0807,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            2.52,
+            0.85
+          ],
+          "color": "#eeeeeb",
+          "roughness": 0.32,
+          "metalness": 0.45
+        },
+        {
+          "name": "sculpted_figure_crest",
+          "shape": "sphere",
+          "args": [
+            0.010450000000000003,
+            16,
+            16
+          ],
+          "position": [
+            0.0,
+            0.12732,
+            0.0
+          ],
+          "color": "#eeeeeb",
+          "roughness": 0.3,
+          "metalness": 0.5
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_charger_adapter",
@@ -678,7 +2957,7 @@
       "description": "Small black rectangular electrical power adapter with loosely arranged connecting wires, placed on the main desk near the printer.",
       "position": {
         "x": -0.48,
-        "y": 0.8,
+        "y": 0.85,
         "z": 0.31
       },
       "rotation": {
@@ -701,9 +2980,107 @@
         0.65,
         0.5
       ],
-      "attached_to_id": null,
+      "attached_to_id": "obj_back_storage_desk",
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "base_aluminum_chassis",
+          "shape": "box",
+          "args": [
+            0.16,
+            0.012,
+            0.0968
+          ],
+          "position": [
+            0.0,
+            0.006,
+            0.0
+          ],
+          "color": "#242629",
+          "roughness": 0.35,
+          "metalness": 0.85
+        },
+        {
+          "name": "recessed_keyboard_well",
+          "shape": "box",
+          "args": [
+            0.1344,
+            0.002,
+            0.0462
+          ],
+          "position": [
+            0.0,
+            0.013000000000000001,
+            -0.0132
+          ],
+          "color": "#18181b",
+          "roughness": 0.7,
+          "metalness": 0.2
+        },
+        {
+          "name": "glass_trackpad",
+          "shape": "box",
+          "args": [
+            0.055999999999999994,
+            0.002,
+            0.0286
+          ],
+          "position": [
+            0.0,
+            0.013000000000000001,
+            0.0286
+          ],
+          "color": "#a1a1aa",
+          "roughness": 0.2,
+          "metalness": 0.5
+        },
+        {
+          "name": "display_lid_back",
+          "shape": "box",
+          "args": [
+            0.16,
+            0.06,
+            0.006
+          ],
+          "position": [
+            0.0,
+            0.039189233611099494,
+            -0.061078547852220985
+          ],
+          "rotation": [
+            0.4363323129985824,
+            0.0,
+            0.0
+          ],
+          "color": "#242629",
+          "roughness": 0.35,
+          "metalness": 0.85
+        },
+        {
+          "name": "glass_retina_screen",
+          "shape": "box",
+          "args": [
+            0.1504,
+            0.0552,
+            0.002
+          ],
+          "position": [
+            0.0,
+            0.039189233611099494,
+            -0.05707854785222098
+          ],
+          "rotation": [
+            0.4363323129985824,
+            0.0,
+            0.0
+          ],
+          "color": "#09090b",
+          "roughness": 0.1,
+          "metalness": 0.9
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_eyeglasses",
@@ -712,7 +3089,7 @@
       "description": "A pair of dark-framed eyeglasses lying open on the wooden desktop.",
       "position": {
         "x": -0.87,
-        "y": 0.78,
+        "y": 0.832,
         "z": 0.76
       },
       "rotation": {
@@ -735,9 +3112,68 @@
         0.69,
         0.42
       ],
-      "attached_to_id": null,
+      "attached_to_id": "obj_back_storage_desk",
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "primary_base_plinth",
+          "shape": "box",
+          "args": [
+            0.14,
+            0.008,
+            0.055
+          ],
+          "position": [
+            0.0,
+            0.004,
+            0.0
+          ],
+          "color": "#1f1b18",
+          "roughness": 0.45,
+          "metalness": 0.2
+        },
+        {
+          "name": "sculpted_figure_body",
+          "shape": "sphere",
+          "args": [
+            0.020900000000000002,
+            18,
+            18
+          ],
+          "position": [
+            0.0,
+            0.0269,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            0.84,
+            0.85
+          ],
+          "color": "#242424",
+          "roughness": 0.32,
+          "metalness": 0.45
+        },
+        {
+          "name": "sculpted_figure_crest",
+          "shape": "sphere",
+          "args": [
+            0.011495000000000002,
+            16,
+            16
+          ],
+          "position": [
+            0.0,
+            0.04244,
+            0.0
+          ],
+          "color": "#242424",
+          "roughness": 0.3,
+          "metalness": 0.5
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_pens",
@@ -771,7 +3207,66 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "primary_base_plinth",
+          "shape": "box",
+          "args": [
+            0.05,
+            0.008,
+            0.16
+          ],
+          "position": [
+            0.0,
+            0.004,
+            0.0
+          ],
+          "color": "#1f1b18",
+          "roughness": 0.45,
+          "metalness": 0.2
+        },
+        {
+          "name": "sculpted_figure_body",
+          "shape": "sphere",
+          "args": [
+            0.019000000000000003,
+            18,
+            18
+          ],
+          "position": [
+            0.0,
+            0.0269,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            0.84,
+            0.85
+          ],
+          "color": "#343f46",
+          "roughness": 0.32,
+          "metalness": 0.45
+        },
+        {
+          "name": "sculpted_figure_crest",
+          "shape": "sphere",
+          "args": [
+            0.010450000000000003,
+            16,
+            16
+          ],
+          "position": [
+            0.0,
+            0.04244,
+            0.0
+          ],
+          "color": "#343f46",
+          "roughness": 0.3,
+          "metalness": 0.5
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_phone_b0bc40",
@@ -780,7 +3275,7 @@
       "description": "",
       "position": {
         "x": -0.07733149631413366,
-        "y": 0.766,
+        "y": 0.826,
         "z": 0.5325833117743501
       },
       "rotation": {
@@ -798,9 +3293,63 @@
       "model_url": null,
       "crop_url": null,
       "box_2d": null,
-      "attached_to_id": null,
+      "attached_to_id": "obj_back_storage_desk",
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "chassis_frame",
+          "shape": "box",
+          "args": [
+            0.08,
+            0.008,
+            0.16
+          ],
+          "position": [
+            0.0,
+            0.004,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "oled_screen_surface",
+          "shape": "box",
+          "args": [
+            0.0752,
+            0.001,
+            0.1536
+          ],
+          "position": [
+            0.0,
+            0.0085,
+            0.0
+          ],
+          "color": "#09090b",
+          "roughness": 0.05,
+          "metalness": 0.95
+        },
+        {
+          "name": "camera_island_bump",
+          "shape": "box",
+          "args": [
+            0.0336,
+            0.002,
+            0.044800000000000006
+          ],
+          "position": [
+            -0.0176,
+            0.009000000000000001,
+            -0.048
+          ],
+          "color": "#18181b",
+          "roughness": 0.2,
+          "metalness": 0.9
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_phone_9f5a57",
@@ -809,7 +3358,7 @@
       "description": "",
       "position": {
         "x": -0.07733149631413366,
-        "y": 0.766,
+        "y": 0.826,
         "z": 0.5325833117743501
       },
       "rotation": {
@@ -827,9 +3376,63 @@
       "model_url": null,
       "crop_url": null,
       "box_2d": null,
-      "attached_to_id": null,
+      "attached_to_id": "obj_back_storage_desk",
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "chassis_frame",
+          "shape": "box",
+          "args": [
+            0.08,
+            0.008,
+            0.16
+          ],
+          "position": [
+            0.0,
+            0.004,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "oled_screen_surface",
+          "shape": "box",
+          "args": [
+            0.0752,
+            0.001,
+            0.1536
+          ],
+          "position": [
+            0.0,
+            0.0085,
+            0.0
+          ],
+          "color": "#09090b",
+          "roughness": 0.05,
+          "metalness": 0.95
+        },
+        {
+          "name": "camera_island_bump",
+          "shape": "box",
+          "args": [
+            0.0336,
+            0.002,
+            0.044800000000000006
+          ],
+          "position": [
+            -0.0176,
+            0.009000000000000001,
+            -0.048
+          ],
+          "color": "#18181b",
+          "roughness": 0.2,
+          "metalness": 0.9
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_phone_c22f1d",
@@ -838,7 +3441,7 @@
       "description": "",
       "position": {
         "x": -0.07733149631413366,
-        "y": 0.766,
+        "y": 0.826,
         "z": 0.5325833117743501
       },
       "rotation": {
@@ -856,9 +3459,63 @@
       "model_url": null,
       "crop_url": null,
       "box_2d": null,
-      "attached_to_id": null,
+      "attached_to_id": "obj_back_storage_desk",
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "chassis_frame",
+          "shape": "box",
+          "args": [
+            0.08,
+            0.008,
+            0.16
+          ],
+          "position": [
+            0.0,
+            0.004,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "oled_screen_surface",
+          "shape": "box",
+          "args": [
+            0.0752,
+            0.001,
+            0.1536
+          ],
+          "position": [
+            0.0,
+            0.0085,
+            0.0
+          ],
+          "color": "#09090b",
+          "roughness": 0.05,
+          "metalness": 0.95
+        },
+        {
+          "name": "camera_island_bump",
+          "shape": "box",
+          "args": [
+            0.0336,
+            0.002,
+            0.044800000000000006
+          ],
+          "position": [
+            -0.0176,
+            0.009000000000000001,
+            -0.048
+          ],
+          "color": "#18181b",
+          "roughness": 0.2,
+          "metalness": 0.9
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_phone_749581",
@@ -867,7 +3524,7 @@
       "description": "",
       "position": {
         "x": 0.32266850368586636,
-        "y": 0.766,
+        "y": 0.826,
         "z": 0.5325833117743501
       },
       "rotation": {
@@ -885,9 +3542,63 @@
       "model_url": null,
       "crop_url": null,
       "box_2d": null,
-      "attached_to_id": null,
+      "attached_to_id": "obj_back_storage_desk",
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "chassis_frame",
+          "shape": "box",
+          "args": [
+            0.08,
+            0.008,
+            0.16
+          ],
+          "position": [
+            0.0,
+            0.004,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "oled_screen_surface",
+          "shape": "box",
+          "args": [
+            0.0752,
+            0.001,
+            0.1536
+          ],
+          "position": [
+            0.0,
+            0.0085,
+            0.0
+          ],
+          "color": "#09090b",
+          "roughness": 0.05,
+          "metalness": 0.95
+        },
+        {
+          "name": "camera_island_bump",
+          "shape": "box",
+          "args": [
+            0.0336,
+            0.002,
+            0.044800000000000006
+          ],
+          "position": [
+            -0.0176,
+            0.009000000000000001,
+            -0.048
+          ],
+          "color": "#18181b",
+          "roughness": 0.2,
+          "metalness": 0.9
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_phone_d2619a",
@@ -896,7 +3607,7 @@
       "description": "",
       "position": {
         "x": 0.7226685036858664,
-        "y": 0.766,
+        "y": 0.826,
         "z": 0.5325833117743501
       },
       "rotation": {
@@ -914,9 +3625,63 @@
       "model_url": null,
       "crop_url": null,
       "box_2d": null,
-      "attached_to_id": null,
+      "attached_to_id": "obj_back_storage_desk",
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "chassis_frame",
+          "shape": "box",
+          "args": [
+            0.08,
+            0.008,
+            0.16
+          ],
+          "position": [
+            0.0,
+            0.004,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "oled_screen_surface",
+          "shape": "box",
+          "args": [
+            0.0752,
+            0.001,
+            0.1536
+          ],
+          "position": [
+            0.0,
+            0.0085,
+            0.0
+          ],
+          "color": "#09090b",
+          "roughness": 0.05,
+          "metalness": 0.95
+        },
+        {
+          "name": "camera_island_bump",
+          "shape": "box",
+          "args": [
+            0.0336,
+            0.002,
+            0.044800000000000006
+          ],
+          "position": [
+            -0.0176,
+            0.009000000000000001,
+            -0.048
+          ],
+          "color": "#18181b",
+          "roughness": 0.2,
+          "metalness": 0.9
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_phone_ac06be",
@@ -943,9 +3708,63 @@
       "model_url": null,
       "crop_url": null,
       "box_2d": null,
-      "attached_to_id": null,
+      "attached_to_id": "obj_main_desk",
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "chassis_frame",
+          "shape": "box",
+          "args": [
+            0.08,
+            0.008,
+            0.16
+          ],
+          "position": [
+            0.0,
+            0.004,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "oled_screen_surface",
+          "shape": "box",
+          "args": [
+            0.0752,
+            0.001,
+            0.1536
+          ],
+          "position": [
+            0.0,
+            0.0085,
+            0.0
+          ],
+          "color": "#09090b",
+          "roughness": 0.05,
+          "metalness": 0.95
+        },
+        {
+          "name": "camera_island_bump",
+          "shape": "box",
+          "args": [
+            0.0336,
+            0.002,
+            0.044800000000000006
+          ],
+          "position": [
+            -0.0176,
+            0.009000000000000001,
+            -0.048
+          ],
+          "color": "#18181b",
+          "roughness": 0.2,
+          "metalness": 0.9
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_phone_2fdd32",
@@ -972,9 +3791,63 @@
       "model_url": null,
       "crop_url": null,
       "box_2d": null,
-      "attached_to_id": null,
+      "attached_to_id": "obj_main_desk",
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "chassis_frame",
+          "shape": "box",
+          "args": [
+            0.08,
+            0.008,
+            0.16
+          ],
+          "position": [
+            0.0,
+            0.004,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "oled_screen_surface",
+          "shape": "box",
+          "args": [
+            0.0752,
+            0.001,
+            0.1536
+          ],
+          "position": [
+            0.0,
+            0.0085,
+            0.0
+          ],
+          "color": "#09090b",
+          "roughness": 0.05,
+          "metalness": 0.95
+        },
+        {
+          "name": "camera_island_bump",
+          "shape": "box",
+          "args": [
+            0.0336,
+            0.002,
+            0.044800000000000006
+          ],
+          "position": [
+            -0.0176,
+            0.009000000000000001,
+            -0.048
+          ],
+          "color": "#18181b",
+          "roughness": 0.2,
+          "metalness": 0.9
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_phone_8511ad",
@@ -1001,13 +3874,67 @@
       "model_url": null,
       "crop_url": null,
       "box_2d": null,
-      "attached_to_id": null,
+      "attached_to_id": "obj_main_desk",
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "chassis_frame",
+          "shape": "box",
+          "args": [
+            0.08,
+            0.008,
+            0.16
+          ],
+          "position": [
+            0.0,
+            0.004,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "oled_screen_surface",
+          "shape": "box",
+          "args": [
+            0.0752,
+            0.001,
+            0.1536
+          ],
+          "position": [
+            0.0,
+            0.0085,
+            0.0
+          ],
+          "color": "#09090b",
+          "roughness": 0.05,
+          "metalness": 0.95
+        },
+        {
+          "name": "camera_island_bump",
+          "shape": "box",
+          "args": [
+            0.0336,
+            0.002,
+            0.044800000000000006
+          ],
+          "position": [
+            -0.0176,
+            0.009000000000000001,
+            -0.048
+          ],
+          "color": "#18181b",
+          "roughness": 0.2,
+          "metalness": 0.9
+        }
+      ],
+      "mesh_obj": null
     }
   ],
   "created_at": "2026-11-21T21:27:28.001933",
-  "updated_at": "2026-11-21T23:20:24.738842",
+  "updated_at": "2026-11-25T16:45:13.938328",
   "status": "ready",
   "status_message": "Scene reconstructed successfully"
 }

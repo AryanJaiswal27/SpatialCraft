@@ -57,7 +57,235 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "base_chassis_plinth",
+          "shape": "box",
+          "args": [
+            2.2,
+            0.23800000000000002,
+            0.95
+          ],
+          "position": [
+            0.0,
+            0.11900000000000001,
+            0.0
+          ],
+          "color": "#6e737b",
+          "roughness": 0.85,
+          "metalness": 0.05
+        },
+        {
+          "name": "left_track_armrest",
+          "shape": "box",
+          "args": [
+            0.22,
+            0.5525,
+            0.9309999999999999
+          ],
+          "position": [
+            -0.9900000000000001,
+            0.442,
+            0.0
+          ],
+          "color": "#6e737b",
+          "roughness": 0.85,
+          "metalness": 0.05
+        },
+        {
+          "name": "right_track_armrest",
+          "shape": "box",
+          "args": [
+            0.22,
+            0.5525,
+            0.9309999999999999
+          ],
+          "position": [
+            0.9900000000000001,
+            0.442,
+            0.0
+          ],
+          "color": "#6e737b",
+          "roughness": 0.85,
+          "metalness": 0.05
+        },
+        {
+          "name": "seat_cushion_1",
+          "shape": "box",
+          "args": [
+            0.5568000000000001,
+            0.153,
+            0.646
+          ],
+          "position": [
+            -0.5900000000000001,
+            0.3145,
+            0.076
+          ],
+          "color": "#6e737b",
+          "roughness": 0.8,
+          "metalness": 0.05
+        },
+        {
+          "name": "seat_cushion_2",
+          "shape": "box",
+          "args": [
+            0.5568000000000001,
+            0.153,
+            0.646
+          ],
+          "position": [
+            -0.010000000000000009,
+            0.3145,
+            0.076
+          ],
+          "color": "#6e737b",
+          "roughness": 0.8,
+          "metalness": 0.05
+        },
+        {
+          "name": "seat_cushion_3",
+          "shape": "box",
+          "args": [
+            0.5568000000000001,
+            0.153,
+            0.646
+          ],
+          "position": [
+            0.5700000000000001,
+            0.3145,
+            0.076
+          ],
+          "color": "#6e737b",
+          "roughness": 0.8,
+          "metalness": 0.05
+        },
+        {
+          "name": "back_cushion_1",
+          "shape": "box",
+          "args": [
+            0.5452,
+            0.42075,
+            0.16
+          ],
+          "position": [
+            -0.5900000000000001,
+            0.57475,
+            -0.304
+          ],
+          "color": "#6e737b",
+          "roughness": 0.85,
+          "metalness": 0.05
+        },
+        {
+          "name": "back_cushion_2",
+          "shape": "box",
+          "args": [
+            0.5452,
+            0.42075,
+            0.16
+          ],
+          "position": [
+            -0.010000000000000009,
+            0.57475,
+            -0.304
+          ],
+          "color": "#6e737b",
+          "roughness": 0.85,
+          "metalness": 0.05
+        },
+        {
+          "name": "back_cushion_3",
+          "shape": "box",
+          "args": [
+            0.5452,
+            0.42075,
+            0.16
+          ],
+          "position": [
+            0.5700000000000001,
+            0.57475,
+            -0.304
+          ],
+          "color": "#6e737b",
+          "roughness": 0.85,
+          "metalness": 0.05
+        },
+        {
+          "name": "sofa_leg_L_B",
+          "shape": "cylinder",
+          "args": [
+            0.02,
+            0.013999999999999999,
+            0.08,
+            16
+          ],
+          "position": [
+            -1.02,
+            0.04,
+            -0.39499999999999996
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "sofa_leg_L_F",
+          "shape": "cylinder",
+          "args": [
+            0.02,
+            0.013999999999999999,
+            0.08,
+            16
+          ],
+          "position": [
+            -1.02,
+            0.04,
+            0.39499999999999996
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "sofa_leg_R_B",
+          "shape": "cylinder",
+          "args": [
+            0.02,
+            0.013999999999999999,
+            0.08,
+            16
+          ],
+          "position": [
+            1.02,
+            0.04,
+            -0.39499999999999996
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "sofa_leg_R_F",
+          "shape": "cylinder",
+          "args": [
+            0.02,
+            0.013999999999999999,
+            0.08,
+            16
+          ],
+          "position": [
+            1.02,
+            0.04,
+            0.39499999999999996
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_rug_1",
@@ -91,7 +319,44 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "woven_area_rug_body",
+          "shape": "box",
+          "args": [
+            2.6,
+            0.012,
+            2.0
+          ],
+          "position": [
+            0.0,
+            0.006,
+            0.0
+          ],
+          "color": "#e5e2dc",
+          "roughness": 0.95,
+          "metalness": 0.05
+        },
+        {
+          "name": "perimeter_binding_trim",
+          "shape": "box",
+          "args": [
+            2.62,
+            0.014,
+            2.02
+          ],
+          "position": [
+            0.0,
+            0.006,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.9,
+          "metalness": 0.05
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_table_1",
@@ -125,7 +390,116 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "tabletop_slab",
+          "shape": "box",
+          "args": [
+            1.2,
+            0.03,
+            0.6
+          ],
+          "position": [
+            0.0,
+            0.435,
+            0.0
+          ],
+          "color": "#b58d63",
+          "roughness": 0.65,
+          "metalness": 0.05
+        },
+        {
+          "name": "front_edge_banding",
+          "shape": "box",
+          "args": [
+            1.204,
+            0.032,
+            0.004
+          ],
+          "position": [
+            0.0,
+            0.435,
+            0.302
+          ],
+          "color": "#18181b",
+          "roughness": 0.5,
+          "metalness": 0.05
+        },
+        {
+          "name": "table_leg_L_B",
+          "shape": "cylinder",
+          "args": [
+            0.024,
+            0.0204,
+            0.42000000000000004,
+            20
+          ],
+          "position": [
+            -0.5499999999999999,
+            0.21000000000000002,
+            -0.25
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.6
+        },
+        {
+          "name": "table_leg_L_F",
+          "shape": "cylinder",
+          "args": [
+            0.024,
+            0.0204,
+            0.42000000000000004,
+            20
+          ],
+          "position": [
+            -0.5499999999999999,
+            0.21000000000000002,
+            0.25
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.6
+        },
+        {
+          "name": "table_leg_R_B",
+          "shape": "cylinder",
+          "args": [
+            0.024,
+            0.0204,
+            0.42000000000000004,
+            20
+          ],
+          "position": [
+            0.5499999999999999,
+            0.21000000000000002,
+            -0.25
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.6
+        },
+        {
+          "name": "table_leg_R_F",
+          "shape": "cylinder",
+          "args": [
+            0.024,
+            0.0204,
+            0.42000000000000004,
+            20
+          ],
+          "position": [
+            0.5499999999999999,
+            0.21000000000000002,
+            0.25
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.6
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_tv_unit_1",
@@ -134,7 +508,7 @@
       "description": "Wall-mounted walnut media console with slatted cabinet doors",
       "position": {
         "x": 0.0,
-        "y": 0.3,
+        "y": 0.2,
         "z": 2.3
       },
       "rotation": {
@@ -159,7 +533,190 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "recessed_plinth_base",
+          "shape": "box",
+          "args": [
+            1.88,
+            0.06,
+            0.35200000000000004
+          ],
+          "position": [
+            0.0,
+            0.03,
+            0.0
+          ],
+          "color": "#4a3020",
+          "roughness": 0.7
+        },
+        {
+          "name": "console_main_carcass",
+          "shape": "box",
+          "args": [
+            2.0,
+            0.31000000000000005,
+            0.4
+          ],
+          "position": [
+            0.0,
+            0.21500000000000002,
+            0.0
+          ],
+          "color": "#5c4033",
+          "roughness": 0.6
+        },
+        {
+          "name": "console_top_slab",
+          "shape": "box",
+          "args": [
+            2.01,
+            0.03,
+            0.41000000000000003
+          ],
+          "position": [
+            0.0,
+            0.385,
+            0.0
+          ],
+          "color": "#5c4033",
+          "roughness": 0.55
+        },
+        {
+          "name": "drawer_front_1",
+          "shape": "box",
+          "args": [
+            0.46499999999999997,
+            0.24180000000000004,
+            0.02
+          ],
+          "position": [
+            -0.7275,
+            0.21500000000000002,
+            0.20600000000000002
+          ],
+          "color": "#f2efe9",
+          "roughness": 0.35
+        },
+        {
+          "name": "drawer_pull_1",
+          "shape": "box",
+          "args": [
+            0.11,
+            0.016,
+            0.016
+          ],
+          "position": [
+            -0.7275,
+            0.21500000000000002,
+            0.218
+          ],
+          "color": "#d4af37",
+          "roughness": 0.25,
+          "metalness": 0.85
+        },
+        {
+          "name": "drawer_front_2",
+          "shape": "box",
+          "args": [
+            0.46499999999999997,
+            0.24180000000000004,
+            0.02
+          ],
+          "position": [
+            -0.24250000000000005,
+            0.21500000000000002,
+            0.20600000000000002
+          ],
+          "color": "#f2efe9",
+          "roughness": 0.35
+        },
+        {
+          "name": "drawer_pull_2",
+          "shape": "box",
+          "args": [
+            0.11,
+            0.016,
+            0.016
+          ],
+          "position": [
+            -0.24250000000000005,
+            0.21500000000000002,
+            0.218
+          ],
+          "color": "#d4af37",
+          "roughness": 0.25,
+          "metalness": 0.85
+        },
+        {
+          "name": "drawer_front_3",
+          "shape": "box",
+          "args": [
+            0.46499999999999997,
+            0.24180000000000004,
+            0.02
+          ],
+          "position": [
+            0.24249999999999994,
+            0.21500000000000002,
+            0.20600000000000002
+          ],
+          "color": "#f2efe9",
+          "roughness": 0.35
+        },
+        {
+          "name": "drawer_pull_3",
+          "shape": "box",
+          "args": [
+            0.11,
+            0.016,
+            0.016
+          ],
+          "position": [
+            0.24249999999999994,
+            0.21500000000000002,
+            0.218
+          ],
+          "color": "#d4af37",
+          "roughness": 0.25,
+          "metalness": 0.85
+        },
+        {
+          "name": "drawer_front_4",
+          "shape": "box",
+          "args": [
+            0.46499999999999997,
+            0.24180000000000004,
+            0.02
+          ],
+          "position": [
+            0.7275,
+            0.21500000000000002,
+            0.20600000000000002
+          ],
+          "color": "#f2efe9",
+          "roughness": 0.35
+        },
+        {
+          "name": "drawer_pull_4",
+          "shape": "box",
+          "args": [
+            0.11,
+            0.016,
+            0.016
+          ],
+          "position": [
+            0.7275,
+            0.21500000000000002,
+            0.218
+          ],
+          "color": "#d4af37",
+          "roughness": 0.25,
+          "metalness": 0.85
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_plant_1",
@@ -193,7 +750,208 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "ceramic_planter_pot",
+          "shape": "cylinder",
+          "args": [
+            0.22799999999999998,
+            0.17328,
+            0.6000000000000001,
+            24
+          ],
+          "position": [
+            0.0,
+            0.30000000000000004,
+            0.0
+          ],
+          "color": "#d6cfc7",
+          "roughness": 0.45,
+          "metalness": 0.05
+        },
+        {
+          "name": "dark_organic_soil",
+          "shape": "cylinder",
+          "args": [
+            0.20976,
+            0.20976,
+            0.015,
+            20
+          ],
+          "position": [
+            0.0,
+            0.5920000000000001,
+            0.0
+          ],
+          "color": "#271b12",
+          "roughness": 0.95,
+          "metalness": 0.0
+        },
+        {
+          "name": "botanical_leaf_1",
+          "shape": "sphere",
+          "args": [
+            0.144,
+            12,
+            12
+          ],
+          "position": [
+            0.1482,
+            0.978,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            -0.0,
+            0.35
+          ],
+          "scale": [
+            1.55,
+            0.26,
+            0.9
+          ],
+          "color": "#3a6e2e",
+          "roughness": 0.5,
+          "metalness": 0.05
+        },
+        {
+          "name": "botanical_leaf_2",
+          "shape": "sphere",
+          "args": [
+            0.144,
+            12,
+            12
+          ],
+          "position": [
+            0.07410000000000001,
+            1.1760000000000002,
+            0.1283449648408538
+          ],
+          "rotation": [
+            0.3031088913245535,
+            -1.0471975511965976,
+            0.17500000000000002
+          ],
+          "scale": [
+            1.55,
+            0.26,
+            0.9
+          ],
+          "color": "#49823a",
+          "roughness": 0.5,
+          "metalness": 0.05
+        },
+        {
+          "name": "botanical_leaf_3",
+          "shape": "sphere",
+          "args": [
+            0.144,
+            12,
+            12
+          ],
+          "position": [
+            -0.07409999999999997,
+            0.978,
+            0.1283449648408538
+          ],
+          "rotation": [
+            0.30310889132455354,
+            -2.0943951023931953,
+            -0.1749999999999999
+          ],
+          "scale": [
+            1.55,
+            0.26,
+            0.9
+          ],
+          "color": "#3a6e2e",
+          "roughness": 0.5,
+          "metalness": 0.05
+        },
+        {
+          "name": "botanical_leaf_4",
+          "shape": "sphere",
+          "args": [
+            0.144,
+            12,
+            12
+          ],
+          "position": [
+            -0.1482,
+            1.1760000000000002,
+            1.8149265563363773e-17
+          ],
+          "rotation": [
+            4.286263797015736e-17,
+            -3.141592653589793,
+            -0.35
+          ],
+          "scale": [
+            1.55,
+            0.26,
+            0.9
+          ],
+          "color": "#49823a",
+          "roughness": 0.5,
+          "metalness": 0.05
+        },
+        {
+          "name": "botanical_leaf_5",
+          "shape": "sphere",
+          "args": [
+            0.144,
+            12,
+            12
+          ],
+          "position": [
+            -0.07410000000000007,
+            0.978,
+            -0.12834496484085378
+          ],
+          "rotation": [
+            -0.30310889132455343,
+            -4.1887902047863905,
+            -0.17500000000000016
+          ],
+          "scale": [
+            1.55,
+            0.26,
+            0.9
+          ],
+          "color": "#3a6e2e",
+          "roughness": 0.5,
+          "metalness": 0.05
+        },
+        {
+          "name": "botanical_leaf_6",
+          "shape": "sphere",
+          "args": [
+            0.144,
+            12,
+            12
+          ],
+          "position": [
+            0.07410000000000001,
+            1.1760000000000002,
+            -0.1283449648408538
+          ],
+          "rotation": [
+            -0.3031088913245535,
+            -5.235987755982989,
+            0.17500000000000002
+          ],
+          "scale": [
+            1.55,
+            0.26,
+            0.9
+          ],
+          "color": "#49823a",
+          "roughness": 0.5,
+          "metalness": 0.05
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_lamp_1",
@@ -227,7 +985,82 @@
       ],
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "weighted_base_disc",
+          "shape": "cylinder",
+          "args": [
+            0.19,
+            0.19,
+            0.025,
+            24
+          ],
+          "position": [
+            0.0,
+            0.0125,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.7
+        },
+        {
+          "name": "vertical_slender_stem",
+          "shape": "cylinder",
+          "args": [
+            0.012,
+            0.012,
+            1.3650000000000002,
+            16
+          ],
+          "position": [
+            0.0,
+            0.7075000000000001,
+            0.0
+          ],
+          "color": "#18181b",
+          "roughness": 0.3,
+          "metalness": 0.8
+        },
+        {
+          "name": "diffuser_lamp_shade",
+          "shape": "cylinder",
+          "args": [
+            0.19125,
+            0.225,
+            0.63,
+            24
+          ],
+          "position": [
+            0.0,
+            1.7850000000000001,
+            0.0
+          ],
+          "color": "#222222",
+          "roughness": 0.85,
+          "metalness": 0.05
+        },
+        {
+          "name": "light_bulb_core",
+          "shape": "sphere",
+          "args": [
+            0.035,
+            16,
+            16
+          ],
+          "position": [
+            0.0,
+            1.7850000000000001,
+            0.0
+          ],
+          "color": "#ffe4b5",
+          "emissive": "#ffd88a",
+          "emissiveIntensity": 0.8,
+          "roughness": 0.1
+        }
+      ],
+      "mesh_obj": null
     },
     {
       "id": "obj_292f4b",
@@ -236,7 +1069,7 @@
       "description": "",
       "position": {
         "x": 0.0,
-        "y": 0.225,
+        "y": 0.5,
         "z": -0.3
       },
       "rotation": {
@@ -256,11 +1089,120 @@
       "box_2d": null,
       "attached_to_id": null,
       "relative_position": null,
-      "relative_yaw": null
+      "relative_yaw": null,
+      "parts": [
+        {
+          "name": "tabletop_slab",
+          "shape": "box",
+          "args": [
+            0.8,
+            0.03,
+            0.8
+          ],
+          "position": [
+            0.0,
+            0.985,
+            0.0
+          ],
+          "color": "#3f3f46",
+          "roughness": 0.65,
+          "metalness": 0.05
+        },
+        {
+          "name": "front_edge_banding",
+          "shape": "box",
+          "args": [
+            0.804,
+            0.032,
+            0.004
+          ],
+          "position": [
+            0.0,
+            0.985,
+            0.402
+          ],
+          "color": "#18181b",
+          "roughness": 0.5,
+          "metalness": 0.05
+        },
+        {
+          "name": "table_leg_L_B",
+          "shape": "cylinder",
+          "args": [
+            0.024,
+            0.0204,
+            0.97,
+            20
+          ],
+          "position": [
+            -0.35000000000000003,
+            0.485,
+            -0.35000000000000003
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.6
+        },
+        {
+          "name": "table_leg_L_F",
+          "shape": "cylinder",
+          "args": [
+            0.024,
+            0.0204,
+            0.97,
+            20
+          ],
+          "position": [
+            -0.35000000000000003,
+            0.485,
+            0.35000000000000003
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.6
+        },
+        {
+          "name": "table_leg_R_B",
+          "shape": "cylinder",
+          "args": [
+            0.024,
+            0.0204,
+            0.97,
+            20
+          ],
+          "position": [
+            0.35000000000000003,
+            0.485,
+            -0.35000000000000003
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.6
+        },
+        {
+          "name": "table_leg_R_F",
+          "shape": "cylinder",
+          "args": [
+            0.024,
+            0.0204,
+            0.97,
+            20
+          ],
+          "position": [
+            0.35000000000000003,
+            0.485,
+            0.35000000000000003
+          ],
+          "color": "#18181b",
+          "roughness": 0.4,
+          "metalness": 0.6
+        }
+      ],
+      "mesh_obj": null
     }
   ],
   "created_at": "2026-11-11T19:09:37.469127",
-  "updated_at": "2026-11-21T21:38:44.268204",
+  "updated_at": "2026-11-25T16:45:14.404048",
   "status": "ready",
   "status_message": "Scene reconstructed successfully"
 }

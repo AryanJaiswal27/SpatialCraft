@@ -31,14 +31,26 @@ const HOME_GEODE_SCENE: SceneGraph = {
 };
 
 export default function App() {
-  const { scene, setScene, fetchScene, setAvailableScenes } = useSceneStore();
+  const { scene, setScene, fetchScene, setAvailableScenes, setTargetLLM } = useSceneStore();
 
   useEffect(() => {
+    let cancelled = false;
+
+    // Sync active physical engine preset from backend config
+    fetch('/api/engine')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.engine) {
+          setTargetLLM(data.engine);
+        }
+      })
+      .catch(() => {});
+
     // Populate scene history for the room dropdown
     fetch('/api/scenes')
       .then((res) => res.json())
       .then((scenes) => {
-        if (Array.isArray(scenes)) {
+        if (!cancelled && Array.isArray(scenes)) {
           setAvailableScenes(scenes);
         }
       })
@@ -53,14 +65,20 @@ export default function App() {
           if (res.ok) return res.json();
           throw new Error('Scene not found');
         })
-        .then((data) => setScene(data))
+        .then((data) => {
+          if (!cancelled) setScene(data);
+        })
         .catch(() => {
-          if (!scene) setScene(HOME_GEODE_SCENE);
+          if (!cancelled) setScene(HOME_GEODE_SCENE);
         });
-    } else if (!scene) {
+    } else {
       setScene(HOME_GEODE_SCENE);
     }
-  }, [setScene, setAvailableScenes]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [setScene, setAvailableScenes, setTargetLLM]);
 
   // Persistent live-sync WebSocket so background refinements immediately update the 3D canvas
   const activeSceneId = scene?.scene_id;

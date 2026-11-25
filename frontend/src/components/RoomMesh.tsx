@@ -60,7 +60,7 @@ export const RoomMesh: React.FC<Props> = ({ room }) => {
     const geom = new THREE.BufferGeometry();
     geom.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
     return geom;
-  }, [width, depth, halfW, halfD, isPolishedFloor]);
+  }, [halfW, halfD, isPolishedFloor]);
 
   return (
     <group>

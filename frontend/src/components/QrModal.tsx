@@ -8,15 +8,28 @@ export const QrModal: React.FC = () => {
   const [tunnelUrl, setTunnelUrl] = useState<string>('');
 
   useEffect(() => {
-    fetch('/tunnel_url.json')
-      .then((res) => res.json())
+    if (activeModal !== 'qr') return;
+    let cancelled = false;
+    fetch('/api/tunnel_url')
+      .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data && data.tunnel_url) {
-          setTunnelUrl(data.tunnel_url);
+        if (!cancelled && data?.url) {
+          setTunnelUrl(data.url);
+          return;
         }
+        return fetch('/tunnel_url.json')
+          .then((r) => (r.ok ? r.json() : null))
+          .then((fallback) => {
+            if (!cancelled && fallback?.tunnel_url) {
+              setTunnelUrl(fallback.tunnel_url);
+            }
+          });
       })
       .catch(() => {});
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [activeModal]);
 
   if (activeModal !== 'qr') return null;
 

@@ -608,7 +608,7 @@ def execute_object_refinement(scene_id: str, obj: dict, scene_data: Optional[dic
                 print(f"[ANTIGRAVITY // MISSED OBJECT RECOVERED] Adding '{m_name}' to scene {scene_id}...")
                 try:
                     add_req = urllib.request.Request(
-                        f"{BASE_URL}/api/scene/{scene_id}/natural_edit",
+                        f"{BASE_URL}/api/scene/{scene_id}/prompt",
                         data=json.dumps({"prompt": f"add {m_name}"}).encode("utf-8"),
                         headers={"Content-Type": "application/json"}
                     )

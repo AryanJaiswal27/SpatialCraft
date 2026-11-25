@@ -42,9 +42,20 @@ export const AntigravityModal: React.FC = () => {
   };
 
   useEffect(() => {
-    if (isOpen) {
-      fetchPlan();
-    }
+    if (!isOpen || !scene?.scene_id || scene.scene_id === 'home') return;
+    let cancelled = false;
+    fetch(`/api/scene/${scene.scene_id}/antigravity_plan`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data) return;
+        const steps = data.plan || [];
+        setPlan(steps);
+        setSelectedStep((prev) => prev || (steps.length > 0 ? steps[0] : null));
+      })
+      .catch((e) => console.error('Failed to fetch Antigravity plan:', e));
+    return () => {
+      cancelled = true;
+    };
   }, [isOpen, scene?.scene_id]);
 
   if (!isOpen) return null;

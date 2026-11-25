@@ -32,6 +32,11 @@ export const UploadModal: React.FC = () => {
       if (wsRef.current) {
         wsRef.current.close();
       }
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }

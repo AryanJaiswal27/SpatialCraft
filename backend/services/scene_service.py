@@ -5,7 +5,7 @@ import math
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, List, Dict, Any
-from ..config import SCENES_DIR, UPLOADS_DIR
+from ..config import SCENES_DIR, UPLOADS_DIR, CROPS_DIR
 from ..models import SceneGraph, SceneObject, UpdateObjectRequest, Vector3D, Rotation3D, Dimensions3D
 
 def get_scene_path(scene_id: str) -> Path:
@@ -162,7 +162,13 @@ def delete_object(scene_id: str, object_id: str) -> Optional[SceneGraph]:
 def add_object(scene_id: str, obj: SceneObject) -> Optional[SceneGraph]:
     scene = get_scene(scene_id)
     if not scene:
-        return None
+        # Support first object drop on newly assembled rooms created from catalog
+        scene = SceneGraph(
+            scene_id=scene_id,
+            name="CUSTOM ROOM TWIN",
+            status="ready",
+            status_message="Custom 3D room workspace initialized"
+        )
 
     scene.objects.append(obj)
     scene = verify_and_ground_scene(scene)
@@ -614,7 +620,7 @@ def verify_and_ground_scene(scene: SceneGraph) -> SceneGraph:
                 }
                 crop_p = None
                 if getattr(obj, "crop_url", None):
-                    crop_cand = Path(obj.crop_url.lstrip("/"))
+                    crop_cand = CROPS_DIR / Path(obj.crop_url).name
                     if crop_cand.exists():
                         crop_p = crop_cand
                 raw_parts = build_antigravity_object_parts(

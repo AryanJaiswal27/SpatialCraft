@@ -23,13 +23,26 @@ export const LogsModal: React.FC = () => {
   };
 
   useEffect(() => {
-    if (activeModal === 'logs') {
-      fetchLogs();
-      const interval = setInterval(() => {
-        if (autoRefresh) fetchLogs();
-      }, 2500);
-      return () => clearInterval(interval);
-    }
+    if (activeModal !== 'logs') return;
+    let cancelled = false;
+    const pull = () => {
+      fetch('/api/logs?limit=100')
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (!cancelled && Array.isArray(data?.logs)) {
+            setLogs(data.logs);
+          }
+        })
+        .catch((e) => console.error('Failed to fetch logs:', e));
+    };
+    pull();
+    const interval = setInterval(() => {
+      if (autoRefresh) pull();
+    }, 2500);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, [activeModal, autoRefresh]);
 
   if (activeModal !== 'logs') return null;
