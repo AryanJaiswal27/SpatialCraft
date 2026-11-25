@@ -134,16 +134,17 @@ def focus_target(target_key: str, delay: float = 0.3):
     time.sleep(delay)
     return True
 
-def scroll_down(amount: int = -450):
+def scroll_down(amount: int = -3500):
     cfg = load_config()
     prompt_pos = cfg.get("targets", {}).get("prompt_box", {"x": 960, "y": 900})
     scroll_x = prompt_pos["x"]
     scroll_y = max(120, prompt_pos["y"] - 280)
     if pyautogui:
-        pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
+        pyautogui.moveTo(scroll_x, scroll_y, duration=0.08)
         pyautogui.scroll(amount)
-        pyautogui.press("end")
-        print(f"[SCREEN CONTROL] Scrolled down at ({scroll_x}, {scroll_y}) with [End] key.")
+        pyautogui.press("pagedown", presses=2, interval=0.02)
+        pyautogui.hotkey("ctrl", "end")
+        print(f"[SCREEN CONTROL] High-volume scroll down at ({scroll_x}, {scroll_y}) with [PageDown] and [Ctrl+End].")
 
 def wait_for_llm(timeout: float = 300.0, min_wait: float = 14.0, expected_id: Optional[str] = None) -> str:
     """
@@ -172,11 +173,12 @@ def wait_for_llm(timeout: float = 300.0, min_wait: float = 14.0, expected_id: Op
     while (time.time() - start_time) < timeout:
         elapsed = time.time() - start_time
 
-        # Continuous downward scroll
+        # Rapid high-volume downward scroll
         try:
-            pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
-            pyautogui.scroll(-500)
-            pyautogui.press("end")
+            pyautogui.moveTo(scroll_x, scroll_y, duration=0.08)
+            pyautogui.scroll(-3500)
+            pyautogui.press("pagedown", presses=2, interval=0.02)
+            pyautogui.hotkey("ctrl", "end")
         except Exception:
             pass
 
@@ -212,8 +214,10 @@ def wait_for_llm(timeout: float = 300.0, min_wait: float = 14.0, expected_id: Op
     if copy_pos:
         for dy in [0, -65, -80, -50, -120]:
             try:
-                pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
-                pyautogui.press("end")
+                pyautogui.moveTo(scroll_x, scroll_y, duration=0.08)
+                pyautogui.scroll(-4000)
+                pyautogui.press("pagedown", presses=2, interval=0.02)
+                pyautogui.hotkey("ctrl", "end")
                 time.sleep(0.3)
                 pyautogui.moveTo(copy_pos["x"], copy_pos["y"] + dy, duration=0.3)
                 pyautogui.click()

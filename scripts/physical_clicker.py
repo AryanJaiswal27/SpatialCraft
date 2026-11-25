@@ -297,11 +297,12 @@ def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional
             print(f"[PHYSICAL] Still waiting for LLM output... ({int(elapsed)}s / {int(gen_timeout)}s elapsed)")
             last_milestone = time.time()
 
-        # A. Continuous downward scroll to track streaming tokens
+        # A. Rapid high-volume downward scroll to track streaming tokens
         try:
-            pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
-            pyautogui.scroll(-500)
-            pyautogui.press("end")
+            pyautogui.moveTo(scroll_x, scroll_y, duration=0.08)
+            pyautogui.scroll(-3500)
+            pyautogui.press("pagedown", presses=2, interval=0.02)
+            pyautogui.hotkey("ctrl", "end")
         except Exception:
             pass
 
@@ -339,8 +340,10 @@ def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional
     if copy_pos:
         for dy in [0, -65, -80, -50, -120]:
             try:
-                pyautogui.moveTo(scroll_x, scroll_y, duration=0.1)
-                pyautogui.press("end")
+                pyautogui.moveTo(scroll_x, scroll_y, duration=0.08)
+                pyautogui.scroll(-4000)
+                pyautogui.press("pagedown", presses=2, interval=0.02)
+                pyautogui.hotkey("ctrl", "end")
                 time.sleep(0.3)
                 pyautogui.moveTo(copy_pos["x"], copy_pos["y"] + dy, duration=move_dur)
                 pyautogui.click()
@@ -706,8 +709,9 @@ def run_physical_daemon(preset: Optional[str] = None):
                                         copy_text_to_clipboard(text_to_type)
                                     physical_paste()
                                 elif action == "scroll_down":
-                                    pyautogui.scroll(-500)
-                                    pyautogui.press("end")
+                                    pyautogui.scroll(-3500)
+                                    pyautogui.press("pagedown", presses=2, interval=0.02)
+                                    pyautogui.hotkey("ctrl", "end")
                                 elif action == "press_key":
                                     key = job.get("key", "enter")
                                     pyautogui.press(key)
