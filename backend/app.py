@@ -20,7 +20,8 @@ from .services.scene_service import (
     verify_and_ground_scene
 )
 from .services.browser_prompt import (
-    generate_spatial_prompt, parse_llm_json_response, build_scene_from_parsed_data
+    generate_spatial_prompt, generate_antigravity_direct_build_prompt,
+    parse_llm_json_response, build_scene_from_parsed_data
 )
 from .services.cropper import crop_objects_from_image
 from .services.antigravity_prompter import (
@@ -83,7 +84,31 @@ def ensure_presets_in_config(data: Dict[str, Any]) -> Dict[str, Any]:
                 "targets": dict(old_targets),
                 "delays": dict(old_delays),
                 "last_calibrated_at": None
+            },
+            "antigravity": {
+                "id": "antigravity",
+                "label": "Antigravity IDE",
+                "browser_url": "ide://antigravity",
+                "targets": {
+                    k: dict(v) for k, v in old_targets.items() if k in ("antigravity_header", "ide_chat_box")
+                },
+                "delays": dict(old_delays),
+                "last_calibrated_at": data.get("last_calibrated_at")
             }
+        }
+    elif isinstance(data.get("presets"), dict) and "antigravity" not in data["presets"]:
+        ref_targets = {}
+        for p in data["presets"].values():
+            for k in ("antigravity_header", "ide_chat_box"):
+                if k in p.get("targets", {}) and k not in ref_targets:
+                    ref_targets[k] = dict(p["targets"][k])
+        data["presets"]["antigravity"] = {
+            "id": "antigravity",
+            "label": "Antigravity IDE",
+            "browser_url": "ide://antigravity",
+            "targets": ref_targets,
+            "delays": dict(data.get("delays", {})),
+            "last_calibrated_at": data.get("last_calibrated_at")
         }
     active_id = data.get("active_preset", "gemini")
     presets = data.get("presets", {})
@@ -401,8 +426,15 @@ async def upload_room_image(
     )
     save_scene(scene)
 
-    # All room capture options are Physical Click Ingestions (Gemini, ChatGPT, DeepSeek)
-    preset_name = target_llm.lower() if target_llm.lower() in ("gemini", "chatgpt", "deepseek") else "gemini"
+    # All room capture options are Physical Click Ingestions (Gemini, ChatGPT, DeepSeek, Antigravity IDE)
+    preset_name = target_llm.lower() if target_llm.lower() in ("gemini", "chatgpt", "deepseek", "antigravity") else "gemini"
+    job_prompt = (
+        generate_antigravity_direct_build_prompt(scene_id, saved_filename)
+        if preset_name == "antigravity"
+        else generate_spatial_prompt()
+    )
+    with open(prompt_path, "w", encoding="utf-8") as f:
+        f.write(job_prompt)
 
     # Automatically activate this preset in physical_clicks_config.json
     try:
@@ -425,13 +457,17 @@ async def upload_room_image(
         "job_type": "initial_reconstruction",
         "preset": preset_name,
         "scene_id": scene_id,
-        "prompt": generate_spatial_prompt(),
+        "prompt": job_prompt,
         "image_path": str(saved_path.resolve()),
         "created_at": datetime.utcnow().isoformat()
     })
     cur_scene = get_scene(scene_id)
     if cur_scene:
-        cur_scene.status_message = f"Awaiting physical click execution on desktop daemon for {preset_name.capitalize()}..."
+        cur_scene.status_message = (
+            "Pasting room photo & custom 3D mesh build request into Antigravity IDE chat..."
+            if preset_name == "antigravity"
+            else f"Awaiting physical click execution on desktop daemon for {preset_name.capitalize()}..."
+        )
         save_scene(cur_scene)
     asyncio.create_task(broadcast_status(scene_id, f"[PHYSICAL] Job queued for desktop mouse execution on {preset_name.capitalize()}...", "progress"))
 
@@ -531,11 +567,12 @@ async def edit_scene_via_prompt(scene_id: str, request: PromptEditRequest):
 @app.post("/api/scene/{scene_id}/submit_raw_output")
 async def submit_raw_output(scene_id: str, payload: Dict[str, Any]):
     raw_text = payload.get("raw_text", "")
+    scene_data_input = payload.get("scene_data")
     target_id = f"scene_{uuid.uuid4().hex[:8]}" if (not scene_id or scene_id == "home") else scene_id
     scene = get_scene(target_id)
     image_url = payload.get("image_url") or (scene.image_url if (scene and scene.image_url) else "")
 
-    parsed_data = parse_llm_json_response(raw_text)
+    parsed_data = scene_data_input if isinstance(scene_data_input, dict) else parse_llm_json_response(raw_text)
     if not parsed_data:
         raise HTTPException(status_code=400, detail="Could not parse valid 3D JSON from submitted text")
 

@@ -44,6 +44,7 @@ export const UploadModal: React.FC = () => {
     { id: 'gemini', name: 'Physical on Gemini', host: 'gemini.google.com' },
     { id: 'chatgpt', name: 'Physical on ChatGPT', host: 'chatgpt.com' },
     { id: 'deepseek', name: 'Physical on DeepSeek', host: 'chat.deepseek.com' },
+    { id: 'antigravity', name: 'Antigravity (Physical)', host: 'IDE Direct • Custom Mesh' },
   ];
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -170,7 +171,7 @@ export const UploadModal: React.FC = () => {
                 OS Mouse & Keyboard Driver
               </span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {targets.map((t) => (
                 <button
                   key={t.id}
@@ -191,6 +192,11 @@ export const UploadModal: React.FC = () => {
                 </button>
               ))}
             </div>
+            {targetLLM === 'antigravity' && (
+              <div className="mt-2 p-2 border border-zinc-800 bg-zinc-900/60 text-[10px] text-zinc-300 font-mono">
+                Direct IDE Mesh Mode: Physically pastes the room image &amp; instructions into Antigravity IDE chat so Antigravity identifies every object and builds custom 3D meshes with matching colors from scratch (avoiding prebuilt models).
+              </div>
+            )}
           </div>
 
           {/* Photo Selection */}

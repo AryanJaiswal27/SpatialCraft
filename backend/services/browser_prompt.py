@@ -55,6 +55,38 @@ Respond with ONLY the JSON code block.
 def generate_spatial_prompt() -> str:
     return SYSTEM_SPATIAL_PROMPT.strip()
 
+
+def generate_antigravity_direct_build_prompt(scene_id: str, image_filename: str = "") -> str:
+    """
+    Generates the direct IDE prompt pasted alongside the room image into Antigravity IDE chat
+    when 'Antigravity (Physical Clicks)' mode is selected.
+    Instructs Antigravity to visually identify every object and construct bespoke multi-part 3D CSG
+    meshes from scratch (avoiding prebuilt templates) with image-matched colors & materials,
+    and submit the finished scene straight to SpatialCraft backend.
+    """
+    img_hint = f" (saved upload: backend/storage/uploads/{image_filename})" if image_filename else ""
+    return f"""[SPATIALCRAFT // ANTIGRAVITY PHYSICAL BUILD REQUEST]
+Scene ID: {scene_id}{img_hint}
+Target Backend Endpoint: POST http://localhost:8000/api/scene/{scene_id}/submit_raw_output
+
+Look carefully at the room photograph attached above and build its COMPLETE 3D digital twin directly from scratch:
+
+STRICT REQUIREMENTS:
+1. IDENTIFY EVERY OBJECT DIRECTLY FROM THIS PHOTOGRAPH:
+   - Detect exact room dimensions (width, height, depth in meters) plus true floor, wall, and ceiling materials and exact hex colors.
+   - Identify every piece of furniture, built-in cabinetry/media wall, lighting fixture (chandelier, ceiling fan, lamps), screen, plant, rug, wall decor, and small shelf/tabletop ornament with accurate metric position (x, y, z), dimensions (width, height, depth), yaw rotation (degrees), color hex, and normalized box_2d [ymin, xmin, ymax, xmax].
+2. BUILD CUSTOM 3D MESHES FROM SCRATCH — AVOID PREBUILT MODELS:
+   - Do NOT rely on generic prebuilt/fallback templates or leave `parts` empty.
+   - For EVERY single object, author a custom bespoke `parts` array of 3D primitives (`box`, `cylinder`, `sphere`, `cone`, `torus`, `plane`) with local coordinates (`y = 0` at object bottom to `y = height`), optional `[rx, ry, rz]` radians rotation, `scale`, exact hex colors sampled from the photo, `roughness`, `metalness`, and `emissive`/`emissiveIntensity` (for LED backlights, frosted lamp globes, TV displays, etc.).
+   - Match the real geometry of each item in the photo (e.g., slats, curved aprons, drawer handles, ceiling fan blades, chandelier arms/globes, open shelf cubbies, mug handles, plant leaves, fluted panels).
+3. COLOR & MATERIAL ACCURACY:
+   - Match every part's color and surface finish directly to what is visible in the attached photo (wood grain hex tones, brushed brass/gold metallic accents, cream matte drawers, veined white marble, dark bronze/porcelain, foliage greens).
+4. COORDINATE & GROUNDING RULES:
+   - Room center on floor is (0, 0, 0); y = 0 is floor; back wall is -depth/2, front is +depth/2.
+   - Floor items rest at y = height / 2. Wall-mounted items (TVs, frames, mirrors) stay at wall mounting height. Ceiling fixtures (fans, chandeliers) stay at ceiling height (room.height - height/2). Interior shelf items stay inside their shelf cubby heights.
+5. SUBMIT DIRECTLY TO BACKEND:
+   - Write the complete JSON (`{{"room": ..., "objects": [...]}}`) and POST it to `http://localhost:8000/api/scene/{scene_id}/submit_raw_output` (via `scene_data` JSON payload or raw text) so the live 3D viewer on localhost:8000 updates immediately!""".strip()
+
 def parse_llm_json_response(raw_text: str) -> Optional[Dict[str, Any]]:
     """
     Extracts and parses JSON from raw LLM output text, handling markdown code fences,

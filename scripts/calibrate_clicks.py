@@ -44,6 +44,15 @@ DEFAULT_PRESET_METADATA = {
         "input_hint": "Hover inside DeepSeek message textarea (Ctrl+V paste target).",
         "send_hint": "Hover over DeepSeek send button arrow.",
         "copy_hint": "Hover over DeepSeek Copy response button icon at bottom of message."
+    },
+    "antigravity": {
+        "id": "antigravity",
+        "label": "Antigravity IDE",
+        "browser_url": "ide://antigravity",
+        "tab_hint": "Hover over the Antigravity IDE window title bar or taskbar icon.",
+        "input_hint": "Hover inside the Antigravity IDE chat composer input box.",
+        "send_hint": "Presses [ENTER] inside Antigravity chat composer.",
+        "copy_hint": "Direct backend HTTP submission (no copy button needed)."
     }
 }
 
@@ -201,6 +210,20 @@ def run_antigravity_verification_simulation(targets: dict, preset_label: str = "
     print("=" * 70)
 
 def get_target_order_for_preset(preset_id: str, label: str):
+    if preset_id == "antigravity":
+        return [
+            (
+                "antigravity_header",
+                "01. ANTIGRAVITY WINDOW / TOP HEADER",
+                "Hover over the top title bar or taskbar icon of this Antigravity IDE window.\nPhysical Clicker clicks here to bring Antigravity IDE to the foreground."
+            ),
+            (
+                "ide_chat_box",
+                "02. ANTIGRAVITY IDE CHAT INPUT",
+                "Hover inside the chat input box at the bottom of this Antigravity IDE window.\nPhysical Clicker pastes the room photo and custom 3D mesh build prompt here."
+            )
+        ]
+
     meta = DEFAULT_PRESET_METADATA.get(preset_id, {
         "label": label,
         "tab_hint": f"Hover over your {label} browser tab or taskbar icon.",
@@ -269,16 +292,16 @@ def run_calibration():
     if not target_preset:
         print(f"Current Active Preset: [{presets.get(active_id, {}).get('label', active_id.upper())}]")
         print("\nSelect LLM Preset to Calibrate:")
-        preset_keys = ["gemini", "chatgpt", "deepseek"]
+        preset_keys = ["gemini", "chatgpt", "deepseek", "antigravity"]
         for idx, pk in enumerate(preset_keys, 1):
             pdata = presets.get(pk, DEFAULT_PRESET_METADATA.get(pk, {}))
             label = pdata.get("label", pk.capitalize())
             active_flag = "  <-- [ACTIVE PRESET]" if pk == active_id else ""
             print(f"  [{idx}] {label:24s} ({pk}){active_flag}")
-        print("  [4] Custom LLM Preset (create new or calibrate other)")
+        print("  [5] Custom LLM Preset (create new or calibrate other)")
         print("  [V] Live Visual Verification of current active coordinates")
 
-        sel = input("\nSelect preset option [1-4 / V] (default 1): ").strip().upper()
+        sel = input("\nSelect preset option [1-5 / V] (default 1): ").strip().upper()
         if sel == "V":
             active_targets = presets.get(active_id, {}).get("targets", cfg.get("targets", {}))
             run_antigravity_verification_simulation(active_targets, presets.get(active_id, {}).get("label", active_id))
@@ -288,6 +311,8 @@ def run_calibration():
         elif sel == "3":
             target_preset = "deepseek"
         elif sel == "4":
+            target_preset = "antigravity"
+        elif sel == "5":
             custom_id = input("Enter custom preset identifier (e.g. claude, mistral): ").strip().lower()
             if not custom_id:
                 custom_id = "custom"

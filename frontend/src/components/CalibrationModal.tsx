@@ -22,6 +22,7 @@ const PRESET_TABS = [
   { id: 'gemini', label: 'Google Gemini', url: 'https://gemini.google.com' },
   { id: 'chatgpt', label: 'OpenAI ChatGPT', url: 'https://chatgpt.com' },
   { id: 'deepseek', label: 'DeepSeek Chat', url: 'https://chat.deepseek.com' },
+  { id: 'antigravity', label: 'Antigravity IDE', url: 'ide://antigravity' },
 ];
 
 export const CalibrationModal: React.FC = () => {
@@ -161,38 +162,52 @@ export const CalibrationModal: React.FC = () => {
     }
   };
 
-  const targetList = [
-    {
-      key: 'browser_tab',
-      defaultName: `01. ${currentPresetData.label || 'Browser'} Tab Header`,
-      hint: `Hover over your ${currentPresetData.label || 'browser'} tab or taskbar icon`,
-    },
-    {
-      key: 'prompt_box',
-      defaultName: `02. ${currentPresetData.label || 'Chat'} Prompt Input`,
-      hint: `Composer input box (Ctrl+V pastes image crops and CAD prompts here)`,
-    },
-    {
-      key: 'send_button',
-      defaultName: `03. ${currentPresetData.label || 'Send'} Button`,
-      hint: `Send arrow / submit button to dispatch prompts`,
-    },
-    {
-      key: 'copy_button',
-      defaultName: `04. ${currentPresetData.label || 'Copy'} Button`,
-      hint: `Copy button icon at bottom of generated response to extract CAD output`,
-    },
-    {
-      key: 'antigravity_header',
-      defaultName: '05. Antigravity Window / Top Header',
-      hint: 'Top title bar to bring Antigravity IDE window to front',
-    },
-    {
-      key: 'ide_chat_box',
-      defaultName: '06. Antigravity IDE Chat Input',
-      hint: 'Chat composer box at bottom of Antigravity IDE (pastes LLM CAD response here)',
-    },
-  ];
+  const targetList =
+    selectedPreset === 'antigravity'
+      ? [
+          {
+            key: 'antigravity_header',
+            defaultName: '01. Antigravity Window / Top Header',
+            hint: 'Top title bar or taskbar icon to bring Antigravity IDE window to front',
+          },
+          {
+            key: 'ide_chat_box',
+            defaultName: '02. Antigravity IDE Chat Input',
+            hint: 'Chat composer box at bottom of Antigravity IDE (pastes room image & custom 3D mesh prompt here)',
+          },
+        ]
+      : [
+          {
+            key: 'browser_tab',
+            defaultName: `01. ${currentPresetData.label || 'Browser'} Tab Header`,
+            hint: `Hover over your ${currentPresetData.label || 'browser'} tab or taskbar icon`,
+          },
+          {
+            key: 'prompt_box',
+            defaultName: `02. ${currentPresetData.label || 'Chat'} Prompt Input`,
+            hint: `Composer input box (Ctrl+V pastes image crops and CAD prompts here)`,
+          },
+          {
+            key: 'send_button',
+            defaultName: `03. ${currentPresetData.label || 'Send'} Button`,
+            hint: `Send arrow / submit button to dispatch prompts`,
+          },
+          {
+            key: 'copy_button',
+            defaultName: `04. ${currentPresetData.label || 'Copy'} Button`,
+            hint: `Copy button icon at bottom of generated response to extract CAD output`,
+          },
+          {
+            key: 'antigravity_header',
+            defaultName: '05. Antigravity Window / Top Header',
+            hint: 'Top title bar to bring Antigravity IDE window to front',
+          },
+          {
+            key: 'ide_chat_box',
+            defaultName: '06. Antigravity IDE Chat Input',
+            hint: 'Chat composer box at bottom of Antigravity IDE',
+          },
+        ];
 
   const isCurrentActive = selectedPreset === activePreset;
 
@@ -229,7 +244,7 @@ export const CalibrationModal: React.FC = () => {
               </span>
             </div>
 
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {PRESET_TABS.map((tab) => {
                 const isActive = tab.id === activePreset;
                 const isSelected = tab.id === selectedPreset;
@@ -278,7 +293,9 @@ export const CalibrationModal: React.FC = () => {
                 )}
               </div>
               <div className="text-[9px] text-zinc-400 truncate mt-0.5">
-                {currentPresetData.browser_url || 'Custom browser window'}
+                {selectedPreset === 'antigravity'
+                  ? 'Antigravity IDE Chat Composer (Direct Image + Custom 3D Mesh)'
+                  : currentPresetData.browser_url || 'Custom browser window'}
               </div>
             </div>
 
@@ -294,7 +311,7 @@ export const CalibrationModal: React.FC = () => {
                   <span>{activating ? 'ACTIVATING...' : 'SET AS ACTIVE'}</span>
                 </button>
               )}
-              {currentPresetData.browser_url && (
+              {currentPresetData.browser_url?.startsWith('http') && (
                 <a
                   href={currentPresetData.browser_url}
                   target="_blank"

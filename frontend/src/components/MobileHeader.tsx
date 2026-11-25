@@ -27,6 +27,7 @@ export const MobileHeader: React.FC = () => {
     { id: 'gemini', name: 'Gemini (Physical)' },
     { id: 'chatgpt', name: 'ChatGPT (Physical)' },
     { id: 'deepseek', name: 'DeepSeek (Physical)' },
+    { id: 'antigravity', name: 'Antigravity (Physical)' },
   ];
 
   const currentTarget = targets.find((t) => t.id === targetLLM) || targets[0];
@@ -161,6 +162,7 @@ export const MobileHeader: React.FC = () => {
                   onClick={() => {
                     setTargetLLM(t.id);
                     setShowLLMMenu(false);
+                    fetch(`/api/physical_clicks/preset/${t.id}/activate`, { method: 'POST' }).catch(() => {});
                   }}
                   className={`w-full flex items-center justify-between px-2 py-1.5 text-[10px] text-left transition-colors ${
                     targetLLM === t.id

@@ -1,5 +1,5 @@
 {
-  "active_preset": "deepseek",
+  "active_preset": "gemini",
   "screen": {
     "width": 1920,
     "height": 1080
@@ -154,32 +154,58 @@
         "move_duration": 0.4
       },
       "last_calibrated_at": "2026-11-24T12:26:31.099919"
+    },
+    "antigravity": {
+      "id": "antigravity",
+      "label": "Antigravity IDE",
+      "browser_url": "ide://antigravity",
+      "targets": {
+        "antigravity_header": {
+          "name": "01. ANTIGRAVITY WINDOW / TOP HEADER",
+          "x": 340,
+          "y": 1053,
+          "description": "Hover over the top title bar or taskbar icon of this Antigravity IDE window.\nPhysical Clicker clicks here to bring Antigravity IDE to the foreground."
+        },
+        "ide_chat_box": {
+          "name": "02. ANTIGRAVITY IDE CHAT INPUT",
+          "x": 1270,
+          "y": 915,
+          "description": "Hover inside the chat input box at the bottom of this Antigravity IDE window.\nPhysical Clicker pastes the room photo and custom 3D mesh build prompt here."
+        }
+      },
+      "delays": {
+        "click_settle": 0.3,
+        "image_upload_settle": 2.5,
+        "llm_generation_timeout": 300.0,
+        "move_duration": 0.4
+      },
+      "last_calibrated_at": "2026-11-25T22:05:00.000000"
     }
   },
   "targets": {
     "browser_tab": {
-      "name": "01. DEEPSEEK CHAT TAB / HEADER",
-      "x": 384,
-      "y": 1048,
-      "description": "Hover over your DeepSeek browser tab or taskbar icon.\nAntigravity clicks here to bring DeepSeek Chat to the foreground."
+      "name": "01. GOOGLE GEMINI TAB / HEADER",
+      "x": 386,
+      "y": 1051,
+      "description": "Hover over your Gemini browser tab or taskbar icon.\nAntigravity clicks here to bring Gemini to the foreground."
     },
     "prompt_box": {
-      "name": "02. DEEPSEEK CHAT CHAT INPUT",
-      "x": 861,
-      "y": 910,
-      "description": "Hover inside DeepSeek message textarea (Ctrl+V paste target).\nAntigravity clicks here to paste images (Ctrl+V) and CAD prompts."
+      "name": "02. GOOGLE GEMINI CHAT INPUT",
+      "x": 963,
+      "y": 949,
+      "description": "Hover inside Gemini prompt input composer box.\nAntigravity clicks here to paste images and CAD prompts."
     },
     "send_button": {
-      "name": "03. DEEPSEEK CHAT SEND BUTTON",
-      "x": 1450,
-      "y": 976,
-      "description": "Hover over DeepSeek send button arrow.\nAntigravity clicks here to dispatch prompts to DeepSeek Chat."
+      "name": "03. GOOGLE GEMINI SEND BUTTON",
+      "x": 1399,
+      "y": 946,
+      "description": "Hover over Gemini send button arrow.\nAntigravity clicks here to submit prompts."
     },
     "copy_button": {
-      "name": "04. DEEPSEEK CHAT COPY BUTTON",
-      "x": 724,
-      "y": 827,
-      "description": "Hover over DeepSeek Copy response button icon at bottom of message.\nAntigravity clicks here to extract the generated 3D CAD data."
+      "name": "04. GOOGLE GEMINI COPY BUTTON",
+      "x": 856,
+      "y": 876,
+      "description": "Hover over Gemini Copy response button icon at bottom of message.\nAntigravity clicks here to extract CAD data."
     },
     "antigravity_header": {
       "name": "05. ANTIGRAVITY WINDOW / TOP HEADER",

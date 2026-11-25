@@ -39,7 +39,17 @@ def load_config(preset: Optional[str] = None) -> dict:
                 data["active_preset"] = active_id
                 data["preset_label"] = pdata.get("label", active_id.capitalize())
             else:
-                data["preset_label"] = data.get("active_preset", "gemini").capitalize()
+                # If antigravity preset isn't explicitly saved yet, pull calibrated IDE coordinates from existing presets
+                if active_id == "antigravity" and presets:
+                    ref_targets = {}
+                    for p in presets.values():
+                        for k in ("antigravity_header", "ide_chat_box"):
+                            if k in p.get("targets", {}) and k not in ref_targets:
+                                ref_targets[k] = p["targets"][k]
+                    if ref_targets:
+                        data["targets"] = ref_targets
+                data["active_preset"] = active_id
+                data["preset_label"] = "Antigravity IDE" if active_id == "antigravity" else active_id.capitalize()
             return data
         except Exception:
             pass
@@ -145,6 +155,105 @@ def focus_antigravity_window(targets: dict, delays: dict):
         pyautogui.moveTo(ag_head["x"], ag_head["y"], duration=move_dur)
         pyautogui.click()
         time.sleep(settle + 0.3)
+
+def execute_antigravity_physical_build(image_path: Optional[Path], scene_id: str, prompt_override: Optional[str] = None, preset: Optional[str] = "antigravity") -> bool:
+    """
+    Antigravity Physical Mode:
+    Physically clicks into the Antigravity IDE window & chat composer,
+    pastes the custom 3D mesh build prompt + room image directly via OS clipboard,
+    and submits ONCE so the Antigravity AI agent inside the IDE inspects the photo,
+    identifies every object, constructs bespoke multi-part 3D CSG meshes with accurate
+    colors from scratch (avoiding prebuilt templates), and submits to the backend API.
+    """
+    from backend.services.browser_prompt import generate_antigravity_direct_build_prompt
+
+    cfg = load_config(preset=preset or "antigravity")
+    targets = cfg.get("targets", {})
+    delays = cfg.get("delays", {})
+
+    # Fallback: harvest antigravity_header / ide_chat_box from any calibrated preset if omitted
+    if not targets.get("ide_chat_box"):
+        for pdata in cfg.get("presets", {}).values():
+            pt = pdata.get("targets", {})
+            if pt.get("ide_chat_box"):
+                targets.setdefault("antigravity_header", pt.get("antigravity_header"))
+                targets["ide_chat_box"] = pt.get("ide_chat_box")
+                break
+
+    ide_chat_pos = targets.get("ide_chat_box")
+    if not ide_chat_pos or not ide_chat_pos.get("x") or not pyautogui:
+        print("[ANTIGRAVITY PHYSICAL // ERROR] Missing 'ide_chat_box' calibration coordinate!")
+        print("                               Run calibrate_antigravity.bat or calibrate_clicks.bat antigravity")
+        return False
+
+    move_dur = delays.get("move_duration", 0.4)
+    settle = delays.get("click_settle", 0.3)
+    img_settle = delays.get("image_upload_settle", 2.5)
+    img_name = image_path.name if image_path else ""
+    prompt_text = prompt_override or generate_antigravity_direct_build_prompt(scene_id, img_name)
+
+    print("\n" + "=" * 65)
+    print(f" [ANTIGRAVITY PHYSICAL MODE] Dispatching Room Image + Custom 3D Mesh Prompt")
+    print(f"  Scene ID : {scene_id}")
+    print(f"  Image    : {img_name or 'None'}")
+    print("=" * 65)
+
+    # 1. Focus Antigravity IDE Window
+    focus_antigravity_window(targets, delays)
+
+    # 2. Click IDE Chat Composer Box
+    x, y = ide_chat_pos["x"], ide_chat_pos["y"]
+    print(f"[ANTIGRAVITY PHYSICAL] Clicking IDE Chat Input: ({x}, {y})...")
+    pyautogui.moveTo(x, y, duration=move_dur)
+    pyautogui.click()
+    time.sleep(settle + 0.2)
+
+    # 3. Paste Custom 3D Mesh Instruction Prompt FIRST
+    print(f"[ANTIGRAVITY PHYSICAL] Pasting custom 3D mesh build prompt ({len(prompt_text)} chars)...")
+    copy_text_to_clipboard(prompt_text)
+    time.sleep(0.15)
+    physical_paste()
+    time.sleep(settle + 0.3)
+
+    # 4. Paste Room Photograph SECOND so Antigravity visually inspects it directly
+    if image_path and image_path.exists():
+        print(f"[ANTIGRAVITY PHYSICAL] Pasting room image to Antigravity chat: {image_path.name}...")
+        if copy_image_to_clipboard(image_path):
+            time.sleep(0.25)
+            physical_paste()
+            print(f"[ANTIGRAVITY PHYSICAL] Waiting {img_settle}s for image attachment to settle...")
+            time.sleep(img_settle)
+
+    # 5. Submit Once via [ENTER]
+    print("[ANTIGRAVITY PHYSICAL] Pressing [ENTER] to submit image & custom build request...")
+    pyautogui.press("enter")
+    time.sleep(0.8)
+    print("[ANTIGRAVITY PHYSICAL // SENT] Antigravity IDE agent now has the photo & instructions!")
+    return True
+
+
+def execute_antigravity_object_refine_paste(scene_id: str, obj: dict, preset: Optional[str] = "antigravity") -> bool:
+    """For single-object refinement under Antigravity Physical mode, pastes crop + custom mesh prompt to IDE chat."""
+    from backend.services.antigravity_prompter import generate_antigravity_object_prompt
+
+    obj_id = obj.get("id", "obj_1")
+    obj_name = obj.get("name", "Object")
+    crop_url = obj.get("crop_url")
+    crop_path = (ROOT_DIR / "backend" / "storage" / "crops" / Path(crop_url).name) if crop_url else None
+    if crop_path and not crop_path.exists():
+        crop_path = None
+
+    base_prompt = generate_antigravity_object_prompt(obj, step_idx=1, total_steps=1, in_conversation=False)
+    direct_prompt = (
+        f"[SPATIALCRAFT // ANTIGRAVITY CUSTOM OBJECT REFINE]\n"
+        f"Scene ID: {scene_id} | Object ID: {obj_id}\n"
+        f"Target Update Endpoint: PUT http://localhost:8000/api/scene/{scene_id}/object/{obj_id}\n\n"
+        f"{base_prompt}\n\n"
+        f"Avoid prebuilt generic models: build custom bespoke 3D mesh `parts` matching exact colors from the attached crop, "
+        f"and PUT the JSON update directly to http://localhost:8000/api/scene/{scene_id}/object/{obj_id}."
+    )
+    return execute_antigravity_physical_build(crop_path, scene_id, prompt_override=direct_prompt, preset=preset)
+
 
 def paste_to_antigravity_ide(text: str, targets: dict, delays: dict, label: str = "") -> bool:
     """
@@ -623,21 +732,45 @@ def run_physical_daemon(preset: Optional[str] = None):
                         print(f"\n[DAEMON // JOB RECEIVED] Type: {job_type} | Preset: {job_preset or 'active'} | ID: {job_id} | Scene: {scene_id}")
 
                         if job_type == "initial_reconstruction" and image_path:
-                            # 1. Run initial room reconstruction with job preset
-                            scene_result = execute_initial_reconstruction(image_path, scene_id, preset=job_preset)
-                            if scene_result:
-                                objs = scene_result.get("objects", [])
-                                print(f"\n[ANTIGRAVITY // PIPELINE] Ingested initial room with {len(objs)} objects.")
-                                # 2. Automatically kick off the refinement loop for ALL objects in the active chat conversation!
-                                print(f"[ANTIGRAVITY // PIPELINE] Beginning sequential refinement loop across ALL {len(objs)} objects (5-min per-object watchdog, text-only in conversation)...")
-                                run_full_scene_refinement_loop(scene_id, max_items=None, preset=job_preset)
+                            eff_preset = (job_preset or load_config().get("active_preset", "gemini")).lower()
+                            if eff_preset == "antigravity":
+                                # Antigravity Physical Mode: Paste photo + direct prompt into Antigravity IDE chat ONCE.
+                                # Do NOT launch browser refinement loop (Antigravity agent builds all custom 3D meshes in one pass).
+                                execute_antigravity_physical_build(
+                                    image_path=image_path,
+                                    scene_id=scene_id,
+                                    prompt_override=job.get("prompt"),
+                                    preset="antigravity"
+                                )
+                            else:
+                                # 1. Run initial room reconstruction with browser preset (Gemini / ChatGPT / DeepSeek)
+                                scene_result = execute_initial_reconstruction(image_path, scene_id, preset=job_preset)
+                                if scene_result:
+                                    objs = scene_result.get("objects", [])
+                                    print(f"\n[ANTIGRAVITY // PIPELINE] Ingested initial room with {len(objs)} objects.")
+                                    # 2. Automatically kick off the refinement loop for ALL objects in the active chat conversation!
+                                    print(f"[ANTIGRAVITY // PIPELINE] Beginning sequential refinement loop across ALL {len(objs)} objects (5-min per-object watchdog, text-only in conversation)...")
+                                    run_full_scene_refinement_loop(scene_id, max_items=None, preset=job_preset)
 
                         elif job_type == "refine_loop":
-                            run_full_scene_refinement_loop(scene_id, max_items=job.get("max_items"), preset=job_preset)
+                            eff_preset = (job_preset or load_config().get("active_preset", "gemini")).lower()
+                            if eff_preset == "antigravity":
+                                sc_req = urllib.request.Request(f"{BASE_URL}/api/scene/{scene_id}")
+                                with urllib.request.urlopen(sc_req, timeout=8) as sc_resp:
+                                    sc_data = json.loads(sc_resp.read().decode("utf-8"))
+                                img_url = sc_data.get("image_url") or ""
+                                img_p = (ROOT_DIR / "backend" / "storage" / "uploads" / Path(img_url).name) if img_url else None
+                                execute_antigravity_physical_build(image_path=img_p, scene_id=scene_id, preset="antigravity")
+                            else:
+                                run_full_scene_refinement_loop(scene_id, max_items=job.get("max_items"), preset=job_preset)
 
                         elif job_type == "refine_single":
                             obj = job.get("object_data", {})
-                            execute_object_refinement(scene_id, obj, preset=job_preset)
+                            eff_preset = (job_preset or load_config().get("active_preset", "gemini")).lower()
+                            if eff_preset == "antigravity":
+                                execute_antigravity_object_refine_paste(scene_id, obj, preset="antigravity")
+                            else:
+                                execute_object_refinement(scene_id, obj, preset=job_preset)
 
                         elif job_type == "screen_action":
                             # Antigravity screen-control directive
@@ -734,6 +867,6 @@ if __name__ == "__main__":
         for k, v in targets.items():
             print(f"  - {v.get('name', k):32s} : X = {v.get('x')}, Y = {v.get('y')}")
         print("\nTo switch active preset, run:")
-        print("  .\\calibrate_clicks.bat [gemini | chatgpt | deepseek]")
+        print("  .\\calibrate_clicks.bat [gemini | chatgpt | deepseek | antigravity]")
         print("\nTo start the standing desktop listener, run:")
         print("  .\\run_physical_daemon.bat  (or python scripts/physical_clicker.py --daemon)")
