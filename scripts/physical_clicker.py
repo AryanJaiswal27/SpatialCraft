@@ -137,7 +137,59 @@ def physical_paste():
     pyautogui.keyUp("ctrl")
     time.sleep(0.25)
 
+def _focus_window_by_title(keywords: list[str]) -> bool:
+    """Focuses an existing visible Windows window whose title matches any keyword."""
+    if sys.platform != "win32":
+        return False
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        user32 = ctypes.windll.user32
+        SW_RESTORE = 9
+
+        def _get_title(hwnd) -> str:
+            length = user32.GetWindowTextLengthW(hwnd)
+            if length <= 0:
+                return ""
+            buf = ctypes.create_unicode_buffer(length + 1)
+            user32.GetWindowTextW(hwnd, buf, length + 1)
+            return buf.value
+
+        fg_hwnd = user32.GetForegroundWindow()
+        if fg_hwnd:
+            fg_title = _get_title(fg_hwnd).lower()
+            if any(kw in fg_title for kw in keywords):
+                return True
+
+        matches = []
+        WNDENUMPROC = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+
+        def _enum_cb(hwnd, _lparam):
+            if user32.IsWindowVisible(hwnd):
+                title = _get_title(hwnd)
+                if title and any(kw in title.lower() for kw in keywords):
+                    matches.append((hwnd, title))
+            return True
+
+        user32.EnumWindows(WNDENUMPROC(_enum_cb), 0)
+        if not matches:
+            return False
+
+        target_hwnd, target_title = matches[0]
+        if user32.IsIconic(target_hwnd):
+            user32.ShowWindow(target_hwnd, SW_RESTORE)
+        user32.SetForegroundWindow(target_hwnd)
+        print(f"[PHYSICAL] Focused window by title: '{target_title}'")
+        return True
+    except Exception as e:
+        print(f"[PHYSICAL] Window title focus fallback ({e})")
+        return False
+
 def focus_browser_tab(targets: dict, move_dur: float = 0.4, settle: float = 0.3):
+    if _focus_window_by_title(["chrome", "gemini", "chatgpt", "deepseek", "edge"]):
+        time.sleep(settle + 0.2)
+        return
     tab_pos = targets.get("browser_tab")
     if tab_pos and pyautogui:
         print(f"[PHYSICAL] Clicking Browser Tab to focus window: ({tab_pos['x']}, {tab_pos['y']})...")
@@ -146,11 +198,14 @@ def focus_browser_tab(targets: dict, move_dur: float = 0.4, settle: float = 0.3)
         time.sleep(settle + 0.3)
 
 def focus_antigravity_window(targets: dict, delays: dict):
-    """Brings the Antigravity IDE window to the foreground by clicking its top header/tab."""
+    """Brings the Antigravity IDE window to the foreground."""
+    settle = delays.get("click_settle", 0.3)
+    if _focus_window_by_title(["antigravity", "spatialcraft"]):
+        time.sleep(settle + 0.2)
+        return
     ag_head = targets.get("antigravity_header")
     if ag_head and (ag_head.get("x", 0) > 0 or ag_head.get("y", 0) > 0) and pyautogui:
         move_dur = delays.get("move_duration", 0.4)
-        settle = delays.get("click_settle", 0.3)
         print(f"[PHYSICAL] Clicking Antigravity Top Header: ({ag_head['x']}, {ag_head['y']}) to bring IDE to front...")
         pyautogui.moveTo(ag_head["x"], ag_head["y"], duration=move_dur)
         pyautogui.click()
