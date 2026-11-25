@@ -137,8 +137,8 @@ def physical_paste():
     pyautogui.keyUp("ctrl")
     time.sleep(0.25)
 
-def _focus_window_by_title(keywords: list[str]) -> bool:
-    """Focuses an existing visible Windows window whose title matches any keyword."""
+def _focus_window_by_title(keywords: list[str], exclude_keywords: Optional[list[str]] = None) -> bool:
+    """Focuses an existing visible Windows window whose title matches any keyword and avoids excluded terms."""
     if sys.platform != "win32":
         return False
     try:
@@ -147,6 +147,7 @@ def _focus_window_by_title(keywords: list[str]) -> bool:
 
         user32 = ctypes.windll.user32
         SW_RESTORE = 9
+        excludes = [ex.lower() for ex in (exclude_keywords or [])]
 
         def _get_title(hwnd) -> str:
             length = user32.GetWindowTextLengthW(hwnd)
@@ -156,11 +157,16 @@ def _focus_window_by_title(keywords: list[str]) -> bool:
             user32.GetWindowTextW(hwnd, buf, length + 1)
             return buf.value
 
+        def _matches(title_lower: str) -> bool:
+            if not title_lower:
+                return False
+            if excludes and any(ex in title_lower for ex in excludes):
+                return False
+            return any(kw in title_lower for kw in keywords)
+
         fg_hwnd = user32.GetForegroundWindow()
-        if fg_hwnd:
-            fg_title = _get_title(fg_hwnd).lower()
-            if any(kw in fg_title for kw in keywords):
-                return True
+        if fg_hwnd and _matches(_get_title(fg_hwnd).lower()):
+            return True
 
         matches = []
         WNDENUMPROC = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
@@ -168,7 +174,7 @@ def _focus_window_by_title(keywords: list[str]) -> bool:
         def _enum_cb(hwnd, _lparam):
             if user32.IsWindowVisible(hwnd):
                 title = _get_title(hwnd)
-                if title and any(kw in title.lower() for kw in keywords):
+                if _matches(title.lower()):
                     matches.append((hwnd, title))
             return True
 
@@ -187,7 +193,10 @@ def _focus_window_by_title(keywords: list[str]) -> bool:
         return False
 
 def focus_browser_tab(targets: dict, move_dur: float = 0.4, settle: float = 0.3):
-    if _focus_window_by_title(["chrome", "gemini", "chatgpt", "deepseek", "edge"]):
+    if _focus_window_by_title(
+        ["google chrome", "microsoft edge", "chrome", "edge", "firefox", "brave"],
+        exclude_keywords=["antigravity", "visual studio code"]
+    ):
         time.sleep(settle + 0.2)
         return
     tab_pos = targets.get("browser_tab")
@@ -200,7 +209,10 @@ def focus_browser_tab(targets: dict, move_dur: float = 0.4, settle: float = 0.3)
 def focus_antigravity_window(targets: dict, delays: dict):
     """Brings the Antigravity IDE window to the foreground."""
     settle = delays.get("click_settle", 0.3)
-    if _focus_window_by_title(["antigravity", "spatialcraft"]):
+    if _focus_window_by_title(
+        ["antigravity"],
+        exclude_keywords=["chrome", "edge", "firefox", "brave"]
+    ):
         time.sleep(settle + 0.2)
         return
     ag_head = targets.get("antigravity_header")
@@ -376,20 +388,19 @@ def paste_and_send(prompt_text: str, image_path: Optional[Path], targets: dict, 
     copy_text_to_clipboard("")  # Clear clipboard so copy check never reads stale clipboard data
     return True
 
-def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional[str] = None, timeout: float = 300.0) -> str:
+def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional[str] = None, timeout: float = 360.0) -> str:
     """
-    Waits for LLM generation with:
-    - 5-minute (300s) generation timeout backup.
-    - Continuous downward scrolling (scroll down + End key) to keep streaming tokens in view.
-    - Clean, silent waiting: NO repeating Ctrl+A selection flashing.
-    - Enforced 14-second minimum buffer before checking Copy button.
-    - Periodically checks the calibrated Copy button for balanced CAD JSON output.
+    Waits for LLM generation cleanly without clicking prematurely:
+    1. Silent wait for at least 3 minutes (min_generation_wait = 180s) with ZERO scrolling or clicking.
+    2. Scrolls down smoothly once the wait finishes so the response & Copy button are visible.
+    3. Clicks the calibrated Copy button ONCE per 15s cycle (no multi-offset click spraying).
     """
     if not pyautogui:
         return ""
 
     move_dur = delays.get("move_duration", 0.4)
-    gen_timeout = delays.get("llm_generation_timeout", timeout)
+    min_wait = float(delays.get("min_generation_wait", 180.0))
+    gen_timeout = max(float(delays.get("llm_generation_timeout", timeout)), min_wait + 180.0)
     copy_pos = targets.get("copy_button")
     prompt_pos = targets.get("prompt_box")
 
@@ -397,82 +408,86 @@ def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional
     scroll_x = prompt_pos["x"] if prompt_pos else 960
     scroll_y = max(120, (prompt_pos["y"] - 280)) if prompt_pos else 500
 
-    print(f"\n[PHYSICAL] Waiting for LLM generation (5-min timeout: {int(gen_timeout)}s)...")
+    print(f"\n[PHYSICAL] Waiting silently {int(min_wait)}s (3 min) before scrolling & clicking (Timeout: {int(gen_timeout)}s)...")
     if expected_id:
         print(f"[PHYSICAL] Expecting target identifier: '{expected_id}'")
-    print(f"[PHYSICAL] Auto-scrolling active at ({scroll_x}, {scroll_y})...")
 
     # Wipe clipboard so previous turn content is never mistakenly read
     copy_text_to_clipboard("")
 
     start_time = time.time()
-    min_wait = 14.0  # Give LLM time to generate before first copy attempt
     last_milestone = start_time
 
+    # Phase 1: Silent wait for at least 3 minutes — NO mouse movement, NO scrolling, NO clicking
+    while (time.time() - start_time) < min_wait:
+        elapsed = time.time() - start_time
+        if (time.time() - last_milestone) >= 30.0:
+            remaining = int(max(0, min_wait - elapsed))
+            print(f"[PHYSICAL] Silent wait: {int(elapsed)}s / {int(min_wait)}s ({remaining}s until scrolling starts)...")
+            last_milestone = time.time()
+        time.sleep(min(5.0, max(0.5, min_wait - elapsed)))
+
+    print(f"[PHYSICAL] 3-minute wait complete. Scrolling down to bottom at ({scroll_x}, {scroll_y})...")
+
+    # Phase 2 & 3: Scroll down first, then single Copy button click every 15s
     while (time.time() - start_time) < gen_timeout:
         elapsed = time.time() - start_time
 
-        # Periodic log every 30 seconds
-        if elapsed - (last_milestone - start_time) >= 30.0:
-            print(f"[PHYSICAL] Still waiting for LLM output... ({int(elapsed)}s / {int(gen_timeout)}s elapsed)")
+        if (time.time() - last_milestone) >= 30.0:
+            print(f"[PHYSICAL] Extracting LLM output... ({int(elapsed)}s / {int(gen_timeout)}s elapsed)")
             last_milestone = time.time()
 
-        # A. Rapid high-volume downward scroll to track streaming tokens
+        # Scroll down cleanly without clicking inside chat messages
         try:
-            pyautogui.moveTo(scroll_x, scroll_y, duration=0.08)
+            pyautogui.moveTo(scroll_x, scroll_y, duration=0.2)
             pyautogui.scroll(-3500)
-            pyautogui.press("pagedown", presses=2, interval=0.02)
+            time.sleep(0.25)
+            pyautogui.scroll(-3500)
+            pyautogui.press("pagedown", presses=2, interval=0.05)
             pyautogui.hotkey("ctrl", "end")
+            time.sleep(1.0)
         except Exception:
             pass
 
-        # During initial buffer, simply wait and keep scrolling
-        if elapsed < min_wait:
-            time.sleep(2.5)
-            continue
-
-        # B. Check Copy button cleanly with adaptive vertical probing (handles banners/popups)
+        # Single precise click on the calibrated Copy button
         if copy_pos:
-            probe_offsets = [0, -65, -80, -50, -120]
-            for dy in probe_offsets:
-                try:
-                    pyautogui.moveTo(copy_pos["x"], copy_pos["y"] + dy, duration=0.15)
-                    pyautogui.click()
-                    time.sleep(0.35)
-                    clip_text = get_clipboard_text()
-                    
-                    if clip_text and "{" in clip_text and "}" in clip_text:
-                        if clip_text.count("{") <= clip_text.count("}"):
-                            has_schema = any(k in clip_text for k in ("room", "dimensions", "objects", "name", "category", "materials"))
-                            matches_id = True if not expected_id else (expected_id in clip_text)
-                            
-                            if has_schema and matches_id:
-                                offset_str = f" (offset {dy}px due to banner)" if dy != 0 else ""
-                                print(f"[PHYSICAL // GENERATION COMPLETE] Captured finished response via Copy button{offset_str} ({len(clip_text)} chars)!")
-                                return clip_text
-                except Exception:
-                    pass
-
-        time.sleep(3.5)
-
-    # Final attempt on timeout
-    print(f"[PHYSICAL // TIMEOUT] {int(gen_timeout)}s (5-minute) timeout reached. Attempting final extraction...")
-    if copy_pos:
-        for dy in [0, -65, -80, -50, -120]:
             try:
-                pyautogui.moveTo(scroll_x, scroll_y, duration=0.08)
-                pyautogui.scroll(-4000)
-                pyautogui.press("pagedown", presses=2, interval=0.02)
-                pyautogui.hotkey("ctrl", "end")
-                time.sleep(0.3)
-                pyautogui.moveTo(copy_pos["x"], copy_pos["y"] + dy, duration=move_dur)
+                pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=0.25)
                 pyautogui.click()
                 time.sleep(0.8)
-                final_text = get_clipboard_text()
-                if final_text and "{" in final_text and "}" in final_text:
-                    return final_text
+                clip_text = get_clipboard_text()
+
+                if clip_text and "{" in clip_text and "}" in clip_text:
+                    if clip_text.count("{") <= clip_text.count("}"):
+                        has_schema = any(k in clip_text for k in ("room", "dimensions", "objects", "name", "category", "materials"))
+                        matches_id = True if not expected_id else (expected_id in clip_text)
+
+                        if has_schema and matches_id:
+                            print(f"[PHYSICAL // GENERATION COMPLETE] Captured finished response via Copy button ({len(clip_text)} chars)!")
+                            return clip_text
             except Exception:
                 pass
+
+        time.sleep(15.0)
+
+    # Final attempt on timeout
+    print(f"[PHYSICAL // TIMEOUT] {int(gen_timeout)}s timeout reached. Attempting final extraction...")
+    if copy_pos:
+        try:
+            pyautogui.moveTo(scroll_x, scroll_y, duration=0.2)
+            pyautogui.scroll(-4000)
+            time.sleep(0.3)
+            pyautogui.press("pagedown", presses=2, interval=0.05)
+            pyautogui.hotkey("ctrl", "end")
+            time.sleep(1.0)
+            pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=move_dur)
+            pyautogui.click()
+            time.sleep(0.8)
+            final_text = get_clipboard_text()
+            if final_text and "{" in final_text and "}" in final_text:
+                return final_text
+        except Exception:
+            pass
 
     # Fallback: full-page selection extraction if copy button was displaced by persistent popups
     try:
@@ -511,7 +526,7 @@ def execute_initial_reconstruction(image_path: Path, scene_id: str, preset: Opti
     pasted = paste_and_send(prompt, image_path, targets, delays)
     raw_output = ""
     if pasted:
-        raw_output = wait_and_extract_response(targets, delays, expected_id="room", timeout=300.0)
+        raw_output = wait_and_extract_response(targets, delays, expected_id="room", timeout=360.0)
 
     # 5-MINUTE BACKUP: If no output received in 5 minutes, Antigravity builds the scene itself!
     if not raw_output:
@@ -608,7 +623,7 @@ def execute_object_refinement(scene_id: str, obj: dict, scene_data: Optional[dic
     pasted = paste_and_send(refine_prompt, image_path=None, targets=targets, delays=delays)
     raw_output = ""
     if pasted:
-        raw_output = wait_and_extract_response(targets, delays, expected_id=obj.get("id"), timeout=300.0)
+        raw_output = wait_and_extract_response(targets, delays, expected_id=obj.get("id"), timeout=360.0)
 
     parsed = None
     if raw_output:
