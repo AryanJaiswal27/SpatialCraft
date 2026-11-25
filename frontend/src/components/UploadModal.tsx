@@ -14,6 +14,7 @@ export const UploadModal: React.FC = () => {
     isUploading,
     uploadLogs,
     addUploadLog,
+    clearUploadLogs,
     refreshAvailableScenes,
   } = useSceneStore();
 
@@ -66,6 +67,16 @@ export const UploadModal: React.FC = () => {
   const handleStartProcessing = async () => {
     if (!selectedFile) return;
 
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+
+    clearUploadLogs();
     setUploading(true, 'UPLOADING ARTIFACT');
     addUploadLog(`Artifact: ${selectedFile.name}`);
     addUploadLog(`Target Engine: ${targetLLM.toUpperCase()}`);
@@ -86,6 +97,17 @@ export const UploadModal: React.FC = () => {
       const sceneId = data.scene_id;
       addUploadLog(`Assigned Scene ID: ${sceneId}`);
 
+      const cleanupListeners = () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+        if (wsRef.current) {
+          wsRef.current.close();
+          wsRef.current = null;
+        }
+      };
+
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const wsUrl = `${protocol}//${window.location.host}/ws/${sceneId}`;
       const ws = new WebSocket(wsUrl);
@@ -97,6 +119,7 @@ export const UploadModal: React.FC = () => {
           addUploadLog(`[${payload.stage.toUpperCase()}] ${payload.message}`);
 
           if (payload.stage === 'done') {
+            cleanupListeners();
             fetch(`/api/scene/${sceneId}`)
               .then((r) => r.json())
               .then((newScene) => {
@@ -115,20 +138,19 @@ export const UploadModal: React.FC = () => {
         addUploadLog('[SYS] Polling mode fallback activated');
       };
 
-      if (intervalRef.current) clearInterval(intervalRef.current);
       intervalRef.current = setInterval(async () => {
         try {
           const checkRes = await fetch(`/api/scene/${sceneId}`);
           if (checkRes.ok) {
             const currentScene = await checkRes.json();
-            if (currentScene.status === 'ready' && currentScene.objects?.length > 0) {
-              if (intervalRef.current) clearInterval(intervalRef.current);
+            if ((currentScene.status === 'ready' || currentScene.status === 'done') && currentScene.objects?.length > 0) {
+              cleanupListeners();
               setScene(currentScene);
               refreshAvailableScenes();
               setUploading(false);
               setActiveModal('none');
             } else if (currentScene.status === 'waiting_payload') {
-              if (intervalRef.current) clearInterval(intervalRef.current);
+              cleanupListeners();
               setUploading(false);
               addUploadLog(`[AUTH/PAYLOAD] ${currentScene.status_message || 'Login required. Tap PAYLOAD below.'}`);
             }

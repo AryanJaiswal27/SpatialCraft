@@ -104,7 +104,7 @@ def copy_text_to_clipboard(text: str) -> bool:
     try:
         if pyperclip:
             pyperclip.copy(text)
-            if pyperclip.paste().strip():
+            if text == "" or pyperclip.paste().strip():
                 return True
     except Exception:
         pass
@@ -137,8 +137,12 @@ def physical_paste():
     pyautogui.keyUp("ctrl")
     time.sleep(0.25)
 
-def _focus_window_by_title(keywords: list[str], exclude_keywords: Optional[list[str]] = None) -> bool:
-    """Focuses an existing visible Windows window whose title matches any keyword and avoids excluded terms."""
+def _focus_window_by_title(
+    keywords: list[str],
+    exclude_keywords: Optional[list[str]] = None,
+    preferred_keywords: Optional[list[str]] = None,
+) -> bool:
+    """Focuses an existing visible Windows window and verifies foreground activation."""
     if sys.platform != "win32":
         return False
     try:
@@ -146,8 +150,11 @@ def _focus_window_by_title(keywords: list[str], exclude_keywords: Optional[list[
         from ctypes import wintypes
 
         user32 = ctypes.windll.user32
+        kernel32 = ctypes.windll.kernel32
         SW_RESTORE = 9
+        SW_SHOW = 5
         excludes = [ex.lower() for ex in (exclude_keywords or [])]
+        prefs = [pr.lower() for pr in (preferred_keywords or [])]
 
         def _get_title(hwnd) -> str:
             length = user32.GetWindowTextLengthW(hwnd)
@@ -165,8 +172,10 @@ def _focus_window_by_title(keywords: list[str], exclude_keywords: Optional[list[
             return any(kw in title_lower for kw in keywords)
 
         fg_hwnd = user32.GetForegroundWindow()
-        if fg_hwnd and _matches(_get_title(fg_hwnd).lower()):
-            return True
+        if fg_hwnd:
+            fg_lower = _get_title(fg_hwnd).lower()
+            if _matches(fg_lower) and (not prefs or any(p in fg_lower for p in prefs)):
+                return True
 
         matches = []
         WNDENUMPROC = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
@@ -174,28 +183,54 @@ def _focus_window_by_title(keywords: list[str], exclude_keywords: Optional[list[
         def _enum_cb(hwnd, _lparam):
             if user32.IsWindowVisible(hwnd):
                 title = _get_title(hwnd)
-                if _matches(title.lower()):
-                    matches.append((hwnd, title))
+                t_lower = title.lower()
+                if _matches(t_lower):
+                    # Rank preset-specific windows (e.g. "DeepSeek - Chrome") ahead of generic browser windows
+                    score = 2 if (prefs and any(p in t_lower for p in prefs)) else (0 if "spatialcraft" in t_lower else 1)
+                    matches.append((score, hwnd, title))
             return True
 
         user32.EnumWindows(WNDENUMPROC(_enum_cb), 0)
         if not matches:
             return False
 
-        target_hwnd, target_title = matches[0]
+        matches.sort(key=lambda item: item[0], reverse=True)
+        _, target_hwnd, target_title = matches[0]
+
         if user32.IsIconic(target_hwnd):
             user32.ShowWindow(target_hwnd, SW_RESTORE)
-        user32.SetForegroundWindow(target_hwnd)
-        print(f"[PHYSICAL] Focused window by title: '{target_title}'")
-        return True
+        else:
+            user32.ShowWindow(target_hwnd, SW_SHOW)
+
+        fg_now = user32.GetForegroundWindow()
+        fg_tid = user32.GetWindowThreadProcessId(fg_now, None) if fg_now else 0
+        cur_tid = kernel32.GetCurrentThreadId()
+        attached = False
+        if fg_tid and cur_tid and fg_tid != cur_tid:
+            attached = bool(user32.AttachThreadInput(fg_tid, cur_tid, True))
+        try:
+            user32.BringWindowToTop(target_hwnd)
+            user32.SetForegroundWindow(target_hwnd)
+        finally:
+            if attached:
+                user32.AttachThreadInput(fg_tid, cur_tid, False)
+
+        time.sleep(0.15)
+        if user32.GetForegroundWindow() == target_hwnd:
+            print(f"[PHYSICAL] Focused window by title: '{target_title}'")
+            return True
+        print(f"[PHYSICAL] Window '{target_title}' resisted SetForegroundWindow; falling back to calibrated click.")
+        return False
     except Exception as e:
         print(f"[PHYSICAL] Window title focus fallback ({e})")
         return False
 
-def focus_browser_tab(targets: dict, move_dur: float = 0.4, settle: float = 0.3):
+def focus_browser_tab(targets: dict, move_dur: float = 0.4, settle: float = 0.3, preset: Optional[str] = None):
+    pref = [preset.lower()] if preset else ["gemini", "chatgpt", "deepseek"]
     if _focus_window_by_title(
         ["google chrome", "microsoft edge", "chrome", "edge", "firefox", "brave"],
-        exclude_keywords=["antigravity", "visual studio code"]
+        exclude_keywords=["antigravity", "visual studio code"],
+        preferred_keywords=pref,
     ):
         time.sleep(settle + 0.2)
         return
@@ -211,7 +246,8 @@ def focus_antigravity_window(targets: dict, delays: dict):
     settle = delays.get("click_settle", 0.3)
     if _focus_window_by_title(
         ["antigravity"],
-        exclude_keywords=["chrome", "edge", "firefox", "brave"]
+        exclude_keywords=["chrome", "edge", "firefox", "brave"],
+        preferred_keywords=["spatialcraft", "antigravity"],
     ):
         time.sleep(settle + 0.2)
         return
@@ -388,12 +424,20 @@ def paste_and_send(prompt_text: str, image_path: Optional[Path], targets: dict, 
     copy_text_to_clipboard("")  # Clear clipboard so copy check never reads stale clipboard data
     return True
 
-def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional[str] = None, timeout: float = 360.0) -> str:
+def wait_and_extract_response(
+    targets: dict,
+    delays: dict,
+    expected_id: Optional[str] = None,
+    timeout: float = 360.0,
+    ignore_texts: Optional[set] = None,
+) -> str:
     """
     Waits for LLM generation cleanly without clicking prematurely:
     1. Silent wait for at least 3 minutes (min_generation_wait = 180s) with ZERO scrolling or clicking.
     2. Scrolls down smoothly once the wait finishes so the response & Copy button are visible.
     3. Clicks the calibrated Copy button ONCE per 15s cycle (no multi-offset click spraying).
+    4. Validates that copied JSON matches the requested scope (full room vs single-object refinement)
+       and ignores stale clipboard content from prior turns.
     """
     if not pyautogui:
         return ""
@@ -403,6 +447,7 @@ def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional
     gen_timeout = max(float(delays.get("llm_generation_timeout", timeout)), min_wait + 180.0)
     copy_pos = targets.get("copy_button")
     prompt_pos = targets.get("prompt_box")
+    stale_set = ignore_texts or set()
 
     # Viewport coordinates for scrolling
     scroll_x = prompt_pos["x"] if prompt_pos else 960
@@ -414,6 +459,26 @@ def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional
 
     # Wipe clipboard so previous turn content is never mistakenly read
     copy_text_to_clipboard("")
+
+    def _is_valid_capture(clip_text: str) -> bool:
+        if not clip_text or "{" not in clip_text or "}" not in clip_text:
+            return False
+        if clip_text.strip() in stale_set:
+            return False
+        if clip_text.count("{") > clip_text.count("}"):
+            return False
+        has_schema = any(k in clip_text for k in ("room", "dimensions", "objects", "name", "category", "materials"))
+        if not has_schema:
+            return False
+        if expected_id and expected_id not in clip_text:
+            return False
+        if expected_id == "room":
+            from backend.services.browser_prompt import parse_llm_json_response
+            parsed = parse_llm_json_response(clip_text)
+            return isinstance(parsed, dict) and ("room" in parsed or "objects" in parsed)
+        # Single-object refinement: must not blindly accept a full-room wrapper without object parts
+        parsed_obj = parse_refinement_json(clip_text, expected_id=expected_id)
+        return parsed_obj is not None
 
     start_time = time.time()
     last_milestone = start_time
@@ -457,14 +522,9 @@ def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional
                 time.sleep(0.8)
                 clip_text = get_clipboard_text()
 
-                if clip_text and "{" in clip_text and "}" in clip_text:
-                    if clip_text.count("{") <= clip_text.count("}"):
-                        has_schema = any(k in clip_text for k in ("room", "dimensions", "objects", "name", "category", "materials"))
-                        matches_id = True if not expected_id else (expected_id in clip_text)
-
-                        if has_schema and matches_id:
-                            print(f"[PHYSICAL // GENERATION COMPLETE] Captured finished response via Copy button ({len(clip_text)} chars)!")
-                            return clip_text
+                if _is_valid_capture(clip_text):
+                    print(f"[PHYSICAL // GENERATION COMPLETE] Captured finished response via Copy button ({len(clip_text)} chars)!")
+                    return clip_text
             except Exception:
                 pass
 
@@ -484,7 +544,7 @@ def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional
             pyautogui.click()
             time.sleep(0.8)
             final_text = get_clipboard_text()
-            if final_text and "{" in final_text and "}" in final_text:
+            if _is_valid_capture(final_text):
                 return final_text
         except Exception:
             pass
@@ -502,9 +562,12 @@ def wait_and_extract_response(targets: dict, delays: dict, expected_id: Optional
         pyautogui.press("escape")
         salvage_text = get_clipboard_text()
         if salvage_text and "{" in salvage_text and "}" in salvage_text:
-            from backend.services.browser_prompt import parse_llm_json_response
-            parsed = parse_llm_json_response(salvage_text)
-            if parsed and (not expected_id or expected_id in salvage_text):
+            if expected_id == "room":
+                from backend.services.browser_prompt import parse_llm_json_response
+                if parse_llm_json_response(salvage_text):
+                    print(f"[PHYSICAL // SALVAGED] Successfully recovered {len(salvage_text)} chars from page fallback!")
+                    return salvage_text
+            elif parse_refinement_json(salvage_text, expected_id=expected_id):
                 print(f"[PHYSICAL // SALVAGED] Successfully recovered {len(salvage_text)} chars from page fallback!")
                 return salvage_text
     except Exception as e:
@@ -520,7 +583,7 @@ def execute_initial_reconstruction(image_path: Path, scene_id: str, preset: Opti
     delays = cfg.get("delays", {})
 
     print(f"\n[PHYSICAL // PHASE 1] Starting Initial 3D Reconstruction for {scene_id}...")
-    focus_browser_tab(targets)
+    focus_browser_tab(targets, preset=preset or cfg.get("active_preset"))
 
     prompt = generate_spatial_prompt()
     pasted = paste_and_send(prompt, image_path, targets, delays)
@@ -573,24 +636,32 @@ def generate_object_refinement_prompt(obj: dict, scene_data: Optional[dict] = No
     """Delegates prompt generation to the Antigravity CAD Intelligence engine."""
     return generate_antigravity_object_prompt(obj, scene=scene_data, step_idx=step_idx, total_steps=total_steps)
 
-def parse_refinement_json(raw_text: str) -> Optional[dict]:
+def parse_refinement_json(raw_text: str, expected_id: Optional[str] = None) -> Optional[dict]:
     import re
+
+    def _valid_single_object(parsed: Any) -> Optional[dict]:
+        if not isinstance(parsed, dict):
+            return None
+        # Reject full-room wrappers from Turn 1 unless we extract a matching refined object with parts
+        if "room" in parsed and "objects" in parsed and "parts" not in parsed:
+            if expected_id and isinstance(parsed.get("objects"), list):
+                for o in parsed["objects"]:
+                    if isinstance(o, dict) and o.get("id") == expected_id and o.get("parts"):
+                        return o
+            return None
+        if expected_id and parsed.get("id") and parsed.get("id") != expected_id:
+            return None
+        if any(k in parsed for k in ("parts", "dimensions", "materials", "color", "description", "features")):
+            return parsed
+        return None
+
     # 1. Search all code fences in reverse (latest response on page first)
     matches = list(re.finditer(r"```(?:json)?\s*([\s\S]*?)\s*```", raw_text))
     for m in reversed(matches):
-        candidate = m.group(1).strip()
         try:
-            parsed = json.loads(candidate)
-            if isinstance(parsed, dict) and any(k in parsed for k in ("dimensions", "color", "materials", "id", "description")):
-                return parsed
-        except Exception:
-            pass
-
-    for m in reversed(matches):
-        try:
-            parsed = json.loads(m.group(1).strip())
-            if isinstance(parsed, dict):
-                return parsed
+            obj = _valid_single_object(json.loads(m.group(1).strip()))
+            if obj is not None:
+                return obj
         except Exception:
             pass
 
@@ -598,12 +669,20 @@ def parse_refinement_json(raw_text: str) -> Optional[dict]:
     brace = re.search(r"(\{[\s\S]*\})", raw_text)
     if brace:
         try:
-            return json.loads(brace.group(1).strip())
+            return _valid_single_object(json.loads(brace.group(1).strip()))
         except Exception:
             pass
     return None
 
-def execute_object_refinement(scene_id: str, obj: dict, scene_data: Optional[dict] = None, step_idx: int = 1, total_steps: int = 1, preset: Optional[str] = None) -> bool:
+def execute_object_refinement(
+    scene_id: str,
+    obj: dict,
+    scene_data: Optional[dict] = None,
+    step_idx: int = 1,
+    total_steps: int = 1,
+    preset: Optional[str] = None,
+    seen_texts: Optional[set] = None,
+) -> bool:
     """Phase 2: Refines an individual object by referencing the room photo already in the active browser conversation (zero image re-upload)."""
     cfg = load_config(preset=preset)
     targets = cfg.get("targets", {})
@@ -612,7 +691,7 @@ def execute_object_refinement(scene_id: str, obj: dict, scene_data: Optional[dic
     print(f"\n" + "=" * 65)
     print(f" [ANTIGRAVITY // CAD AGENT] Step {step_idx}/{total_steps}: Refining '{obj.get('name')}'")
     print("=" * 65)
-    focus_browser_tab(targets)
+    focus_browser_tab(targets, preset=preset or cfg.get("active_preset"))
 
     # Antigravity generates tailored prompt referencing the photo already in the active thread
     refine_prompt = generate_antigravity_object_prompt(obj, scene=scene_data, step_idx=step_idx, total_steps=total_steps, in_conversation=True)
@@ -623,12 +702,20 @@ def execute_object_refinement(scene_id: str, obj: dict, scene_data: Optional[dic
     pasted = paste_and_send(refine_prompt, image_path=None, targets=targets, delays=delays)
     raw_output = ""
     if pasted:
-        raw_output = wait_and_extract_response(targets, delays, expected_id=obj.get("id"), timeout=360.0)
+        raw_output = wait_and_extract_response(
+            targets,
+            delays,
+            expected_id=obj.get("id"),
+            timeout=360.0,
+            ignore_texts=seen_texts,
+        )
 
     parsed = None
     if raw_output:
+        if seen_texts is not None:
+            seen_texts.add(raw_output.strip())
         # Direct backend ingestion (bypassing IDE chat paste to prevent message queue pile-up)
-        parsed = parse_refinement_json(raw_output)
+        parsed = parse_refinement_json(raw_output, expected_id=obj.get("id"))
 
     # 5-MINUTE BACKUP: If no output or invalid JSON received within 5 minutes, Antigravity constructs 3D mesh itself!
     if not parsed:
@@ -734,6 +821,7 @@ def run_full_scene_refinement_loop(scene_id: str, max_items: Optional[int] = Non
     print(f"[ANTIGRAVITY] Plan assembled: {len(candidates)} items to refine in active conversation (zero image re-upload)...")
 
     refined_count = 0
+    seen_texts = set()
     objects_by_id = {o["id"]: o for o in scene_data.get("objects", [])}
 
     for idx, step in enumerate(candidates[:total_to_process], 1):
@@ -748,7 +836,8 @@ def run_full_scene_refinement_loop(scene_id: str, max_items: Optional[int] = Non
             scene_data=scene_data,
             step_idx=idx,
             total_steps=total_to_process,
-            preset=preset
+            preset=preset,
+            seen_texts=seen_texts,
         )
         if success:
             refined_count += 1

@@ -30,6 +30,7 @@ interface SceneState {
   setActiveModal: (modal: ActiveModal) => void;
   setUploading: (uploading: boolean, status?: string) => void;
   addUploadLog: (log: string) => void;
+  clearUploadLogs: () => void;
 
   fetchScene: (sceneId: string) => Promise<void>;
   updateObjectPosition: (objId: string, newPos: Vector3D) => Promise<void>;
@@ -101,6 +102,7 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   setActiveModal: (activeModal) => set({ activeModal }),
   setUploading: (isUploading, uploadStatus = '') => set({ isUploading, uploadStatus }),
   addUploadLog: (log) => set((state) => ({ uploadLogs: [...state.uploadLogs, log] })),
+  clearUploadLogs: () => set({ uploadLogs: [] }),
 
   fetchScene: async (sceneId: string) => {
     try {

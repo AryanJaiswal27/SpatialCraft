@@ -121,7 +121,7 @@ def physical_paste():
     time.sleep(0.25)
 
 def _focus_window_by_title(keywords: list[str], exclude_keywords: Optional[list[str]] = None) -> bool:
-    """Focuses an existing visible Windows window whose title matches any keyword and avoids excluded terms."""
+    """Focuses an existing visible Windows window and verifies foreground activation."""
     if sys.platform != "win32":
         return False
     try:
@@ -129,7 +129,9 @@ def _focus_window_by_title(keywords: list[str], exclude_keywords: Optional[list[
         from ctypes import wintypes
 
         user32 = ctypes.windll.user32
+        kernel32 = ctypes.windll.kernel32
         SW_RESTORE = 9
+        SW_SHOW = 5
         excludes = [ex.lower() for ex in (exclude_keywords or [])]
 
         def _get_title(hwnd) -> str:
@@ -168,9 +170,27 @@ def _focus_window_by_title(keywords: list[str], exclude_keywords: Optional[list[
         target_hwnd, target_title = matches[0]
         if user32.IsIconic(target_hwnd):
             user32.ShowWindow(target_hwnd, SW_RESTORE)
-        user32.SetForegroundWindow(target_hwnd)
-        print(f"[SCREEN CONTROL] Focused window by title: '{target_title}'")
-        return True
+        else:
+            user32.ShowWindow(target_hwnd, SW_SHOW)
+
+        fg_now = user32.GetForegroundWindow()
+        fg_tid = user32.GetWindowThreadProcessId(fg_now, None) if fg_now else 0
+        cur_tid = kernel32.GetCurrentThreadId()
+        attached = False
+        if fg_tid and cur_tid and fg_tid != cur_tid:
+            attached = bool(user32.AttachThreadInput(fg_tid, cur_tid, True))
+        try:
+            user32.BringWindowToTop(target_hwnd)
+            user32.SetForegroundWindow(target_hwnd)
+        finally:
+            if attached:
+                user32.AttachThreadInput(fg_tid, cur_tid, False)
+
+        time.sleep(0.15)
+        if user32.GetForegroundWindow() == target_hwnd:
+            print(f"[SCREEN CONTROL] Focused window by title: '{target_title}'")
+            return True
+        return False
     except Exception:
         return False
 

@@ -268,11 +268,12 @@ async def trigger_antigravity_backup_build(scene_id: str):
     if not image_path:
         raise HTTPException(status_code=400, detail="Original room image not found for this scene")
 
+    loop = asyncio.get_event_loop()
+
     def cb(msg: str):
-        asyncio.create_task(broadcast_status(scene_id, msg, "progress"))
+        asyncio.run_coroutine_threadsafe(broadcast_status(scene_id, msg, "progress"), loop)
 
     await broadcast_status(scene_id, "[ANTIGRAVITY BACKUP] Beginning autonomous 3D reconstruction...", "start")
-    loop = asyncio.get_event_loop()
     updated_scene = await loop.run_in_executor(
         None,
         lambda: run_antigravity_full_scene_build_and_refine(scene_id, image_path, status_cb=cb)
@@ -374,6 +375,7 @@ async def set_engine_endpoint(data: Dict[str, str]):
             with open(PHYSICAL_CONFIG_PATH, "r", encoding="utf-8") as f:
                 cfg = json.load(f)
             cfg["active_preset"] = engine
+            ensure_presets_in_config(cfg)
             with open(PHYSICAL_CONFIG_PATH, "w", encoding="utf-8") as f:
                 json.dump(cfg, f, indent=2)
         except Exception:
@@ -411,11 +413,6 @@ async def upload_room_image(
     with open(root_saved_path, "wb") as f:
         f.write(contents)
 
-    # Save prompt file to disk for inspection
-    prompt_path = UPLOADS_DIR / f"{scene_id}_prompt.txt"
-    with open(prompt_path, "w", encoding="utf-8") as f:
-        f.write(generate_spatial_prompt())
-
     # Create initial scene state
     scene = SceneGraph(
         scene_id=scene_id,
@@ -433,6 +430,7 @@ async def upload_room_image(
         if preset_name == "antigravity"
         else generate_spatial_prompt()
     )
+    prompt_path = UPLOADS_DIR / f"{scene_id}_prompt.txt"
     with open(prompt_path, "w", encoding="utf-8") as f:
         f.write(job_prompt)
 
@@ -471,30 +469,30 @@ async def upload_room_image(
         save_scene(cur_scene)
     asyncio.create_task(broadcast_status(scene_id, f"[PHYSICAL] Job queued for desktop mouse execution on {preset_name.capitalize()}...", "progress"))
 
-    # 5-MINUTE BACKUP WATCHDOG: If no output is received from browser LLM within 5 minutes,
-    # Antigravity autonomously builds the scene and executes the refinement loop over all objects!
-    async def scene_5min_backup_watchdog():
-        await asyncio.sleep(300)  # 300 seconds = 5 minutes
+    # BACKUP WATCHDOG: Waits 420s (after 180s silent wait + 180s extraction window + buffer)
+    # before activating autonomous fallback so it never collides with physical_clicker.
+    async def scene_backup_watchdog():
+        await asyncio.sleep(420)
         cur_scene = get_scene(scene_id)
-        if cur_scene and (cur_scene.status in ("processing", "waiting_payload") or len(cur_scene.objects) == 0):
-            print(f"\n[ANTIGRAVITY WATCHDOG // 5-MIN TIMEOUT] Scene {scene_id} received no browser LLM output within 5 minutes.")
+        if cur_scene and (cur_scene.status in ("processing", "waiting_payload") and len(cur_scene.objects) == 0):
+            print(f"\n[ANTIGRAVITY WATCHDOG // TIMEOUT] Scene {scene_id} received no output within 420s.")
             print(f"[ANTIGRAVITY WATCHDOG] Activating autonomous 3D CAD reconstruction backup...")
-            def cb(msg: str):
-                asyncio.create_task(broadcast_status(scene_id, msg, "progress"))
             loop = asyncio.get_event_loop()
+            def cb(msg: str):
+                asyncio.run_coroutine_threadsafe(broadcast_status(scene_id, msg, "progress"), loop)
             await loop.run_in_executor(
                 None,
                 lambda: run_antigravity_full_scene_build_and_refine(scene_id, saved_path, status_cb=cb)
             )
 
-    asyncio.create_task(scene_5min_backup_watchdog())
+    asyncio.create_task(scene_backup_watchdog())
 
     return {
         "scene_id": scene_id,
         "image_url": f"/api/uploads/{saved_filename}",
         "status": "processing",
         "target_llm": target_llm,
-        "prompt": generate_spatial_prompt()
+        "prompt": job_prompt
     }
 
 @app.get("/api/scene/{scene_id}")

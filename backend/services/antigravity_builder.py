@@ -1734,7 +1734,7 @@ def build_antigravity_fallback_scene(image_path: Path, scene_id: str) -> SceneGr
         image_url=f"/api/uploads/{image_path.name}",
         room=room,
         objects=objects,
-        status="active",
+        status="ready",
         status_message="[ANTIGRAVITY BUILDER] 3D room reconstructed from fresh directly from image."
     )
 
@@ -1810,7 +1810,7 @@ def run_antigravity_full_scene_build_and_refine(scene_id: str, image_path: Path,
         refine_object_with_antigravity_cad(scene_id, obj.id)
 
     final_scene = get_scene(scene_id) or scene
-    final_scene.status = "done"
+    final_scene.status = "ready"
     final_scene.status_message = f"[ANTIGRAVITY COMPLETE] Autonomous CAD generation finished across all {total} objects!"
     save_scene(final_scene)
     if status_cb:
