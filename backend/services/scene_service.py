@@ -584,20 +584,19 @@ def verify_and_ground_scene(scene: SceneGraph) -> SceneGraph:
                 obj.position.y = round(p_top_y + (h / 2.0), 3)
 
         # B. Wall-mounted, TV screen, or ceiling-mounted items (NEVER ground to floor!)
-        is_wall_or_ceiling = (
+        elif (
             (attached and attached.startswith("wall_")) or
             any(k in name for k in ("wall-mounted", "wall mounted", "ceiling", "chandelier", "fan", "pendant", "sconce", "television", "flat-screen", "smart tv")) or
             (cat == "tv_unit" and d <= 0.16 and not any(k in name for k in ("unit", "console", "credenza", "stand", "media", "cabinet")))
-        )
-        if is_wall_or_ceiling:
+        ):
             if attached and attached.startswith("wall_") and obj.position.y < 0.5:
                 obj.position.y = round(max(1.2, (h / 2.0) + 0.5), 3)
 
-        # C. Floor-based objects (sofa, chair, table, rug, bookshelf, console, floor lamp, tall floor plant)
+        # C. Floor-based objects (word-boundary guarded so 'desktop'/'tabletop' never match 'desk'/'table'!)
         else:
             is_floor_item = (
                 cat in ("sofa", "chair", "table", "desk", "rug", "bed", "tv_unit", "bookshelf", "wardrobe") or
-                any(k in name for k in ("chair", "sofa", "couch", "desk", "table", "credenza", "rug", "carpet", "bookshelf", "cabinet")) or
+                bool(re.search(r"\b(chair|armchair|sofa|couch|desk|table|credenza|rug|carpet|bookshelf|cabinet)\b", name)) or
                 (h >= 0.70 and obj.position.y < 1.2)
             )
             if is_floor_item:
