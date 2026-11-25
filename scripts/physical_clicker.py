@@ -148,54 +148,10 @@ def focus_antigravity_window(targets: dict, delays: dict):
 
 def paste_to_antigravity_ide(text: str, targets: dict, delays: dict, label: str = "") -> bool:
     """
-    Pastes the extracted LLM web response directly into the Antigravity IDE chat composer,
-    and presses Enter to submit it into this active IDE conversation.
+    Bypassed: Direct backend API ingestion is used to prevent piling up in
+    the Antigravity IDE chat message queue.
     """
-    ide_chat_pos = targets.get("ide_chat_box")
-    if not ide_chat_pos or not ide_chat_pos.get("x") or not pyautogui:
-        print(f"[PHYSICAL] Target 6 (ide_chat_box) not calibrated - skipping paste into Antigravity IDE.")
-        print(f"           (Run calibrate_antigravity.bat to calibrate the IDE chat composer)")
-        return False
-
-    move_dur = delays.get("move_duration", 0.4)
-    settle = delays.get("click_settle", 0.3)
-
-    print("\n" + "=" * 65)
-    print(f" [PHYSICAL -> ANTIGRAVITY IDE] Dispatching Web Response to IDE Chat...")
-    if label:
-        print(f"  Context: {label}")
-    print("=" * 65)
-
-    # 1. Bring Antigravity IDE to the top first!
-    focus_antigravity_window(targets, delays)
-
-    # 2. Ensure clipboard has the response text
-    copy_text_to_clipboard(text)
-    time.sleep(0.15)
-
-    # 3. Click to focus Antigravity IDE Chat input box at the bottom
-    x, y = ide_chat_pos["x"], ide_chat_pos["y"]
-    print(f"[PHYSICAL] Clicking Antigravity IDE Chat Box: ({x}, {y})...")
-    pyautogui.moveTo(x, y, duration=move_dur)
-    pyautogui.click()
-    time.sleep(settle + 0.2)
-
-    # 4. Select all (Ctrl+A) so any leftover draft text is replaced cleanly
-    pyautogui.keyDown("ctrl")
-    pyautogui.press("a")
-    pyautogui.keyUp("ctrl")
-    time.sleep(0.1)
-
-    # 5. Paste via Ctrl+V
-    print(f"[PHYSICAL] Pasting response ({len(text)} chars) into IDE composer...")
-    physical_paste()
-    time.sleep(0.3)
-
-    # 6. Submit via Enter
-    print("[PHYSICAL] Pressing [ENTER] to submit message to Antigravity AI...")
-    pyautogui.press("enter")
-    time.sleep(1.0)
-    print("[PHYSICAL -> ANTIGRAVITY IDE] Successfully posted web response into Antigravity IDE!\n")
+    print(f"[PHYSICAL] Direct backend API ingestion active. Bypassing IDE chat paste to prevent message queue pile-up.")
     return True
 
 def paste_and_send(prompt_text: str, image_path: Optional[Path], targets: dict, delays: dict) -> bool:
@@ -408,8 +364,8 @@ def execute_initial_reconstruction(image_path: Path, scene_id: str, preset: Opti
             print(f"[ANTIGRAVITY BACKUP // ERROR] Failed fallback scene build: {e}")
             return None
 
-    # Step 1: Dispatch to Antigravity IDE Chat Composer if calibrated
-    paste_to_antigravity_ide(raw_output, targets, delays, label=f"Initial Room CAD Reconstruction ({scene_id})")
+    # Direct backend ingestion (bypassing IDE chat paste to prevent message queue pile-up)
+    # paste_to_antigravity_ide(raw_output, targets, delays, label=f"Initial Room CAD Reconstruction ({scene_id})")
 
     print(f"[PHYSICAL] Extracted initial output ({len(raw_output)} chars). Ingesting to SpatialCraft...")
     try:
@@ -492,8 +448,7 @@ def execute_object_refinement(scene_id: str, obj: dict, scene_data: Optional[dic
 
     parsed = None
     if raw_output:
-        # Dispatch to Antigravity IDE Chat Composer if calibrated
-        paste_to_antigravity_ide(raw_output, targets, delays, label=f"Refinement Step {step_idx}/{total_steps} for '{obj.get('name')}'")
+        # Direct backend ingestion (bypassing IDE chat paste to prevent message queue pile-up)
         parsed = parse_refinement_json(raw_output)
 
     # 5-MINUTE BACKUP: If no output or invalid JSON received within 5 minutes, Antigravity constructs 3D mesh itself!

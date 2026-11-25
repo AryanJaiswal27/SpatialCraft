@@ -248,42 +248,11 @@ def wait_for_llm(timeout: float = 300.0, min_wait: float = 14.0, expected_id: Op
     return ""
 
 def paste_to_ide_chat(text: str) -> bool:
-    cfg = load_config()
-    targets = cfg.get("targets", {})
-    ag_header = targets.get("antigravity_header")
-    ide_chat = targets.get("ide_chat_box")
-
-    if not ide_chat or not pyautogui:
-        print("[ERROR] ide_chat_box not calibrated.")
-        return False
-
-    # 1. Bring Antigravity IDE to the front
-    if ag_header and (ag_header.get("x", 0) > 0 or ag_header.get("y", 0) > 0):
-        print(f"[SCREEN CONTROL] Clicking Antigravity Header at ({ag_header['x']}, {ag_header['y']})...")
-        pyautogui.moveTo(ag_header["x"], ag_header["y"], duration=0.35)
-        pyautogui.click()
-        time.sleep(0.4)
-
-    # 2. Focus Chat Input Box
-    x, y = ide_chat["x"], ide_chat["y"]
-    print(f"[SCREEN CONTROL] Clicking Antigravity IDE Chat Input at ({x}, {y})...")
-    pyautogui.moveTo(x, y, duration=0.35)
-    pyautogui.click()
-    time.sleep(0.3)
-
-    # 3. Select all and paste
-    pyautogui.keyDown("ctrl"); pyautogui.press("a"); pyautogui.keyUp("ctrl")
-    time.sleep(0.1)
-    copy_text_to_clipboard(text)
-    time.sleep(0.1)
-    physical_paste()
-    time.sleep(0.3)
-
-    # 4. Press Enter to submit
-    print("[SCREEN CONTROL] Pressing [ENTER] to submit message to Antigravity AI...")
-    pyautogui.press("enter")
-    time.sleep(1.0)
-    print("[SUCCESS] Posted message into Antigravity IDE chat!")
+    """
+    Bypassed: Direct backend API ingestion is used to prevent piling up in
+    the Antigravity IDE chat message queue.
+    """
+    print("[SCREEN CONTROL] Direct backend API ingestion active. Bypassing IDE chat paste to prevent message queue pile-up.")
     return True
 
 def run_single_refinement_step(scene_id: str, step_index: int) -> bool:
@@ -373,8 +342,8 @@ def run_single_refinement_step(scene_id: str, step_index: int) -> bool:
             print(f"[ANTIGRAVITY BACKUP // ERROR] {e}")
         return False
 
-    # 6. Switch to Antigravity IDE and paste response into this chat!
-    paste_to_ide_chat(f"### [Refined Object CAD Output - Step {step_index}/{len(candidates)}: {obj_name}]\n\n{raw_response}")
+    # 6. Direct backend ingestion (bypassing IDE chat paste to prevent message queue pile-up)
+    # paste_to_ide_chat(...)
 
     # 7. Update SpatialCraft 3D twin
     parsed = parse_llm_json_response(raw_response)
