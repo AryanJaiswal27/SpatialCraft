@@ -225,7 +225,7 @@ def _focus_window_by_title(
         print(f"[PHYSICAL] Window title focus fallback ({e})")
         return False
 
-def focus_browser_tab(targets: dict, move_dur: float = 0.4, settle: float = 15.0, preset: Optional[str] = None):
+def focus_browser_tab(targets: dict, move_dur: float = 0.4, settle: float = 1.0, preset: Optional[str] = None):
     pref = [preset.lower()] if preset else ["gemini", "chatgpt", "deepseek"]
     if _focus_window_by_title(
         ["google chrome", "microsoft edge", "chrome", "edge", "firefox", "brave"],
@@ -236,15 +236,15 @@ def focus_browser_tab(targets: dict, move_dur: float = 0.4, settle: float = 15.0
         return
     tab_pos = targets.get("browser_tab")
     if tab_pos and pyautogui:
-        hold = max(15.0, float(settle))
-        print(f"[PHYSICAL] Clicking Browser Tab to focus window: ({tab_pos['x']}, {tab_pos['y']}) and holding {hold:.0f}s...")
+        hold = max(0.5, float(settle))
+        print(f"[PHYSICAL] Clicking Browser Tab to focus window: ({tab_pos['x']}, {tab_pos['y']})...")
         pyautogui.moveTo(tab_pos["x"], tab_pos["y"], duration=move_dur)
         pyautogui.click()
         time.sleep(hold)
 
 def focus_antigravity_window(targets: dict, delays: dict):
     """Brings the Antigravity IDE window to the foreground."""
-    hold = max(15.0, float(delays.get("click_settle", 15.0)))
+    hold = max(0.5, float(delays.get("click_settle", 1.0)))
     if _focus_window_by_title(
         ["antigravity"],
         exclude_keywords=["chrome", "edge", "firefox", "brave"],
@@ -255,7 +255,7 @@ def focus_antigravity_window(targets: dict, delays: dict):
     ag_head = targets.get("antigravity_header")
     if ag_head and (ag_head.get("x", 0) > 0 or ag_head.get("y", 0) > 0) and pyautogui:
         move_dur = delays.get("move_duration", 0.4)
-        print(f"[PHYSICAL] Clicking Antigravity Top Header: ({ag_head['x']}, {ag_head['y']}) to bring IDE to front (holding {hold:.0f}s)...")
+        print(f"[PHYSICAL] Clicking Antigravity Top Header: ({ag_head['x']}, {ag_head['y']}) to bring IDE to front...")
         pyautogui.moveTo(ag_head["x"], ag_head["y"], duration=move_dur)
         pyautogui.click()
         time.sleep(hold)
@@ -291,8 +291,8 @@ def execute_antigravity_physical_build(image_path: Optional[Path], scene_id: str
         return False
 
     move_dur = delays.get("move_duration", 0.4)
-    settle = max(15.0, float(delays.get("click_settle", 15.0)))
-    img_settle = max(15.0, float(delays.get("image_upload_settle", 15.0)))
+    settle = float(delays.get("click_settle", 1.0))
+    img_settle = float(delays.get("image_upload_settle", 8.0))
     img_name = image_path.name if image_path else ""
     prompt_text = prompt_override or generate_antigravity_direct_build_prompt(scene_id, img_name)
 
@@ -305,9 +305,9 @@ def execute_antigravity_physical_build(image_path: Optional[Path], scene_id: str
     # 1. Focus Antigravity IDE Window
     focus_antigravity_window(targets, delays)
 
-    # 2. Click IDE Chat Composer Box and hold 15s
+    # 2. Click IDE Chat Composer Box
     x, y = ide_chat_pos["x"], ide_chat_pos["y"]
-    print(f"[ANTIGRAVITY PHYSICAL] Clicking IDE Chat Input: ({x}, {y}) and holding {settle:.0f}s...")
+    print(f"[ANTIGRAVITY PHYSICAL] Clicking IDE Chat Input: ({x}, {y})...")
     pyautogui.moveTo(x, y, duration=move_dur)
     pyautogui.click()
     time.sleep(settle)
@@ -317,9 +317,9 @@ def execute_antigravity_physical_build(image_path: Optional[Path], scene_id: str
     copy_text_to_clipboard(prompt_text)
     time.sleep(0.15)
     physical_paste()
-    time.sleep(0.8)
+    time.sleep(0.6)
 
-    # 4. Paste Room Photograph SECOND so Antigravity visually inspects it directly, and hold 15s for upload
+    # 4. Paste Room Photograph SECOND and wait for upload settle (default 8s)
     if image_path and image_path.exists():
         print(f"[ANTIGRAVITY PHYSICAL] Pasting room image to Antigravity chat: {image_path.name}...")
         if copy_image_to_clipboard(image_path):
@@ -379,8 +379,8 @@ def paste_and_send(prompt_text: str, image_path: Optional[Path], targets: dict, 
         return False
 
     move_dur = delays.get("move_duration", 0.4)
-    settle = max(15.0, float(delays.get("click_settle", 15.0)))
-    img_settle = max(15.0, float(delays.get("image_upload_settle", 15.0)))
+    settle = float(delays.get("click_settle", 1.0))
+    img_settle = float(delays.get("image_upload_settle", 8.0))
     prompt_pos = targets.get("prompt_box")
     send_pos = targets.get("send_button")
 
@@ -388,8 +388,8 @@ def paste_and_send(prompt_text: str, image_path: Optional[Path], targets: dict, 
         print("[PHYSICAL // ERROR] Missing prompt_box or send_button calibration coordinates!")
         return False
 
-    # 1. Focus the clean, empty prompt composer and hold 15s
-    print(f"[PHYSICAL] Clicking Prompt Input Box: ({prompt_pos['x']}, {prompt_pos['y']}) and holding {settle:.0f}s...")
+    # 1. Focus the clean, empty prompt composer
+    print(f"[PHYSICAL] Clicking Prompt Input Box: ({prompt_pos['x']}, {prompt_pos['y']})...")
     pyautogui.moveTo(prompt_pos["x"], prompt_pos["y"], duration=move_dur)
     pyautogui.click()
     time.sleep(settle)
@@ -400,9 +400,9 @@ def paste_and_send(prompt_text: str, image_path: Optional[Path], targets: dict, 
     time.sleep(0.15)
     print("[PHYSICAL] Pasting prompt text via Ctrl+V...")
     physical_paste()
-    time.sleep(0.8)
+    time.sleep(0.6)
 
-    # 3. Paste Image SECOND if provided and hold 15s for image upload
+    # 3. Paste Image SECOND if provided and hold 8s for image upload
     if image_path and image_path.exists():
         print(f"[PHYSICAL] Loading image to clipboard: {image_path.name}...")
         if copy_image_to_clipboard(image_path):
@@ -413,8 +413,8 @@ def paste_and_send(prompt_text: str, image_path: Optional[Path], targets: dict, 
             print(f"[PHYSICAL] Holding {img_settle:.0f}s for image upload to finish...")
             time.sleep(img_settle)
 
-    # 4. Click Send Button and hold 15s
-    print(f"[PHYSICAL] Clicking Send Button: ({send_pos['x']}, {send_pos['y']}) and holding {settle:.0f}s...")
+    # 4. Click Send Button
+    print(f"[PHYSICAL] Clicking Send Button: ({send_pos['x']}, {send_pos['y']})...")
     pyautogui.moveTo(send_pos["x"], send_pos["y"], duration=move_dur)
     pyautogui.click()
     time.sleep(0.3)
@@ -422,6 +422,29 @@ def paste_and_send(prompt_text: str, image_path: Optional[Path], targets: dict, 
     time.sleep(settle)
     copy_text_to_clipboard("")  # Clear clipboard so copy check never reads stale clipboard data
     return True
+
+def _capture_region_signature(bbox: tuple[int, int, int, int]):
+    """Captures a lightweight grayscale 160x90 thumbnail of the chat response region (zero clicks)."""
+    try:
+        from PIL import ImageGrab
+        img = ImageGrab.grab(bbox=bbox)
+        return img.convert("L").resize((160, 90))
+    except Exception:
+        return None
+
+def _frame_change_ratio(prev_img, cur_img) -> float:
+    """Returns fraction of pixels that changed significantly (>12/255) between two grayscale thumbnails."""
+    if prev_img is None or cur_img is None:
+        return 1.0
+    try:
+        from PIL import ImageChops
+        diff = ImageChops.difference(prev_img, cur_img)
+        hist = diff.histogram()
+        unchanged = sum(hist[:13])
+        total = max(1, diff.width * diff.height)
+        return max(0.0, (total - unchanged) / total)
+    except Exception:
+        return 1.0
 
 def wait_and_extract_response(
     targets: dict,
@@ -431,32 +454,41 @@ def wait_and_extract_response(
     ignore_texts: Optional[set] = None,
 ) -> str:
     """
-    Waits for LLM generation cleanly without clicking prematurely:
-    1. Silent wait for at least 3 minutes (min_generation_wait = 180s) with ZERO scrolling or clicking.
-    2. Scrolls down smoothly once the wait finishes so the response & Copy button are visible.
-    3. Clicks the calibrated Copy button ONCE per 15s cycle (no multi-offset click spraying).
-    4. Validates that copied JSON matches the requested scope (full room vs single-object refinement)
-       and ignores stale clipboard content from prior turns.
+    Waits adaptively for LLM generation with ZERO premature clicks:
+    1. Waits a short initial buffer (default 10s) so streaming/thinking begins.
+    2. Scrolls quietly (no clicks!) every ~3s and watches visual pixel changes in the response +
+       Copy button region using zero-click screen captures (`ImageGrab`).
+    3. Clicks the calibrated Copy button ONCE only after pixels stabilize (stream ended) for
+       two consecutive checks (~6s unchanged) with at least a 20s cooldown between clicks
+       (plus a 45s safety fallback if subtle page animations keep firing).
     """
     if not pyautogui:
         return ""
 
     move_dur = delays.get("move_duration", 0.4)
-    min_wait = float(delays.get("min_generation_wait", 180.0))
-    gen_timeout = max(float(delays.get("llm_generation_timeout", timeout)), min_wait + 180.0)
+    min_wait = float(delays.get("min_generation_wait", 10.0))
+    gen_timeout = float(delays.get("llm_generation_timeout", timeout))
     copy_pos = targets.get("copy_button")
     prompt_pos = targets.get("prompt_box")
     stale_set = ignore_texts or set()
 
-    # Viewport coordinates for scrolling
     scroll_x = prompt_pos["x"] if prompt_pos else 960
     scroll_y = max(120, (prompt_pos["y"] - 280)) if prompt_pos else 500
+    copy_x = copy_pos["x"] if copy_pos else scroll_x
+    copy_y = copy_pos["y"] if copy_pos else max(160, scroll_y + 180)
+    prompt_y = prompt_pos["y"] if prompt_pos else 920
 
-    print(f"\n[PHYSICAL] Waiting silently {int(min_wait)}s (3 min) before scrolling & clicking (Timeout: {int(gen_timeout)}s)...")
+    # Tightly track lower response stream + action bar so small thinking timers register clearly
+    bbox_x1 = max(80, min(scroll_x - 220, copy_x - 100))
+    bbox_x2 = min(1840, max(scroll_x + 220, copy_x + 360))
+    bbox_y2 = max(copy_y + 28, prompt_y - 35)
+    bbox_y1 = max(100, min(copy_y - 180, bbox_y2 - 220))
+    watch_bbox = (bbox_x1, bbox_y1, max(bbox_x1 + 120, bbox_x2), max(bbox_y1 + 80, bbox_y2))
+
+    print(f"\n[PHYSICAL] Adaptive wait for LLM stream completion (Initial buffer: {int(min_wait)}s, Max timeout: {int(gen_timeout)}s)...")
     if expected_id:
         print(f"[PHYSICAL] Expecting target identifier: '{expected_id}'")
 
-    # Wipe clipboard so previous turn content is never mistakenly read
     copy_text_to_clipboard("")
 
     def _is_valid_capture(clip_text: str) -> bool:
@@ -475,59 +507,84 @@ def wait_and_extract_response(
             from backend.services.browser_prompt import parse_llm_json_response
             parsed = parse_llm_json_response(clip_text)
             return isinstance(parsed, dict) and ("room" in parsed or "objects" in parsed)
-        # Single-object refinement: must not blindly accept a full-room wrapper without object parts
         parsed_obj = parse_refinement_json(clip_text, expected_id=expected_id)
         return parsed_obj is not None
 
     start_time = time.time()
     last_milestone = start_time
 
-    # Phase 1: Silent wait for at least 3 minutes — NO mouse movement, NO scrolling, NO clicking
+    # Phase 1: Short initial buffer (NO clicking, NO scrolling yet while prompt submits & begins thinking)
     while (time.time() - start_time) < min_wait:
-        elapsed = time.time() - start_time
-        if (time.time() - last_milestone) >= 30.0:
-            remaining = int(max(0, min_wait - elapsed))
-            print(f"[PHYSICAL] Silent wait: {int(elapsed)}s / {int(min_wait)}s ({remaining}s until scrolling starts)...")
-            last_milestone = time.time()
-        time.sleep(min(5.0, max(0.5, min_wait - elapsed)))
+        time.sleep(min(2.0, max(0.2, min_wait - (time.time() - start_time))))
 
-    print(f"[PHYSICAL] 3-minute wait complete. Scrolling down to bottom at ({scroll_x}, {scroll_y})...")
+    print(f"[PHYSICAL] Monitoring response stream visually at region {watch_bbox} (zero clicks while streaming)...")
 
-    # Phase 2 & 3: Scroll down first, then single Copy button click every 15s
+    prev_frame = None
+    stable_streak = 0
+    saw_activity = False
+    last_click_time = 0.0  # Last time copy_button was clicked
+    click_cooldown = 20.0
+    max_unclicked_gap = 45.0  # Safety probe if animated spinner/ads never settle
+
+    # Phase 2 & 3: Quiet scroll + visual stream-end detection -> single clean Copy click
     while (time.time() - start_time) < gen_timeout:
-        elapsed = time.time() - start_time
+        now = time.time()
+        elapsed = now - start_time
 
-        if (time.time() - last_milestone) >= 30.0:
-            print(f"[PHYSICAL] Extracting LLM output... ({int(elapsed)}s / {int(gen_timeout)}s elapsed)")
-            last_milestone = time.time()
+        if (now - last_milestone) >= 30.0:
+            print(f"[PHYSICAL] Waiting for stream end... ({int(elapsed)}s / {int(gen_timeout)}s elapsed)")
+            last_milestone = now
 
-        # Scroll down cleanly without clicking inside chat messages
+        # Quiet scroll to bottom without clicking chat content
         try:
-            pyautogui.moveTo(scroll_x, scroll_y, duration=0.2)
+            pyautogui.moveTo(scroll_x, scroll_y, duration=0.15)
             pyautogui.scroll(-3500)
-            time.sleep(0.25)
-            pyautogui.scroll(-3500)
-            pyautogui.press("pagedown", presses=2, interval=0.05)
+            time.sleep(0.35)
+            pyautogui.press("pagedown")
             pyautogui.hotkey("ctrl", "end")
-            time.sleep(1.0)
+            time.sleep(0.5)
         except Exception:
             pass
 
-        # Single precise click on the calibrated Copy button
-        if copy_pos:
+        cur_frame = _capture_region_signature(watch_bbox)
+        delta = _frame_change_ratio(prev_frame, cur_frame) if prev_frame is not None else None
+        prev_frame = cur_frame
+
+        if cur_frame is None:
+            # ImageGrab unavailable (e.g., headless/mock environment): wait cooldown between single checks
+            ready_to_click = (now - last_click_time) >= click_cooldown
+        else:
+            if delta is not None and delta > 0.002:
+                saw_activity = True
+                stable_streak = 0
+            elif delta is not None:
+                stable_streak += 1
+
+            since_last_click = (now - last_click_time) if last_click_time > 0 else elapsed
+            stream_settled = (stable_streak >= 2) and (since_last_click >= click_cooldown or (last_click_time == 0.0 and stable_streak >= 2))
+            fallback_due = since_last_click >= max_unclicked_gap
+            ready_to_click = bool(copy_pos) and (stream_settled or fallback_due)
+
+        if ready_to_click and copy_pos:
+            reason = "stream stabilized" if cur_frame is not None and stable_streak >= 2 else "periodic check"
+            print(f"[PHYSICAL] Response {reason} ({int(elapsed)}s). Clicking Copy button once at ({copy_pos['x']}, {copy_pos['y']})...")
             try:
                 pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=0.25)
                 pyautogui.click()
+                last_click_time = time.time()
+                stable_streak = 0
+                prev_frame = None  # Force fresh activity cycle before another click
                 time.sleep(0.8)
                 clip_text = get_clipboard_text()
-
                 if _is_valid_capture(clip_text):
-                    print(f"[PHYSICAL // GENERATION COMPLETE] Captured finished response via Copy button ({len(clip_text)} chars)!")
+                    print(f"[PHYSICAL // GENERATION COMPLETE] Captured response cleanly in {int(elapsed)}s ({len(clip_text)} chars)!")
                     return clip_text
+                # Not valid yet (e.g. caught a brief thinking pause); bump cooldown before retrying
+                print("[PHYSICAL] Valid JSON not ready yet; resuming zero-click stream watch...")
             except Exception:
-                pass
+                last_click_time = time.time()
 
-        time.sleep(15.0)
+        time.sleep(3.0)
 
     # Final attempt on timeout
     print(f"[PHYSICAL // TIMEOUT] {int(gen_timeout)}s timeout reached. Attempting final extraction...")
@@ -945,7 +1002,7 @@ def run_physical_daemon(preset: Optional[str] = None):
                                 print(f"\n[DAEMON // ANTIGRAVITY CONTROL] Action '{action}' on {target_key or 'target'} ({x}, {y})...")
                                 pyautogui.moveTo(x, y, duration=0.4)
                                 cfg_delays = load_config().get("delays", {})
-                                click_hold = max(15.0, float(cfg_delays.get("click_settle", 15.0)))
+                                click_hold = float(cfg_delays.get("click_settle", 1.0))
                                 if action == "click":
                                     pyautogui.click()
                                     time.sleep(click_hold)

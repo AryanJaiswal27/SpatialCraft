@@ -89,7 +89,7 @@ def load_config() -> dict:
                 "label": meta["label"],
                 "browser_url": meta["browser_url"],
                 "targets": {},
-                "delays": {"click_settle": 15.0, "image_upload_settle": 15.0, "min_generation_wait": 180.0, "llm_generation_timeout": 360.0, "move_duration": 0.4},
+                "delays": {"click_settle": 1.0, "image_upload_settle": 8.0, "min_generation_wait": 10.0, "llm_generation_timeout": 360.0, "move_duration": 0.4},
                 "last_calibrated_at": None
             }
             for pid, meta in DEFAULT_PRESET_METADATA.items()
@@ -324,7 +324,7 @@ def run_calibration():
                 "label": custom_label,
                 "browser_url": "",
                 "targets": {},
-                "delays": {"click_settle": 15.0, "image_upload_settle": 15.0, "min_generation_wait": 180.0, "llm_generation_timeout": 360.0, "move_duration": 0.4},
+                "delays": {"click_settle": 1.0, "image_upload_settle": 8.0, "min_generation_wait": 10.0, "llm_generation_timeout": 360.0, "move_duration": 0.4},
                 "last_calibrated_at": None
             })
             target_preset = custom_id
@@ -336,7 +336,7 @@ def run_calibration():
         "label": target_preset.capitalize(),
         "browser_url": "",
         "targets": {},
-        "delays": {"click_settle": 15.0, "image_upload_settle": 15.0, "min_generation_wait": 180.0, "llm_generation_timeout": 360.0, "move_duration": 0.4},
+        "delays": {"click_settle": 1.0, "image_upload_settle": 8.0, "min_generation_wait": 10.0, "llm_generation_timeout": 360.0, "move_duration": 0.4},
         "last_calibrated_at": None
     }))
 

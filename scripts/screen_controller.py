@@ -197,7 +197,7 @@ def _focus_window_by_title(keywords: list[str], exclude_keywords: Optional[list[
 def focus_target(target_key: str, delay: Optional[float] = None):
     cfg = load_config()
     delays = cfg.get("delays", {})
-    hold = float(delay) if delay is not None else max(15.0, float(delays.get("click_settle", 15.0)))
+    hold = float(delay) if delay is not None else float(delays.get("click_settle", 1.0))
     if target_key == "browser_tab" and _focus_window_by_title(
         ["google chrome", "microsoft edge", "chrome", "edge", "firefox", "brave"],
         exclude_keywords=["antigravity", "visual studio code"]
@@ -236,12 +236,35 @@ def scroll_down(amount: int = -3500):
         pyautogui.hotkey("ctrl", "end")
         print(f"[SCREEN CONTROL] Scrolled down at ({scroll_x}, {scroll_y}).")
 
-def wait_for_llm(timeout: float = 360.0, min_wait: float = 180.0, expected_id: Optional[str] = None) -> str:
+def _capture_region_signature(bbox: tuple[int, int, int, int]):
+    """Captures a lightweight grayscale 160x90 thumbnail of the chat response region (zero clicks)."""
+    try:
+        from PIL import ImageGrab
+        img = ImageGrab.grab(bbox=bbox)
+        return img.convert("L").resize((160, 90))
+    except Exception:
+        return None
+
+def _frame_change_ratio(prev_img, cur_img) -> float:
+    """Returns fraction of pixels that changed significantly (>12/255) between two grayscale thumbnails."""
+    if prev_img is None or cur_img is None:
+        return 1.0
+    try:
+        from PIL import ImageChops
+        diff = ImageChops.difference(prev_img, cur_img)
+        hist = diff.histogram()
+        unchanged = sum(hist[:13])
+        total = max(1, diff.width * diff.height)
+        return max(0.0, (total - unchanged) / total)
+    except Exception:
+        return 1.0
+
+def wait_for_llm(timeout: float = 360.0, min_wait: float = 10.0, expected_id: Optional[str] = None) -> str:
     """
-    Waits for LLM generation cleanly without clicking prematurely:
-    1. Silent wait for at least min_wait (default 180s / 3 minutes) with ZERO scrolling or clicking.
-    2. Scrolls down gently once the wait finishes so the latest message and Copy button are in view.
-    3. Performs a single clean click on the calibrated Copy button every 15s (no multi-offset click spraying).
+    Waits adaptively for LLM generation using zero-click visual stream stability detection:
+    1. Short initial wait (default 10s).
+    2. Quiet downward scrolling while watching response + Copy toolbar pixels.
+    3. Clicks Copy button ONCE once stream pixels stabilize (~6s unchanged) with cooldown.
     """
     cfg = load_config()
     targets = cfg.get("targets", {})
@@ -250,46 +273,70 @@ def wait_for_llm(timeout: float = 360.0, min_wait: float = 180.0, expected_id: O
     prompt_pos = targets.get("prompt_box", {"x": 960, "y": 900})
     scroll_x = prompt_pos["x"]
     scroll_y = max(120, prompt_pos["y"] - 280)
+    copy_x = copy_pos["x"] if copy_pos else scroll_x
+    copy_y = copy_pos["y"] if copy_pos else max(160, scroll_y + 180)
+    prompt_y = prompt_pos["y"]
 
-    eff_min_wait = max(float(min_wait), float(delays.get("min_generation_wait", 180.0)))
-    eff_timeout = max(float(delays.get("llm_generation_timeout", timeout)), eff_min_wait + 180.0)
+    bbox_x1 = max(80, min(scroll_x - 220, copy_x - 100))
+    bbox_x2 = min(1840, max(scroll_x + 220, copy_x + 360))
+    bbox_y2 = max(copy_y + 28, prompt_y - 35)
+    bbox_y1 = max(100, min(copy_y - 180, bbox_y2 - 220))
+    watch_bbox = (bbox_x1, bbox_y1, max(bbox_x1 + 120, bbox_x2), max(bbox_y1 + 80, bbox_y2))
 
-    print(f"\n[SCREEN CONTROL] Waiting silently {int(eff_min_wait)}s (3 min) before scrolling & copying (Total Timeout: {int(eff_timeout)}s)...")
+    eff_min_wait = float(delays.get("min_generation_wait", min_wait))
+    eff_timeout = float(delays.get("llm_generation_timeout", timeout))
+
+    print(f"\n[SCREEN CONTROL] Adaptive stream-end watch (Initial buffer: {int(eff_min_wait)}s, Max timeout: {int(eff_timeout)}s)...")
     if expected_id:
         print(f"                 Expecting target identifier: '{expected_id}'")
 
     copy_text_to_clipboard("")
     start_time = time.time()
 
-    # Phase 1: Pure silent wait — NO scrolling, NO mouse movement, NO clicking
-    last_log = start_time
     while (time.time() - start_time) < eff_min_wait:
-        elapsed = time.time() - start_time
-        if (time.time() - last_log) >= 30.0:
-            remaining = int(max(0, eff_min_wait - elapsed))
-            print(f"[SCREEN CONTROL] Silent wait: {int(elapsed)}s / {int(eff_min_wait)}s elapsed ({remaining}s until scroll & copy)...")
-            last_log = time.time()
-        time.sleep(min(5.0, max(0.5, eff_min_wait - elapsed)))
+        time.sleep(min(2.0, max(0.2, eff_min_wait - (time.time() - start_time))))
 
-    print(f"[SCREEN CONTROL] {int(eff_min_wait)}s wait finished. Scrolling down to response and checking Copy button...")
+    prev_frame = None
+    stable_streak = 0
+    last_click_time = 0.0
+    click_cooldown = 20.0
+    max_unclicked_gap = 45.0
 
-    # Phase 2 & 3: Scroll down first, then single Copy button click every 15s
     while (time.time() - start_time) < eff_timeout:
+        now = time.time()
+        elapsed = now - start_time
+
         try:
-            pyautogui.moveTo(scroll_x, scroll_y, duration=0.2)
+            pyautogui.moveTo(scroll_x, scroll_y, duration=0.15)
             pyautogui.scroll(-3500)
-            time.sleep(0.25)
-            pyautogui.scroll(-3500)
-            pyautogui.press("pagedown", presses=2, interval=0.05)
+            time.sleep(0.35)
+            pyautogui.press("pagedown")
             pyautogui.hotkey("ctrl", "end")
-            time.sleep(1.0)
+            time.sleep(0.5)
         except Exception:
             pass
 
-        if copy_pos:
+        cur_frame = _capture_region_signature(watch_bbox)
+        delta = _frame_change_ratio(prev_frame, cur_frame) if prev_frame is not None else None
+        prev_frame = cur_frame
+
+        if cur_frame is None:
+            ready_to_click = (now - last_click_time) >= click_cooldown
+        else:
+            if delta is not None and delta > 0.002:
+                stable_streak = 0
+            elif delta is not None:
+                stable_streak += 1
+            since_last_click = (now - last_click_time) if last_click_time > 0 else elapsed
+            ready_to_click = bool(copy_pos) and ((stable_streak >= 2 and (since_last_click >= click_cooldown or last_click_time == 0.0)) or since_last_click >= max_unclicked_gap)
+
+        if ready_to_click and copy_pos:
             try:
                 pyautogui.moveTo(copy_pos["x"], copy_pos["y"], duration=0.25)
                 pyautogui.click()
+                last_click_time = time.time()
+                stable_streak = 0
+                prev_frame = None
                 time.sleep(0.8)
                 clip_text = get_clipboard_text()
                 if clip_text and "{" in clip_text and "}" in clip_text:
@@ -297,12 +344,12 @@ def wait_for_llm(timeout: float = 360.0, min_wait: float = 180.0, expected_id: O
                         has_schema = any(k in clip_text for k in ("room", "dimensions", "objects", "name", "category", "materials"))
                         matches_id = True if not expected_id else (expected_id in clip_text)
                         if has_schema and matches_id:
-                            print(f"[SUCCESS] Captured response via Copy button ({len(clip_text)} chars)!")
+                            print(f"[SUCCESS] Captured response via Copy button in {int(elapsed)}s ({len(clip_text)} chars)!")
                             return clip_text
             except Exception:
-                pass
+                last_click_time = time.time()
 
-        time.sleep(15.0)
+        time.sleep(3.0)
 
     # Final attempt on timeout
     print(f"[TIMEOUT] {int(eff_timeout)}s reached. Taking final copy...")
@@ -398,20 +445,20 @@ def run_single_refinement_step(scene_id: str, step_index: int) -> bool:
     cfg = load_config()
     targets = cfg.get("targets", {})
     delays = cfg.get("delays", {})
-    hold = max(15.0, float(delays.get("click_settle", 15.0)))
-    img_settle = max(15.0, float(delays.get("image_upload_settle", 15.0)))
+    hold = float(delays.get("click_settle", 1.0))
+    img_settle = float(delays.get("image_upload_settle", 8.0))
 
     # 1. Bring Browser to front
     focus_target("browser_tab", delay=hold)
 
-    # 2. Focus prompt box (hold 15s) & paste text
+    # 2. Focus prompt box & paste text
     focus_target("prompt_box", delay=hold)
     copy_text_to_clipboard(prompt)
     time.sleep(0.15)
     physical_paste()
-    time.sleep(0.8)
+    time.sleep(0.6)
 
-    # 3. Paste image crop & hold 15s to upload image
+    # 3. Paste image crop & hold 8s to upload image
     if crop_path.exists():
         print(f"[SCREEN CONTROL] Pasting 2D crop: {crop_name}...")
         copy_image_to_clipboard(crop_path)
@@ -420,14 +467,14 @@ def run_single_refinement_step(scene_id: str, step_index: int) -> bool:
         print(f"[SCREEN CONTROL] Holding {img_settle:.0f}s for image upload...")
         time.sleep(img_settle)
 
-    # 4. Click send button (hold 15s) & Enter
+    # 4. Click send button & Enter
     focus_target("send_button", delay=hold)
     pyautogui.press("enter")
     copy_text_to_clipboard("") # Clear clipboard
     print(f"[SCREEN CONTROL] Dispatched prompt for '{obj_name}' to Gemini!")
 
-    # 5. Wait silently at least 3 min, then scroll down & capture
-    raw_response = wait_for_llm(timeout=360.0, min_wait=180.0, expected_id=obj_id)
+    # 5. Adaptive wait via stream-end visual stability detection
+    raw_response = wait_for_llm(timeout=360.0, min_wait=10.0, expected_id=obj_id)
     if not raw_response:
         print(f"\n[ANTIGRAVITY BACKUP // 5-MIN TIMEOUT] No response captured from browser LLM for {obj_id} within 5 minutes.")
         print(f"[ANTIGRAVITY BACKUP] Constructing 3D CAD mesh model autonomously from crop...")
@@ -495,7 +542,7 @@ def main():
 
     wait_parser = subparsers.add_parser("wait_response")
     wait_parser.add_argument("--timeout", type=float, default=360.0)
-    wait_parser.add_argument("--min-wait", type=float, default=180.0)
+    wait_parser.add_argument("--min-wait", type=float, default=10.0)
     wait_parser.add_argument("--expected", type=str, default=None)
 
     refine_parser = subparsers.add_parser("refine_step")
