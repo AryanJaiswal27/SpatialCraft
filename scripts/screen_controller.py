@@ -194,30 +194,32 @@ def _focus_window_by_title(keywords: list[str], exclude_keywords: Optional[list[
     except Exception:
         return False
 
-def focus_target(target_key: str, delay: float = 0.3):
+def focus_target(target_key: str, delay: Optional[float] = None):
+    cfg = load_config()
+    delays = cfg.get("delays", {})
+    hold = float(delay) if delay is not None else max(15.0, float(delays.get("click_settle", 15.0)))
     if target_key == "browser_tab" and _focus_window_by_title(
         ["google chrome", "microsoft edge", "chrome", "edge", "firefox", "brave"],
         exclude_keywords=["antigravity", "visual studio code"]
     ):
-        time.sleep(delay)
+        time.sleep(0.5)
         return True
     if target_key == "antigravity_header" and _focus_window_by_title(
         ["antigravity"],
         exclude_keywords=["chrome", "edge", "firefox", "brave"]
     ):
-        time.sleep(delay)
+        time.sleep(0.5)
         return True
-    cfg = load_config()
     targets = cfg.get("targets", {})
     t = targets.get(target_key)
     if not t or not pyautogui:
         print(f"[ERROR] Target '{target_key}' not found or uncalibrated.")
         return False
     x, y = t["x"], t["y"]
-    print(f"[SCREEN CONTROL] Clicking {target_key} at ({x}, {y})...")
+    print(f"[SCREEN CONTROL] Clicking {target_key} at ({x}, {y}) and holding {hold:.0f}s...")
     pyautogui.moveTo(x, y, duration=0.35)
     pyautogui.click()
-    time.sleep(delay)
+    time.sleep(hold)
     return True
 
 def scroll_down(amount: int = -3500):
@@ -395,27 +397,31 @@ def run_single_refinement_step(scene_id: str, step_index: int) -> bool:
 
     cfg = load_config()
     targets = cfg.get("targets", {})
+    delays = cfg.get("delays", {})
+    hold = max(15.0, float(delays.get("click_settle", 15.0)))
+    img_settle = max(15.0, float(delays.get("image_upload_settle", 15.0)))
 
     # 1. Bring Browser to front
-    focus_target("browser_tab", delay=0.5)
+    focus_target("browser_tab", delay=hold)
 
-    # 2. Focus prompt box & paste text
-    focus_target("prompt_box", delay=0.3)
+    # 2. Focus prompt box (hold 15s) & paste text
+    focus_target("prompt_box", delay=hold)
     copy_text_to_clipboard(prompt)
     time.sleep(0.15)
     physical_paste()
-    time.sleep(0.5)
+    time.sleep(0.8)
 
-    # 3. Paste image crop
+    # 3. Paste image crop & hold 15s to upload image
     if crop_path.exists():
         print(f"[SCREEN CONTROL] Pasting 2D crop: {crop_name}...")
         copy_image_to_clipboard(crop_path)
         time.sleep(0.2)
         physical_paste()
-        time.sleep(3.0) # Settle image upload
+        print(f"[SCREEN CONTROL] Holding {img_settle:.0f}s for image upload...")
+        time.sleep(img_settle)
 
-    # 4. Click send button & Enter
-    focus_target("send_button", delay=0.2)
+    # 4. Click send button (hold 15s) & Enter
+    focus_target("send_button", delay=hold)
     pyautogui.press("enter")
     copy_text_to_clipboard("") # Clear clipboard
     print(f"[SCREEN CONTROL] Dispatched prompt for '{obj_name}' to Gemini!")

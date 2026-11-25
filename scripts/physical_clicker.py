@@ -225,39 +225,40 @@ def _focus_window_by_title(
         print(f"[PHYSICAL] Window title focus fallback ({e})")
         return False
 
-def focus_browser_tab(targets: dict, move_dur: float = 0.4, settle: float = 0.3, preset: Optional[str] = None):
+def focus_browser_tab(targets: dict, move_dur: float = 0.4, settle: float = 15.0, preset: Optional[str] = None):
     pref = [preset.lower()] if preset else ["gemini", "chatgpt", "deepseek"]
     if _focus_window_by_title(
         ["google chrome", "microsoft edge", "chrome", "edge", "firefox", "brave"],
         exclude_keywords=["antigravity", "visual studio code"],
         preferred_keywords=pref,
     ):
-        time.sleep(settle + 0.2)
+        time.sleep(0.5)
         return
     tab_pos = targets.get("browser_tab")
     if tab_pos and pyautogui:
-        print(f"[PHYSICAL] Clicking Browser Tab to focus window: ({tab_pos['x']}, {tab_pos['y']})...")
+        hold = max(15.0, float(settle))
+        print(f"[PHYSICAL] Clicking Browser Tab to focus window: ({tab_pos['x']}, {tab_pos['y']}) and holding {hold:.0f}s...")
         pyautogui.moveTo(tab_pos["x"], tab_pos["y"], duration=move_dur)
         pyautogui.click()
-        time.sleep(settle + 0.3)
+        time.sleep(hold)
 
 def focus_antigravity_window(targets: dict, delays: dict):
     """Brings the Antigravity IDE window to the foreground."""
-    settle = delays.get("click_settle", 0.3)
+    hold = max(15.0, float(delays.get("click_settle", 15.0)))
     if _focus_window_by_title(
         ["antigravity"],
         exclude_keywords=["chrome", "edge", "firefox", "brave"],
         preferred_keywords=["spatialcraft", "antigravity"],
     ):
-        time.sleep(settle + 0.2)
+        time.sleep(0.5)
         return
     ag_head = targets.get("antigravity_header")
     if ag_head and (ag_head.get("x", 0) > 0 or ag_head.get("y", 0) > 0) and pyautogui:
         move_dur = delays.get("move_duration", 0.4)
-        print(f"[PHYSICAL] Clicking Antigravity Top Header: ({ag_head['x']}, {ag_head['y']}) to bring IDE to front...")
+        print(f"[PHYSICAL] Clicking Antigravity Top Header: ({ag_head['x']}, {ag_head['y']}) to bring IDE to front (holding {hold:.0f}s)...")
         pyautogui.moveTo(ag_head["x"], ag_head["y"], duration=move_dur)
         pyautogui.click()
-        time.sleep(settle + 0.3)
+        time.sleep(hold)
 
 def execute_antigravity_physical_build(image_path: Optional[Path], scene_id: str, prompt_override: Optional[str] = None, preset: Optional[str] = "antigravity") -> bool:
     """
@@ -290,8 +291,8 @@ def execute_antigravity_physical_build(image_path: Optional[Path], scene_id: str
         return False
 
     move_dur = delays.get("move_duration", 0.4)
-    settle = delays.get("click_settle", 0.3)
-    img_settle = delays.get("image_upload_settle", 2.5)
+    settle = max(15.0, float(delays.get("click_settle", 15.0)))
+    img_settle = max(15.0, float(delays.get("image_upload_settle", 15.0)))
     img_name = image_path.name if image_path else ""
     prompt_text = prompt_override or generate_antigravity_direct_build_prompt(scene_id, img_name)
 
@@ -304,27 +305,27 @@ def execute_antigravity_physical_build(image_path: Optional[Path], scene_id: str
     # 1. Focus Antigravity IDE Window
     focus_antigravity_window(targets, delays)
 
-    # 2. Click IDE Chat Composer Box
+    # 2. Click IDE Chat Composer Box and hold 15s
     x, y = ide_chat_pos["x"], ide_chat_pos["y"]
-    print(f"[ANTIGRAVITY PHYSICAL] Clicking IDE Chat Input: ({x}, {y})...")
+    print(f"[ANTIGRAVITY PHYSICAL] Clicking IDE Chat Input: ({x}, {y}) and holding {settle:.0f}s...")
     pyautogui.moveTo(x, y, duration=move_dur)
     pyautogui.click()
-    time.sleep(settle + 0.2)
+    time.sleep(settle)
 
     # 3. Paste Custom 3D Mesh Instruction Prompt FIRST
     print(f"[ANTIGRAVITY PHYSICAL] Pasting custom 3D mesh build prompt ({len(prompt_text)} chars)...")
     copy_text_to_clipboard(prompt_text)
     time.sleep(0.15)
     physical_paste()
-    time.sleep(settle + 0.3)
+    time.sleep(0.8)
 
-    # 4. Paste Room Photograph SECOND so Antigravity visually inspects it directly
+    # 4. Paste Room Photograph SECOND so Antigravity visually inspects it directly, and hold 15s for upload
     if image_path and image_path.exists():
         print(f"[ANTIGRAVITY PHYSICAL] Pasting room image to Antigravity chat: {image_path.name}...")
         if copy_image_to_clipboard(image_path):
             time.sleep(0.25)
             physical_paste()
-            print(f"[ANTIGRAVITY PHYSICAL] Waiting {img_settle}s for image attachment to settle...")
+            print(f"[ANTIGRAVITY PHYSICAL] Holding {img_settle:.0f}s for image upload to complete...")
             time.sleep(img_settle)
 
     # 5. Submit Once via [ENTER]
@@ -378,7 +379,8 @@ def paste_and_send(prompt_text: str, image_path: Optional[Path], targets: dict, 
         return False
 
     move_dur = delays.get("move_duration", 0.4)
-    settle = delays.get("click_settle", 0.3)
+    settle = max(15.0, float(delays.get("click_settle", 15.0)))
+    img_settle = max(15.0, float(delays.get("image_upload_settle", 15.0)))
     prompt_pos = targets.get("prompt_box")
     send_pos = targets.get("send_button")
 
@@ -386,11 +388,11 @@ def paste_and_send(prompt_text: str, image_path: Optional[Path], targets: dict, 
         print("[PHYSICAL // ERROR] Missing prompt_box or send_button calibration coordinates!")
         return False
 
-    # 1. Focus the clean, empty prompt composer
-    print(f"[PHYSICAL] Clicking Prompt Input Box: ({prompt_pos['x']}, {prompt_pos['y']})...")
+    # 1. Focus the clean, empty prompt composer and hold 15s
+    print(f"[PHYSICAL] Clicking Prompt Input Box: ({prompt_pos['x']}, {prompt_pos['y']}) and holding {settle:.0f}s...")
     pyautogui.moveTo(prompt_pos["x"], prompt_pos["y"], duration=move_dur)
     pyautogui.click()
-    time.sleep(settle + 0.2)
+    time.sleep(settle)
 
     # 2. Paste the Text Prompt FIRST
     print(f"[PHYSICAL] Loading text prompt to clipboard ({len(prompt_text)} chars)...")
@@ -398,9 +400,9 @@ def paste_and_send(prompt_text: str, image_path: Optional[Path], targets: dict, 
     time.sleep(0.15)
     print("[PHYSICAL] Pasting prompt text via Ctrl+V...")
     physical_paste()
-    time.sleep(settle + 0.3)
+    time.sleep(0.8)
 
-    # 3. Paste Image SECOND if provided
+    # 3. Paste Image SECOND if provided and hold 15s for image upload
     if image_path and image_path.exists():
         print(f"[PHYSICAL] Loading image to clipboard: {image_path.name}...")
         if copy_image_to_clipboard(image_path):
@@ -408,19 +410,16 @@ def paste_and_send(prompt_text: str, image_path: Optional[Path], targets: dict, 
             # Notice: Cursor is already inside the active composer; do not click on potential thumbnails!
             print("[PHYSICAL] Pasting image attachment via Ctrl+V...")
             physical_paste()
-            img_settle = delays.get("image_upload_settle", 3.5)
-            print(f"[PHYSICAL] Waiting {img_settle}s for image to attach...")
+            print(f"[PHYSICAL] Holding {img_settle:.0f}s for image upload to finish...")
             time.sleep(img_settle)
 
-    # 4. Click Send Button
-    print(f"[PHYSICAL] Clicking Send Button: ({send_pos['x']}, {send_pos['y']})...")
+    # 4. Click Send Button and hold 15s
+    print(f"[PHYSICAL] Clicking Send Button: ({send_pos['x']}, {send_pos['y']}) and holding {settle:.0f}s...")
     pyautogui.moveTo(send_pos["x"], send_pos["y"], duration=move_dur)
     pyautogui.click()
-    time.sleep(settle)
-
-    # Fallback Enter key
-    time.sleep(0.2)
+    time.sleep(0.3)
     pyautogui.press("enter")
+    time.sleep(settle)
     copy_text_to_clipboard("")  # Clear clipboard so copy check never reads stale clipboard data
     return True
 
@@ -945,13 +944,17 @@ def run_physical_daemon(preset: Optional[str] = None):
                                 x, y = coords["x"], coords["y"]
                                 print(f"\n[DAEMON // ANTIGRAVITY CONTROL] Action '{action}' on {target_key or 'target'} ({x}, {y})...")
                                 pyautogui.moveTo(x, y, duration=0.4)
+                                cfg_delays = load_config().get("delays", {})
+                                click_hold = max(15.0, float(cfg_delays.get("click_settle", 15.0)))
                                 if action == "click":
                                     pyautogui.click()
+                                    time.sleep(click_hold)
                                 elif action == "double_click":
                                     pyautogui.doubleClick()
+                                    time.sleep(click_hold)
                                 elif action == "paste":
                                     pyautogui.click()
-                                    time.sleep(0.2)
+                                    time.sleep(click_hold)
                                     if text_to_type:
                                         copy_text_to_clipboard(text_to_type)
                                     physical_paste()

@@ -469,10 +469,10 @@ async def upload_room_image(
         save_scene(cur_scene)
     asyncio.create_task(broadcast_status(scene_id, f"[PHYSICAL] Job queued for desktop mouse execution on {preset_name.capitalize()}...", "progress"))
 
-    # BACKUP WATCHDOG: Waits 420s (after 180s silent wait + 180s extraction window + buffer)
+    # BACKUP WATCHDOG: Waits 450s (after 15s button holds + 180s silent wait + 180s extraction window)
     # before activating autonomous fallback so it never collides with physical_clicker.
     async def scene_backup_watchdog():
-        await asyncio.sleep(420)
+        await asyncio.sleep(450)
         cur_scene = get_scene(scene_id)
         if cur_scene and (cur_scene.status in ("processing", "waiting_payload") and len(cur_scene.objects) == 0):
             print(f"\n[ANTIGRAVITY WATCHDOG // TIMEOUT] Scene {scene_id} received no output within 420s.")
